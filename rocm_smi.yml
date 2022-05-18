@@ -1,0 +1,102 @@
+# Copyright (c) 2019 RRZE, University Erlangen-Nuremberg
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+---
+GENERATOR:
+  PackageName: rocm_smi
+  PackageDescription: "Package ROCM SMI bindings"
+  PackageLicense: |-
+    Copyright (c) 2019 RRZE, University Erlangen-Nuremberg
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+    
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+  Includes: ["rocm_smi/rocm_smi.h", "rocm_smi/kfd_ioctl.h"]
+  SysIncludes:
+    - "stdint.h"
+    - "unistd.h"
+  FlagGroups:
+    - {name: "LDFLAGS", flags: ["-Wl,--unresolved-symbols=ignore-in-object-files"]}
+    - {name: "CFLAGS", flags: [""]}
+PARSER:
+  SourcesPaths: ["rocm_smi/rocm_smi.h", "rocm_smi/kfd_ioctl.h"]
+TRANSLATOR:
+  ConstCharIsString: true
+  ConstRules:
+    defines: eval
+    enum: eval
+  PtrTips:
+    function:
+      - {target: "^rsmi_", default: "sref"}
+  MemTips:
+    - {target: "^rsmi_", default: "raw"}
+  Rules:
+    const:
+      - {action: ignore, from: "rsmi_clk_type_t"}
+      - {action: ignore, from: "rsmi_dev_perf_level_t"}
+      - {action: ignore, from: "rsmi_temperature_metric_t"}
+      - {action: ignore, from: "rsmi_power_profile_preset_masks_t"}
+      - {action: ignore, from: "rsmi_gpu_block_t"}
+      - {action: ignore, from: "rsmi_freq_ind_t"}
+      - {action: accept, from: "^RSMI_"}
+      - {action: accept, from: "^rsmi"}
+      - {action: accept, from: "RSMI_IO_LINK_TYPE"}
+      - {action: accept, from: "RSMI_UTILIZATION_COUNTER_TYPE"}
+      - {action: replace, from: "^RSMI_"}
+      - {action: replace, from: "^rsmi"}
+      - {transform: export}
+    type:
+      - {action: ignore, from: "rsmi_clk_type_t"}
+      - {action: ignore, from: "rsmi_dev_perf_level_t"}
+      - {action: ignore, from: "rsmi_temperature_metric_t"}
+      - {action: ignore, from: "rsmi_power_profile_preset_masks_t"}
+      - {action: ignore, from: "rsmi_gpu_block_t"}
+      - {action: ignore, from: "rsmi_freq_ind_t"}
+      - {action: accept, from: "^rsmi"}
+      - {action: accept, from: "RSMI_IO_LINK_TYPE"}
+      - {action: accept, from: "RSMI_UTILIZATION_COUNTER_TYPE"}
+      - {action: accept, from: "rsmi_utilization_counter_t"}
+      - {action: replace, from: "^rsmi_status_t", to: "RSMI_status_t"}
+      - {action: replace, from: "^rsmi_version_t", to: "RSMI_version_t"}
+      - {action: replace, from: "^rsmi_range_t", to: "RSMI_range_t"}
+      - {action: replace, from: "^rsmi", to: "RSMI"}
+      - {action: replace, from: "_t$"}
+      - {action: replace, from: "^_"}
+      - {transform: export}
+
+    function:
+      - {action: ignore, from: "rsmi_status_string"}
+      - {action: accept, from: "^rsmi"}
+      - {transform: unexport}
+
