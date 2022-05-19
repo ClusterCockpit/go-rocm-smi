@@ -1,8 +1,7 @@
 # Introduction
 
 This is an unofficial interface to the AMD ROCM SMI library for Golang applications. It is heavily
-inspired by [`go-nvml`](https://github.com/NVIDIA/go-nvml) by also using [`cgo`](https://golang.org/cmd/cgo/)
-and [`c-for-go`](https://c.for-go.com/).
+inspired by [`go-nvml`](https://github.com/NVIDIA/go-nvml) by also using [`cgo`](https://golang.org/cmd/cgo/), [`c-for-go`](https://c.for-go.com/) and its [`dlopen` wrapper](https://github.com/NVIDIA/go-nvml/tree/main/pkg/dl).
 
 This Golang interface is planned to be used in [cc-metric-collector](https://github.com/ClusterCockpit/cc-metric-collector).
 
@@ -109,13 +108,12 @@ func (Device DeviceHandle) DeviceGetSerial() (string, RSMI_status) {
 - The device index and the "device index". Commonly, you get a device handle by `rsmi_dev_id_get` but not in the case of the ROCm SMI library. The "device id" returned by this function is completely meaningless and it not required for the other calls. While for [`go-nvml`](https://github.com/NVIDIA/go-nvml), you at first get the device handle for an index and use this handle for subsequent calls, the ROCm SMI library only uses the index. That's why we created a separate type `DeviceHandle` which contains the "device id" and the index. This way, the behavior is similar to [`go-nvml`](https://github.com/NVIDIA/go-nvml), see examples in README here and in the [`go-nvml`](https://github.com/NVIDIA/go-nvml) repository.
 
 - One big problem is currently, that [`c-for-go`](https://c.for-go.com/) does not generate `uint64` types for the C type `uint64_t`. It is the main data type used in the ROCm SMI headers. While I was able to generate underlying code for `uint64_t`, the Golang function still uses `uint32`:
-Input:
-```C
-rsmi_status_t rsmi_dev_unique_id_get(uint32_t dv_ind, uint64_t *id);
-```
-Output:
-```go
-func rsmi_dev_unique_id_get(Dv_ind uint32, Id *uint32) RSMI_status {
+  ```C
+  rsmi_status_t rsmi_dev_unique_id_get(uint32_t dv_ind, uint64_t *id);
+  ```
+  Output:
+  ```go
+  func rsmi_dev_unique_id_get(Dv_ind uint32, Id *uint32) RSMI_status {
 	cDv_ind, cDv_indAllocMap := (C.uint32_t)(Dv_ind), cgoAllocsUnknown
 	cId, cIdAllocMap := (*C.uint64_t)(unsafe.Pointer(Id)), cgoAllocsUnknown
 	__ret := C.rsmi_dev_unique_id_get(cDv_ind, cId)
@@ -123,9 +121,9 @@ func rsmi_dev_unique_id_get(Dv_ind uint32, Id *uint32) RSMI_status {
 	runtime.KeepAlive(cDv_indAllocMap)
 	__v := (RSMI_status)(__ret)
 	return __v
-}
-```
-One can see, that the ID is casted to `*C.uint64_t`, but the `Id` variable used by the function is `*uint32`. I was not able to persuade [`c-for-go`](https://c.for-go.com/) to use `uint64`. See also https://github.com/xlab/c-for-go/issues/120.
+  }
+  ```
+  One can see, that the `cId` is casted to `*C.uint64_t`, but the `Id` variable used by the function is `*uint32`. I was not able to persuade [`c-for-go`](https://c.for-go.com/) to use `uint64`. See also https://github.com/xlab/c-for-go/issues/120.
 
 - The symbol `rsmi_dev_sku_get` is defined by the `rocm_smi.h` header but on the test system with ROCm 5.1.0, the symbol lookup fails. There is now an `updateFunctionPointers()` function that is called at `Init()`. This is quite similar the function `updateVersionedSymbols()` in [`go-nvml`](https://github.com/NVIDIA/go-nvml).
 
