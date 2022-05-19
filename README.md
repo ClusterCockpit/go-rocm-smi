@@ -5,6 +5,8 @@ inspired by [`go-nvml`](https://github.com/NVIDIA/go-nvml) by also using [`cgo`]
 
 This Golang interface is planned to be used in [cc-metric-collector](https://github.com/ClusterCockpit/cc-metric-collector).
 
+**Disclaimer**: These bindings are created without any collaboration with AMD. Use them as you like but we, the developers of these bindings, are not responsible for any damage or anything that was caused by them. If you want official Golang bindings for the ROCm SMI library, send a request to AMD.
+
 # Usage
 
 ```go
