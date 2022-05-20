@@ -31,13 +31,13 @@ func NumMonitorDevices() (int, RSMI_status) {
 
 // rocm_smi.DeviceGetHandleByIndex()
 func DeviceGetHandleByIndex(Index int) (DeviceHandle, RSMI_status) {
-	var device uint16
 	var index uint32 = uint32(Index)
-	ret := rsmi_dev_id_get(index, &device)
-	return DeviceHandle{
-		handle: device,
+	handle := DeviceHandle{
+		handle: 0,
 		index:  index,
-	}, ret
+	}
+	ret := rsmi_dev_id_get(handle.index, &handle.handle)
+	return handle, ret
 }
 
 // rocm_smi.DeviceGetBrand()
@@ -729,9 +729,154 @@ func (Device DeviceHandle) GetEccMask() (uint32, RSMI_status) {
 	return DeviceGetEccMask(Device)
 }
 
+// SKIP Performance Counter Functions
 // SKIP rsmi_dev_counter_group_supported
 // SKIP rsmi_dev_counter_create
 // SKIP rsmi_dev_counter_destroy
 // SKIP rsmi_counter_control
 // SKIP rsmi_counter_read
 // SKIP rsmi_counter_available_counters_get
+
+// XGMI Functions
+
+// rocm_smi.DeviceXgmiErrorStatus()
+func DeviceXgmiErrorStatus(Device DeviceHandle) (RSMI_xgmi_status, RSMI_status) {
+	var status RSMI_xgmi_status
+	ret := rsmi_dev_xgmi_error_status(Device.index, &status)
+	return status, ret
+}
+
+func (Device DeviceHandle) XgmiErrorStatus() (RSMI_xgmi_status, RSMI_status) {
+	return DeviceXgmiErrorStatus(Device)
+}
+
+// rocm_smi.DeviceXgmiErrorReset()
+func DeviceXgmiErrorReset(Device DeviceHandle) RSMI_status {
+	ret := rsmi_dev_xgmi_error_reset(Device.index)
+	return ret
+}
+
+func (Device DeviceHandle) XgmiErrorReset() RSMI_status {
+	return DeviceXgmiErrorReset(Device)
+}
+
+// rocm_smi.DeviceXgmiHiveId()
+func DeviceXgmiHiveId(Device DeviceHandle) (uint32, RSMI_status) {
+	var id uint32
+	ret := rsmi_dev_xgmi_hive_id_get(Device.index, &id)
+	return id, ret
+}
+
+func (Device DeviceHandle) XgmiHiveId() (uint32, RSMI_status) {
+	return DeviceXgmiHiveId(Device)
+}
+
+// Hardware Topology Functions
+
+// rocm_smi.DeviceGetNumaNode()
+func DeviceGetNumaNode(Device DeviceHandle) (uint32, RSMI_status) {
+	var node uint32
+	ret := rsmi_topo_get_numa_node_number(Device.index, &node)
+	return node, ret
+}
+
+func (Device DeviceHandle) GetNumaNode() (uint32, RSMI_status) {
+	return DeviceGetNumaNode(Device)
+}
+
+// rocm_smi.DeviceGetLinkWeight()
+func DeviceGetLinkWeight(SrcDevice DeviceHandle, DstDevice DeviceHandle) (uint32, RSMI_status) {
+	var weight uint32
+	ret := rsmi_topo_get_link_weight(SrcDevice.index, DstDevice.index, &weight)
+	return weight, ret
+}
+
+func (Device DeviceHandle) GetLinkWeight(DstDevice DeviceHandle) (uint32, RSMI_status) {
+	return DeviceGetLinkWeight(Device, DstDevice)
+}
+
+// rocm_smi.DeviceGetMinMaxBandwidth()
+func DeviceGetMinMaxBandwidth(SrcDevice DeviceHandle, DstDevice DeviceHandle) (uint32, uint32, RSMI_status) {
+	var mini uint32
+	var maxi uint32
+	ret := rsmi_minmax_bandwidth_get(SrcDevice.index, DstDevice.index, &mini, &maxi)
+	return mini, maxi, ret
+}
+
+func (Device DeviceHandle) GetMinMaxBandwidth(DstDevice DeviceHandle) (uint32, uint32, RSMI_status) {
+	return DeviceGetMinMaxBandwidth(Device, DstDevice)
+}
+
+// rocm_smi.DeviceGetLinkType()
+func DeviceGetLinkType(SrcDevice DeviceHandle, DstDevice DeviceHandle) (uint32, RSMI_IO_LINK_TYPE, RSMI_status) {
+	var hops uint32
+	var Type RSMI_IO_LINK_TYPE
+	ret := rsmi_topo_get_link_type(SrcDevice.index, DstDevice.index, &hops, &Type)
+	return hops, Type, ret
+}
+
+func (Device DeviceHandle) GetLinkType(DstDevice DeviceHandle) (uint32, RSMI_IO_LINK_TYPE, RSMI_status) {
+	return DeviceGetLinkType(Device, DstDevice)
+}
+
+// rocm_smi.DeviceIsP2PAccessible()
+func DeviceIsP2PAccessible(SrcDevice DeviceHandle, DstDevice DeviceHandle) (bool, RSMI_status) {
+	var access bool
+	ret := rsmi_is_P2P_accessible(SrcDevice.index, DstDevice.index, &access)
+	return access, ret
+}
+
+func (Device DeviceHandle) IsP2PAccessible(DstDevice DeviceHandle) (bool, RSMI_status) {
+	return DeviceIsP2PAccessible(Device, DstDevice)
+}
+
+// SKIP Supported Functions
+// SKIP rsmi_dev_supported_func_iterator_open
+// SKIP rsmi_dev_supported_variant_iterator_open
+// SKIP rsmi_func_iter_next
+// SKIP rsmi_dev_supported_func_iterator_close
+// SKIP rsmi_func_iter_value_get
+
+// Event Notification Functions
+
+// rocm_smi.DeviceInitEventNotification()
+func DeviceInitEventNotification(Device DeviceHandle) RSMI_status {
+	ret := rsmi_event_notification_init(Device.index)
+	return ret
+}
+
+func (Device DeviceHandle) InitEventNotification() RSMI_status {
+	return DeviceInitEventNotification(Device)
+}
+
+// rocm_smi.DeviceSetEventNotificationMask()
+func DeviceSetEventNotificationMask(Device DeviceHandle, Mask uint32) RSMI_status {
+	ret := rsmi_event_notification_mask_set(Device.index, Mask)
+	return ret
+}
+
+func (Device DeviceHandle) SetEventNotificationMask(Mask uint32) RSMI_status {
+	return DeviceSetEventNotificationMask(Device, Mask)
+}
+
+// rocm_smi.GetEventNotification()
+func GetEventNotification(TimeoutMs int32) ([]RSMI_evt_notification_data, RSMI_status) {
+	var num_events uint32
+	data := make([]RSMI_evt_notification_data, 0)
+	ret := rsmi_event_notification_get(TimeoutMs, &num_events, nil)
+	if ret == STATUS_SUCCESS && num_events > 0 {
+		data = make([]RSMI_evt_notification_data, num_events)
+		ret = rsmi_event_notification_get(TimeoutMs, &num_events, &data[0])
+	}
+	return data, ret
+}
+
+// rocm_smi.DeviceStopEventNotification()
+func DeviceStopEventNotification(Device DeviceHandle) RSMI_status {
+	ret := rsmi_event_notification_stop(Device.index)
+	return ret
+}
+
+func (Device DeviceHandle) StopEventNotification() RSMI_status {
+	return DeviceStopEventNotification(Device)
+}

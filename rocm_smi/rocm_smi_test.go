@@ -113,7 +113,7 @@ func TestSystem(t *testing.T) {
 	}
 }
 
-func TestUnit(t *testing.T) {
+func TestDevice(t *testing.T) {
 	Init()
 	defer Shutdown()
 
@@ -571,5 +571,108 @@ func TestUnit(t *testing.T) {
 		t.Logf("  Average UMC Activity: %v", metrics.Average_umc_activity)
 		t.Logf("  Average MM Activity: %v", metrics.Average_mm_activity)
 		t.Logf("  Average Socket Power: %v", metrics.Average_socket_power)
+	}
+
+	node, ret := DeviceGetNumaNode(devHandle)
+	if ret == STATUS_NOT_SUPPORTED {
+		t.Logf("DeviceGetNumaNode: %v (NOT SUPPORTED)", ret)
+	} else if ret != STATUS_SUCCESS {
+		t.Errorf("DeviceGetNumaNode: %v", ret)
+	} else {
+		t.Logf("DeviceGetNumaNode: %v", ret)
+		t.Logf("  NUMA node: %v", node)
+	}
+
+	xgmiStatus, ret := DeviceXgmiErrorStatus(devHandle)
+	if ret == STATUS_NOT_SUPPORTED {
+		t.Logf("DeviceXgmiErrorStatus: %v (NOT SUPPORTED)", ret)
+	} else if ret != STATUS_SUCCESS {
+		t.Errorf("DeviceXgmiErrorStatus: %v", ret)
+	} else {
+		t.Logf("DeviceXgmiErrorStatus: %v", ret)
+		t.Logf("  XGMI error status: %v", xgmiStatus)
+	}
+
+	xgmiHive, ret := DeviceXgmiHiveId(devHandle)
+	if ret == STATUS_NOT_SUPPORTED {
+		t.Logf("DeviceXgmiHiveId: %v (NOT SUPPORTED)", ret)
+	} else if ret != STATUS_SUCCESS {
+		t.Errorf("DeviceXgmiHiveId: %v", ret)
+	} else {
+		t.Logf("DeviceXgmiHiveId: %v", ret)
+		t.Logf("  XGMI hive id: %v", xgmiHive)
+	}
+}
+
+func TestMultiDevice(t *testing.T) {
+	Init()
+	defer Shutdown()
+
+	deviceCount, ret := NumMonitorDevices()
+	if ret != STATUS_SUCCESS {
+		t.Errorf("NumMonitorDevices: %v", ret)
+	} else {
+		t.Logf("NumMonitorDevices: %v", ret)
+		t.Logf("  count: %v", deviceCount)
+	}
+
+	if deviceCount < 2 {
+		t.Skip("Skipping test because it requires at least two GPUs.")
+	}
+
+	firstHandle, ret := DeviceGetHandleByIndex(0)
+	if ret != STATUS_SUCCESS {
+		t.Errorf("DeviceGetHandleByIndex(0): %v", ret)
+	} else {
+		t.Logf("DeviceGetHandleByIndex(0): %v", ret)
+	}
+
+	secondHandle, ret := DeviceGetHandleByIndex(1)
+	if ret != STATUS_SUCCESS {
+		t.Errorf("DeviceGetHandleByIndex(1): %v", ret)
+	} else {
+		t.Logf("DeviceGetHandleByIndex(1): %v", ret)
+	}
+
+	linkWidth, linkType, ret := DeviceGetLinkType(firstHandle, secondHandle)
+	if ret == STATUS_NOT_SUPPORTED {
+		t.Logf("DeviceGetLinkType: %v (NOT SUPPORTED)", ret)
+	} else if ret != STATUS_SUCCESS {
+		t.Errorf("DeviceGetLinkType: %v", ret)
+	} else {
+		t.Logf("DeviceGetLinkType: %v", ret)
+		t.Logf("  link width: %v", linkWidth)
+		t.Logf("  link type: %v", linkType)
+	}
+
+	linkWeight, ret := DeviceGetLinkWeight(firstHandle, secondHandle)
+	if ret == STATUS_NOT_SUPPORTED {
+		t.Logf("DeviceGetLinkWeight: %v (NOT SUPPORTED)", ret)
+	} else if ret != STATUS_SUCCESS {
+		t.Errorf("DeviceGetLinkWeight: %v", ret)
+	} else {
+		t.Logf("DeviceGetLinkWeight: %v", ret)
+		t.Logf("  link weight: %v", linkWeight)
+	}
+
+	p2p, ret := DeviceIsP2PAccessible(firstHandle, secondHandle)
+	if ret == STATUS_NOT_SUPPORTED {
+		t.Logf("DeviceIsP2PAccessible: %v (NOT SUPPORTED)", ret)
+	} else if ret != STATUS_SUCCESS {
+		t.Errorf("DeviceIsP2PAccessible: %v", ret)
+	} else {
+		t.Logf("DeviceIsP2PAccessible: %v", ret)
+		t.Logf("  P2P accessible: %v", p2p)
+	}
+
+	minBand, maxBand, ret := DeviceGetMinMaxBandwidth(firstHandle, secondHandle)
+	if ret == STATUS_NOT_SUPPORTED {
+		t.Logf("DeviceGetMinMaxBandwidth: %v (NOT SUPPORTED)", ret)
+	} else if ret != STATUS_SUCCESS {
+		t.Errorf("DeviceGetMinMaxBandwidth: %v", ret)
+	} else {
+		t.Logf("DeviceGetMinMaxBandwidth: %v", ret)
+		t.Logf("  minimal bandwidth: %v", minBand)
+		t.Logf("  maximal bandwidth: %v", maxBand)
 	}
 }
