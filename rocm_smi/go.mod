@@ -1,4 +1,4 @@
-module github.com/ClusterCockpit/go-rocm-smi
+module github.com/ClusterCockpit/go-rocm-smi/rocm_smi
 
 go 1.16
 
