@@ -16,7 +16,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/ClusterCockpit/go-rocm-smi/rocm_smi"
+	"github.com/ClusterCockpit/go-rocm-smi/pkg/rocm_smi"
 )
 
 func main() {
