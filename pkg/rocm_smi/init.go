@@ -30,8 +30,8 @@ import (
 #cgo LDFLAGS: -Wl,--unresolved-symbols=ignore-in-object-files
 #cgo CFLAGS:
 #include <stdint.h>
-#include "rocm_smi.h"
-#include "kfd_ioctl.h"
+#include "rocm_smi/rocm_smi.h"
+#include "rocm_smi/kfd_ioctl.h"
 #include <stdlib.h>
 #include "cgo_helpers.h"
 */
