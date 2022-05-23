@@ -22,8 +22,9 @@ package rocm_smi
 
 import (
 	"fmt"
-	"github.com/NVIDIA/go-nvml/pkg/dl"
 	"runtime"
+
+	"github.com/NVIDIA/go-nvml/pkg/dl"
 )
 
 /*
@@ -49,6 +50,14 @@ type DeviceHandle struct {
 	index  uint32
 }
 type DeviceIndex uint32
+
+func (d *DeviceHandle) Index() uint32 {
+	return d.index
+}
+
+func (d *DeviceHandle) ID() uint16 {
+	return d.handle
+}
 
 // rocm_smi.Init()
 func Init() RSMI_status {
