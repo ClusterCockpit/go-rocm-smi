@@ -45,21 +45,33 @@ const (
 
 var rocm_smi_lib *dl.DynamicLibrary
 
+// Virtual device handle for the usage with the functions provided
+// by the rocm_smi package to have similar handling as other packages
+// by first getting the handle for a device index and use this in all
+// subsequent calls.
 type DeviceHandle struct {
 	handle uint16
 	index  uint32
 }
-type DeviceIndex uint32
 
+// Index returns the device index in the system
 func (d *DeviceHandle) Index() uint32 {
 	return d.index
 }
 
+// ID returns the device ID for the device. This ID is an identification of the type of device, so calling this
+// function for different devices will give the same value if they are kind
+// of device. Consequently, this function should not be used to distinguish
+// one device from another. DeviceGetPciId() should be used to get a
+// unique identifier.
 func (d *DeviceHandle) ID() uint16 {
 	return d.handle
 }
 
-// rocm_smi.Init()
+// Init initializes ROCm SMI. When called, this initializes internal data structures, 
+// including those corresponding to sources of information that SMI provides. This version
+// of the Init function specifies no RSMI_init_flags.
+// STATUS_SUCCESS is returned upon successful call.
 func Init() RSMI_status {
 	lib := dl.New(rocmSmiLibraryName, rocmSmiLibraryLoadFlags)
 	if lib == nil {
@@ -76,8 +88,11 @@ func Init() RSMI_status {
 	return rsmi_init(0)
 }
 
-// rocm_smi.InitWithFlags()
-func InitWithFlags(Flags uint32) RSMI_status {
+// Init initializes ROCm SMI. When called, this initializes internal data structures, 
+// including those corresponding to sources of information that SMI provides. This version
+// uses the Flags argument as RSMI_init_flags.
+// STATUS_SUCCESS is returned upon successful call.
+func InitWithFlags(Flags uint64) RSMI_status {
 	lib := dl.New(rocmSmiLibraryName, rocmSmiLibraryLoadFlags)
 	if lib == nil {
 		panic(fmt.Sprintf("error instantiating DynamicLibrary for %s", rocmSmiLibraryName))
@@ -93,7 +108,7 @@ func InitWithFlags(Flags uint32) RSMI_status {
 	return rsmi_init(Flags)
 }
 
-// rocm_smi.Shutdown()
+// Shutdown shuts down ROCm SMI and does any necessary clean up
 func Shutdown() RSMI_status {
 	ret := rsmi_shut_down()
 	if ret != STATUS_SUCCESS {

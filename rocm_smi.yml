@@ -44,6 +44,7 @@ GENERATOR:
     SOFTWARE.
   Includes: ["rocm_smi/rocm_smi.h", "rocm_smi/kfd_ioctl.h"]
   SysIncludes:
+    - "stdlib.h"
     - "stdint.h"
     - "unistd.h"
   FlagGroups:
@@ -51,6 +52,7 @@ GENERATOR:
     - {name: "CFLAGS", flags: [""]}
 PARSER:
   SourcesPaths: ["rocm_smi/rocm_smi.h", "rocm_smi/kfd_ioctl.h"]
+  IncludePaths: ["/usr/include"]
 TRANSLATOR:
   ConstCharIsString: true
   ConstRules:

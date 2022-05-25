@@ -19,7 +19,7 @@ type RSMI_evt_notification_data struct {
 	Message	[64]int8
 }
 
-type RSMI_bit_field uint32
+type RSMI_bit_field uint64
 
 type RSMI_utilization_counter struct {
 	Type	uint32

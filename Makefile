@@ -4,9 +4,15 @@ CGO = cgo
 
 all: generate
 
+UINT64_TYPE = unsigned long long
+INT64_TYPE = long long
+#TEST_VERBOSE = -v
+
 generate:
-	cd pkg && $(CFORGO) -ccincl --ccdefs ../rocm_smi.yml && cd -
-	cd pkg && sed -i -e s/'cStatus, cStatus_string'/'cStatus, \&cStatus_string'/g rocm_smi/rocm_smi.go && cd -
+	cd pkg && \
+		sed -e "s/uint64_t/$(UINT64_TYPE)/g" -e "s/int64_t/$(INT64_TYPE)/g" rocm_smi/rocm_smi/rocm_smi.h.orig > rocm_smi/rocm_smi/rocm_smi.h && \
+		$(CFORGO) -ccincl --ccdefs ../rocm_smi.yml && \
+		cd -
 	cd pkg/rocm_smi && \
 		$(CGO) -godefs types.go > types.go.expand && \
 		mv types.go.expand types.go && \
@@ -19,7 +25,7 @@ clean:
 	rm -f pkg/rocm_smi/rocm_smi.go
 
 test:
-	cd pkg/rocm_smi && go build && go test
+	cd pkg/rocm_smi && go build && go test $(TEST_VERBOSE)
 
 .PHONY: fmt
 fmt:
