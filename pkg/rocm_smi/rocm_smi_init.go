@@ -52,6 +52,7 @@ var rocm_smi_lib *dl.DynamicLibrary
 type DeviceHandle struct {
 	handle uint16
 	index  uint32
+	supported map[string]map[uint64][]uint64
 }
 
 // Index returns the device index in the system
@@ -68,9 +69,21 @@ func (d *DeviceHandle) ID() uint16 {
 	return d.handle
 }
 
-// Init initializes ROCm SMI. When called, this initializes internal data structures, 
+// Supported returns the supported functions and their arguments. The structure is
+// - Go or C function name (like DeviceGetName and rsmi_dev_name_get)
+//     - Default variant identifier (DEFAULT_VARIANT) or a value usable for temperature, memory and other types listed in the const.go
+//         - If the parent is DEFAULT_VARIANT: List with single entry containing the default usable value for temperature, memory, etc. type
+//         - If it is a usable value: There might be a list of sub_values which relate to the second argument like DeviceGetTemperatureMetric with its RSMI_temperature_type and RSMI_temperature_metric, first the sensors and second min, max or current.
+//
+// This information is used when calling one of the functions listed and the arguments are compared to avoid (maybe) costly calls to the RSMI library.
+func (d *DeviceHandle) Supported() map[string]map[uint64][]uint64 {
+	return d.supported
+}
+
+// Init initializes ROCm SMI on all AMD GPUs. When called, this initializes internal data structures, 
 // including those corresponding to sources of information that SMI provides. This version
 // of the Init function specifies no RSMI_init_flags.
+//
 // STATUS_SUCCESS is returned upon successful call.
 func Init() RSMI_status {
 	lib := dl.New(rocmSmiLibraryName, rocmSmiLibraryLoadFlags)
@@ -90,8 +103,11 @@ func Init() RSMI_status {
 
 // Init initializes ROCm SMI. When called, this initializes internal data structures, 
 // including those corresponding to sources of information that SMI provides. This version
-// uses the Flags argument as RSMI_init_flags.
-// STATUS_SUCCESS is returned upon successful call.
+// uses the Flags argument as RSMI_init_flags:
+// 
+// - INIT_FLAG_ALL_GPUS: Attempt to add all GPUs found (including non-AMD) to the list of devices from which SMI information can be retrieved. By default, only AMD devices are  enumerated by RSMI.
+// 
+// - STATUS_SUCCESS is returned upon successful call.
 func InitWithFlags(Flags uint64) RSMI_status {
 	lib := dl.New(rocmSmiLibraryName, rocmSmiLibraryLoadFlags)
 	if lib == nil {
@@ -108,7 +124,7 @@ func InitWithFlags(Flags uint64) RSMI_status {
 	return rsmi_init(Flags)
 }
 
-// Shutdown shuts down ROCm SMI and does any necessary clean up
+// Shutdown shuts down ROCm SMI and does any necessary clean up.
 func Shutdown() RSMI_status {
 	ret := rsmi_shut_down()
 	if ret != STATUS_SUCCESS {
@@ -123,20 +139,35 @@ func Shutdown() RSMI_status {
 	return ret
 }
 
+// Version gets the major, minor, patch and build string for the currently running build of RSMI.
+//
+// - STATUS_SUCCESS is returned upon successful call.
 func Version() (RSMI_version, RSMI_status) {
 	var v RSMI_version
 	ret := rsmi_version_get(&v)
 	return v, ret
 }
 
+
+// ComponentVersionString gets the driver version string for the current system.
+// Given a software component, this function will return the driver version string for the current system.
+//
+// - STATUS_SUCCESS call was successful.
+// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// - STATUS_INSUFFICIENT_SIZE is returned if version string is larger than defaultRsmiStringLength bytes.
 func ComponentVersionString(Component RSMI_sw_component) (string, RSMI_status) {
-	var version []byte = make([]byte, 100)
+	var version []byte = make([]byte, defaultRsmiStringLength)
 	vptr := &version[0]
-	ret := rsmi_version_str_get(Component, vptr, 100)
-	return string(version), ret
+	ret := rsmi_version_str_get(Component, vptr, defaultRsmiStringLength)
+	return bytes2String(version), ret
 }
 
-// Created manually since the the c-for-go parser does not generate a version with &cStr
+// StatusString returns the string representation for the given RSMI_status.
+//
+// Note: Created manually since the the c-for-go parser does not generate a version with &cStr.
+//
+// - STATUS_SUCCESS is returned upon successful call.
 func StatusString(Status RSMI_status) (string, RSMI_status) {
 	var cStr *C.char
 	cStatus, cStatusAllocMap := (C.rsmi_status_t)(Status), cgoAllocsUnknown
@@ -146,8 +177,12 @@ func StatusString(Status RSMI_status) (string, RSMI_status) {
 	return C.GoString(cStr), __v
 }
 
-// Created manually since the the c-for-go parser does not generate a version with &cStr
-// Version without returing RSMI_status for simpler usage
+// StatusStringNoError returns the string representation for the given RSMI_status.
+// Version without returing RSMI_status for simpler usage.
+//
+// Note: Created manually since the the c-for-go parser does not generate a version with &cStr
+//
+// - STATUS_SUCCESS is returned upon successful call.
 func StatusStringNoError(Status RSMI_status) string {
 	var cStr *C.char
 	cStatus, cStatusAllocMap := (C.rsmi_status_t)(Status), cgoAllocsUnknown
@@ -157,21 +192,31 @@ func StatusStringNoError(Status RSMI_status) string {
 }
 
 // Check whether some symbols are defined by the rocm_smi library and update
-// functions pointers accordingly
+// functions pointers accordingly.
 func updateFunctionPointers() {
 	var err error
 	err = rocm_smi_lib.Lookup("rsmi_dev_sku_get")
 	if err == nil {
-		DeviceGetSku = DeviceGetSkuReal
+		DeviceGetSku = deviceGetSkuReal
+	} else {
+	    DeviceGetSku = deviceGetSkuFake
 	}
 
 	err = rocm_smi_lib.Lookup("rsmi_dev_perf_level_set")
 	if err == nil {
-		DeviceSetPerfLevel = DeviceSetPerfLevel_v2
+		DeviceSetPerfLevel = deviceSetPerfLevel_v0
+	}
+	err = rocm_smi_lib.Lookup("rsmi_dev_perf_level_set_v1")
+	if err == nil {
+		DeviceSetPerfLevel = deviceSetPerfLevel_v1
 	}
 
+	err = rocm_smi_lib.Lookup("rsmi_dev_overdrive_level_set_v1")
+	if err == nil {
+		DeviceSetOverdriveLevel = deviceSetOverdriveLevel_v1
+	}
 	err = rocm_smi_lib.Lookup("rsmi_dev_overdrive_level_set")
 	if err == nil {
-		DeviceSetOverdriveLevel = DeviceSetOverdriveLevel_v2
+		DeviceSetOverdriveLevel = deviceSetOverdriveLevel_v2
 	}
 }

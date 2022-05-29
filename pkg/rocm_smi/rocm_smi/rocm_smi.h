@@ -939,7 +939,7 @@ typedef struct rsmi_func_id_iter_handle * rsmi_func_id_iter_handle_t;
  * value may be a function name, or an ennumerated variant value of types
  * such as ::rsmi_memory_type_t, ::rsmi_temperature_metric_t, etc.
  */
-typedef union id {
+typedef union id_rename {
         unsigned long long id;           //!< unsigned long long representation of value
         const char *name;      //!< name string (applicable to functions only)
         union {

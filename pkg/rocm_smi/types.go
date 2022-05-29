@@ -144,3 +144,20 @@ type RSMI_func_id_iter_handle *_Ctype_struct_rsmi_func_id_iter_handle
 const sizeofRSMI_func_id_value = unsafe.Sizeof([8]byte{})
 
 type RSMI_func_id_value [sizeofRSMI_func_id_value]byte
+
+type RSMI_helper_variants struct {
+	Num_variants	int32
+	Variant_id	uint64
+	Variantlist	[100]uint64
+}
+
+type RSMI_helper_function_variants struct {
+	Name		[200]int8
+	Sensors		int32
+	Sensorlist	[30]RSMI_helper_variants
+}
+
+type RSMI_helper_function struct {
+	Functions	int32
+	Functionlist	[300]RSMI_helper_function_variants
+}

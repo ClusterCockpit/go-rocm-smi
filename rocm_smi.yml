@@ -42,7 +42,7 @@ GENERATOR:
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-  Includes: ["rocm_smi/rocm_smi.h", "rocm_smi/kfd_ioctl.h"]
+  Includes: ["rocm_smi/rocm_smi.h", "rocm_smi/kfd_ioctl.h", "rocm_smi/rocm_smi_helpers.h"]
   SysIncludes:
     - "stdlib.h"
     - "stdint.h"
@@ -51,7 +51,7 @@ GENERATOR:
     - {name: "LDFLAGS", flags: ["-Wl,--unresolved-symbols=ignore-in-object-files"]}
     - {name: "CFLAGS", flags: [""]}
 PARSER:
-  SourcesPaths: ["rocm_smi/rocm_smi.h", "rocm_smi/kfd_ioctl.h"]
+  SourcesPaths: ["rocm_smi/rocm_smi.h", "rocm_smi/kfd_ioctl.h", "rocm_smi/rocm_smi_helpers.h"]
   IncludePaths: ["/usr/include"]
 TRANSLATOR:
   ConstCharIsString: true

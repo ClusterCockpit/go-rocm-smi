@@ -63,7 +63,10 @@ There are three ROCm SMI Headers, all located at `rocm_smi/rocm_smi`
 - `rocm_smi64Config.h`
 - `kfd_ioctl.h`
 
-The files are copied from ROCm 5.1.0 and no changes were made to them.
+The files are copied from ROCm 5.1.0. For the generation, the `rocm_smi.h` header is changed to support [`c-for- go`](https://c.for-go.com/)'s parser.
+- All occurences of `uint64_t` are changed to `unsigned long long`, otherwise [`c-for-go`](https://c.for-go.com/) wouldn't use Golang's `uint64` type.
+- All occurences of `int64_t` are changed to `long long`, otherwise [`c-for-go`](https://c.for-go.com/) wouldn't use Golang's `int64` type.
+- The `union id` is renamed to `union id_rename` to avoid problems with clang. The type is never addressed with the name `id` but a `typedef` name.
 
 ## Generation
 
@@ -72,7 +75,7 @@ Calling [`c-for-go`](https://c.for-go.com/) with the `rocm_smi.yml` as input
 ## Post processing
 
 After the generation, the `types.go` file still contains the C types but it is more suitable to have
-Go types for them. Luckly [`cgo`](https://golang.org/cmd/cgo/) has a bootstrapping option `-godefs` to
+Golang types for them. Luckly [`cgo`](https://golang.org/cmd/cgo/) has a bootstrapping option `-godefs` to
 generate the Go types.
 
 Before:
@@ -99,7 +102,7 @@ func DeviceGetSerial(Device DeviceHandle) (string, RSMI_status) {
 	var Serial []byte = make([]byte, 100)
 	sptr := &Serial[0]
 	ret := rsmi_dev_serial_number_get(Device.index, sptr, 100)
-	return string(Serial), ret
+	return bytes2String(Serial), ret
 }
 
 func (Device DeviceHandle) DeviceGetSerial() (string, RSMI_status) {
@@ -108,10 +111,13 @@ func (Device DeviceHandle) DeviceGetSerial() (string, RSMI_status) {
 ```
 
 
+
+# The device index and the "device handle"
+
+For most libraries which handle multiple devices ([`go-nvml`](https://github.com/NVIDIA/go-nvml) is an example), the user at first requests a handle for each device, mostly through the logical index in the list of available devices. The official `rocm_smi` library uses the logical index instead but in order to get everything right, you have to do quite some work to know what is supported. The `rocm_smi` provides a feature (`APISupport` in `rocm_smi.h`) to determine which functions are supported for a device and if a function accepts arguments, which ones are valid for this device. An example would be the function to get the firmware version and the list of GPU parts that provide such a version. The `go-rocm-smi` bindings introduce a virtual type `DeviceHandle`, retrivable through the logical index (so similar to [`go-nvml`](https://github.com/ NVIDIA/go-nvml)), which encapsulates the `APISupport` lookup: `DeviceGetHandleByIndex()`. The `DeviceHandle` is used for all device related calls in `go-rocm-smi`. You can get the logical index by `deviceHandle.Index()`, the **not** unique ID of a GPU by `deviceHandle.ID()` and the list of supported functions through `deviceHandle.Supported()`
+
+
 # Problems
-
-- The device index and the "device index". Commonly, you get a device handle by `rsmi_dev_id_get` but not in the case of the ROCm SMI library. The "device id" returned by this function is completely meaningless and it not required for the other calls. While for [`go-nvml`](https://github.com/NVIDIA/go-nvml), you at first get the device handle for an index and use this handle for subsequent calls, the ROCm SMI library only uses the index. That's why we created a separate type `DeviceHandle` which contains the "device id" and the index. This way, the behavior is similar to [`go-nvml`](https://github.com/NVIDIA/go-nvml), see examples in README here and in the [`go-nvml`](https://github.com/NVIDIA/go-nvml) repository.
-
 - One big problem is currently, that [`c-for-go`](https://c.for-go.com/) does not generate `uint64` types for the C type `uint64_t`. It is one of the main data type used in the ROCm SMI headers. While I was able to generate underlying code for `uint64_t`, the Golang function still uses `uint32`:
   ```C
   rsmi_status_t rsmi_dev_unique_id_get(uint32_t dv_ind, uint64_t *id);
@@ -128,26 +134,10 @@ func (Device DeviceHandle) DeviceGetSerial() (string, RSMI_status) {
 	return __v
   }
   ```
-  One can see, that the `cId` is casted to `*C.uint64_t`, but the `Id` variable used by the function is `*uint32`. I was not able to persuade [`c-for-go`](https://c.for-go.com/) to use `uint64`. See also https://github.com/xlab/c-for-go/issues/120. As a workaround, `uint64_t` gets replaced by `unsigned long long` and `int64_t` gets replaced by `long long`, see `Makefile`.
+  One can see, that the `cId` is casted to `*C.uint64_t`, but the `Id` variable used by the function is `*uint32`. I was not able to persuade [`c-for-go`](https://c.for-go.com/) to use `uint64`. See also https://github.com/xlab/c-for-go/issues/120. As a workaround, `uint64_t` gets replaced by `unsigned long long` and `int64_t` gets replaced by `long long`, see `Makefile`. Interestingly, the translation of the C types to Golang types with [`cgo`](https://golang.org/cmd/cgo/) generates `uint64` without the type exchange in the header. If we wouldn't use `unsigned long long`, the `uint32` generated by [`c-for-go`](https://c.for-go.com/) would clash with the `uint64` generated by [`cgo`](https://golang.org/cmd/cgo/).
 
-- The symbol `rsmi_dev_sku_get` is defined by the `rocm_smi.h` header but on the test system with ROCm 5.1.0, the symbol lookup fails. There is now an `updateFunctionPointers()` function that is called at `Init()`. This is quite similar the function `updateVersionedSymbols()` in [`go-nvml`](https://github.com/NVIDIA/go-nvml).
+- The symbol `rsmi_dev_sku_get` is defined by the `rocm_smi.h` header but on the test system with ROCm 5.1.0, the symbol lookup fails. There is now an `updateFunctionPointers()` function that is called at `Init()`. This is quite similar the function `updateVersionedSymbols()` in [`go-nvml`](https://github.com/NVIDIA/go-nvml). The `APISupport` feature of the `rocm_smi` library shows, `rsmi_dev_sku_get` is supported by the device.
 
 - The function `rsmi_status_string` cannot use the wrapper generated by [`c-for-go`](https://c.for-go.com/) because it requires a pointer to a `char` array while [`c-for-go`](https://c.for-go.com/) wants to use the `char` array directly. There is a manually created version to get the status string `StatusString()`. One issue is when using it in prints (see example) because `rsmi_status_string` accepts a status and returns a new status and the string. To drop the new status, use `StatusStringNoError()`.
 
-- The `Build` part in `RSMI_version` is currently not really accessible because it requires [pointer arithmetic](https://go.dev/doc/faq#no_pointer_arithmetic).
-
-# No implemented
-
-- Performance Counter Functions
-  - `rsmi_dev_counter_group_supported`
-  - `rsmi_dev_counter_create`
-  - `rsmi_dev_counter_destroy`
-  - `rsmi_counter_control`
-  - `rsmi_counter_read`
-  - `rsmi_counter_available_counters_get`
-- Supported Functions
-  - `rsmi_dev_supported_func_iterator_open`
-  - `rsmi_dev_supported_variant_iterator_open`
-  - `rsmi_func_iter_next`
-  - `rsmi_dev_supported_func_iterator_close`
-  - `rsmi_func_iter_value_get`
+- I havn't found a way to access the `Build` field in `RSMI_version`. It is a `char*` in `rocm_smi` but [`c-for-go`](https://c.for-go.com/) generates an `*int8` entry for it.

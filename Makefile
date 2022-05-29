@@ -6,11 +6,14 @@ all: generate
 
 UINT64_TYPE = unsigned long long
 INT64_TYPE = long long
-#TEST_VERBOSE = -v
+TEST_VERBOSE = -v
 
 generate:
 	cd pkg && \
-		sed -e "s/uint64_t/$(UINT64_TYPE)/g" -e "s/int64_t/$(INT64_TYPE)/g" rocm_smi/rocm_smi/rocm_smi.h.orig > rocm_smi/rocm_smi/rocm_smi.h && \
+		sed -e "s/uint64_t/$(UINT64_TYPE)/g" \
+		    -e "s/int64_t/$(INT64_TYPE)/g" \
+		    -e "s/union id/union id_rename/g" \
+		    rocm_smi/rocm_smi/rocm_smi.h.orig > rocm_smi/rocm_smi/rocm_smi.h && \
 		$(CFORGO) -ccincl --ccdefs ../rocm_smi.yml && \
 		cd -
 	cd pkg/rocm_smi && \
