@@ -20,7 +20,8 @@ jobs:
 
     - name: Install c-for-go
       run: |
-         find ${GOROOT} -name "cgo"
+         find ${GOTOOLDIR} -name "cgo"
+         ls ${GOTOOLDIR}
          go mod download github.com/NVIDIA/go-nvml
          go get github.com/xlab/c-for-go
          go install github.com/xlab/c-for-go
