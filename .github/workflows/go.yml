@@ -22,6 +22,7 @@ jobs:
       run: |
          go mod download github.com/NVIDIA/go-nvml
          go get github.com/xlab/c-for-go
+         go install github.com/xlab/c-for-go
 
     - name: Generate
       run: make
