@@ -54,6 +54,9 @@ func main() {
 
 The `librocm_smi64.so` is dynamically loaded by the `rocm_smi` package. Make sure that the directory containing this library is in your `LD_LIBRARY_PATH`.
 
+# Documentation
+See [pkg.go.dev](https://pkg.go.dev/github.com/ClusterCockpit/go-rocm-smi).
+
 # Generating the bindings
 
 ## ROCm SMI Headers
