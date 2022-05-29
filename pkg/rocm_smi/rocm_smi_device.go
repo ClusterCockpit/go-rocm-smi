@@ -24,7 +24,7 @@ package rocm_smi
 //import "strings"
 
 const defaultRsmiStringLength uint32 = 1000
-var CtoGoFuncMapping = map[string]string {
+var ctoGoFuncMapping = map[string]string {
     "rsmi_dev_fan_reset": "DeviceResetFan",
     "rsmi_dev_fan_speed_set": "DeviceSetFanSpeed",
     "rsmi_dev_volt_metric_get": "DeviceGetVoltageMetric",
@@ -166,7 +166,7 @@ func DeviceGetHandleByIndex(Index int) (DeviceHandle, RSMI_status) {
 					}
 					handle.supported[name][sensor] = l
 				}
-				if goname, ok := CtoGoFuncMapping[name]; ok {
+				if goname, ok := ctoGoFuncMapping[name]; ok {
 				    handle.supported[goname] = handle.supported[name]
 				}
 			}
