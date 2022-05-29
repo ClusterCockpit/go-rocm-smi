@@ -18,13 +18,9 @@ jobs:
       with:
         go-version: 1.18
 
-    - name: Env
-      run: env
-
     - name: Install c-for-go
       run: |
-         find ${GOTOOLDIR} -name "cgo"
-         ls ${GOTOOLDIR}
+         export PATH=$(go env GOTOOLDIR):$PATH
          go mod download github.com/NVIDIA/go-nvml
          go get github.com/xlab/c-for-go
          go install github.com/xlab/c-for-go
@@ -32,7 +28,5 @@ jobs:
     - name: Generate
       run: make
 
-    - name: Test
-      run: |
-        cd pkg/rocm_smi
-        go build
+    - name: Build
+      run: make build
