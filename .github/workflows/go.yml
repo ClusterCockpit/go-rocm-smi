@@ -87,5 +87,11 @@ jobs:
     - build-1-17
     - build-1-16
     steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
     - name: Publish
-      run: go list -m github.com/ClusterCockpit/go-rocm-smi/pkg/rocm_smi
+      run: go list -m github.com/ClusterCockpit/go-rocm-smi/pkg/rocm_smi@$(git describe --tags)
