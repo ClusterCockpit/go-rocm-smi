@@ -18,6 +18,9 @@ jobs:
       with:
         go-version: 1.18
 
+    - name: Env
+      run: env
+
     - name: Install c-for-go
       run: |
          find ${GOTOOLDIR} -name "cgo"
