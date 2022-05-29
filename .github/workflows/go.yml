@@ -21,7 +21,7 @@ jobs:
     - name: Install c-for-go
       run: |
          go mod download github.com/NVIDIA/go-nvml
-         go install github.com/xlab/c-for-go
+         go get github.com/xlab/c-for-go
 
     - name: Generate
       run: make
