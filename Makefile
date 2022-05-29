@@ -1,6 +1,6 @@
 
 CFORGO = ${HOME}/go/bin/c-for-go
-CGO = cgo
+CGO = $(shell go env GOTOOLDIR)/cgo
 
 all: generate
 
