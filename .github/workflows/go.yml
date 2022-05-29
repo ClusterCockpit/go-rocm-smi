@@ -94,4 +94,7 @@ jobs:
       with:
         go-version: 1.18
     - name: Publish
-      run: go list -m github.com/ClusterCockpit/go-rocm-smi/pkg/rocm_smi@$(git describe --tags)
+      run: |
+        export TAG=$(git tag -l | tail -n 1)
+        if [ "${TAG}" == "" ]; then export TAG=$(git log -1 --format='%h'); fi
+        go list -m github.com/ClusterCockpit/go-rocm-smi/pkg/rocm_smi@${TAG}
