@@ -24,10 +24,9 @@
 #include <errno.h>
 #include <string.h>
 
-#include "rocm_smi.h"
-#include "kfd_ioctl.h"
-
-#include "rocm_smi_helpers.h"
+#include "rocm_smi/rocm_smi_helpers.h"
+#include "rocm_smi/rocm_smi.h"
+#include "rocm_smi/kfd_ioctl.h"
 
 
 
