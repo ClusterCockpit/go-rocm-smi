@@ -1,6 +1,6 @@
 
 CFORGO = ${HOME}/go/bin/c-for-go
-CGO = cgo
+CGO = $(shell go env GOTOOLDIR)/cgo
 
 all: generate
 
@@ -27,8 +27,11 @@ clean:
 	rm -f pkg/rocm_smi/const.go pkg/rocm_smi/doc.go pkg/rocm_smi/types.go
 	rm -f pkg/rocm_smi/rocm_smi.go
 
-test:
-	cd pkg/rocm_smi && go build && go test $(TEST_VERBOSE)
+build:
+	cd pkg/rocm_smi && go build
+
+test: build
+	cd pkg/rocm_smi && go test $(TEST_VERBOSE)
 
 .PHONY: fmt
 fmt:
