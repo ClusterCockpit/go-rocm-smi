@@ -25,6 +25,9 @@ jobs:
          go mod download github.com/NVIDIA/go-nvml
          go get github.com/xlab/c-for-go
          go install github.com/xlab/c-for-go
+   
+    - name: Get depdencies
+      run: go get
 
     - name: Generate
       run: make
@@ -50,6 +53,9 @@ jobs:
          go get github.com/xlab/c-for-go
          go install github.com/xlab/c-for-go
 
+    - name: Get depdencies
+      run: go get
+
     - name: Generate
       run: make
 
@@ -72,6 +78,9 @@ jobs:
          go mod download github.com/NVIDIA/go-nvml
          go get github.com/xlab/c-for-go
          go install github.com/xlab/c-for-go
+
+    - name: Get depdencies
+      run: go get
 
     - name: Generate
       run: make
