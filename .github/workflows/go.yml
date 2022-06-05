@@ -11,6 +11,7 @@ jobs:
 
   build-1-18:
     runs-on: ubuntu-latest
+    container: rocm/rocm-terminal@latest
     steps:
     - uses: actions/checkout@v3
 
@@ -38,6 +39,7 @@ jobs:
 
   build-1-17:
     runs-on: ubuntu-latest
+    container: rocm/rocm-terminal@latest
     steps:
     - uses: actions/checkout@v3
 
@@ -64,6 +66,7 @@ jobs:
   
   build-1-16:
     runs-on: ubuntu-latest
+    container: rocm/rocm-terminal@latest
     steps:
     - uses: actions/checkout@v3
 
