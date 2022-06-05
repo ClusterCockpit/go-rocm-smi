@@ -1,9 +1,7 @@
 name: Go
 
-on:  
-  push:
-    tags:
-      - '*'
+on: push
+
 
 
 
