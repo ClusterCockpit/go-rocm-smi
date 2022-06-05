@@ -118,7 +118,7 @@ func bytes2String(bytes []byte) string {
 // The number of devices which have monitors is returned. Monitors are
 // referenced by the index which can be between 0 and the returned num_devices - 1.
 // 
-// - Returns STATUS_SUCCESS upon successful call.
+// Returns STATUS_SUCCESS upon successful call.
 func NumMonitorDevices() (int, RSMI_status) {
 	var DeviceCount uint32
 	ret := rsmi_num_monitor_devices(&DeviceCount)
@@ -128,9 +128,9 @@ func NumMonitorDevices() (int, RSMI_status) {
 // DeviceGetHandleByIndex gets the device handle associated with the device with provided device index.
 // It also reads the supported functions and their supported arguments. It retrieves also the **not** unique ID.
 //
-// - Returns STATUS_SUCCESS when call was successful.
-// - Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
-// - Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
+// Returns STATUS_SUCCESS when call was successful.
+// Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
+// Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
 func DeviceGetHandleByIndex(Index int) (DeviceHandle, RSMI_status) {
 	var index uint32 = uint32(Index)
 	handle := DeviceHandle{
@@ -180,10 +180,10 @@ func DeviceGetHandleByIndex(Index int) (DeviceHandle, RSMI_status) {
 // contained within rsmi_dev_brand_get, then this function will return the
 // device marketing name as a string instead of the brand name.
 //
-// - Returns STATUS_SUCCESS when call was successful.
-// - Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
-// - Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
-// - Returns STATUS_INSUFFICIENT_SIZE when the vendor name is longer than defaultRsmiStringLength characters.
+// Returns STATUS_SUCCESS when call was successful.
+// Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
+// Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
+// Returns STATUS_INSUFFICIENT_SIZE when the vendor name is longer than defaultRsmiStringLength characters.
 func DeviceGetBrand(Device DeviceHandle) (string, RSMI_status) {
 	if _, ok := Device.supported["rsmi_dev_brand_get"]; !ok {
 		return "", STATUS_NOT_SUPPORTED
@@ -199,10 +199,10 @@ func DeviceGetBrand(Device DeviceHandle) (string, RSMI_status) {
 // contained within rsmi_dev_brand_get, then this function will return the
 // device marketing name as a string instead of the brand name.
 //
-// - Returns STATUS_SUCCESS when call was successful.
-// - Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
-// - Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
-// - Returns STATUS_INSUFFICIENT_SIZE when the vendor name is longer than defaultRsmiStringLength characters.
+// Returns STATUS_SUCCESS when call was successful.
+// Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
+// Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
+// Returns STATUS_INSUFFICIENT_SIZE when the vendor name is longer than defaultRsmiStringLength characters.
 func (Device DeviceHandle) GetBrand() (string, RSMI_status) {
 	return DeviceGetBrand(Device)
 }
@@ -212,10 +212,10 @@ func (Device DeviceHandle) GetBrand() (string, RSMI_status) {
 // files containing device name information (e.g. /usr/share/misc/pci.ids), then this
 // function will return the hex device ID as a string.
 //
-// - Returns STATUS_SUCCESS when call was successful.
-// - Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
-// - Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
-// - Returns STATUS_INSUFFICIENT_SIZE when the vendor name is longer than defaultRsmiStringLength characters.
+// Returns STATUS_SUCCESS when call was successful.
+// Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
+// Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
+// Returns STATUS_INSUFFICIENT_SIZE when the vendor name is longer than defaultRsmiStringLength characters.
 func DeviceGetName(Device DeviceHandle) (string, RSMI_status) {
 	if _, ok := Device.supported["rsmi_dev_name_get"]; !ok {
 		return "", STATUS_NOT_SUPPORTED
@@ -231,10 +231,10 @@ func DeviceGetName(Device DeviceHandle) (string, RSMI_status) {
 // files containing device name information (e.g. /usr/share/misc/pci.ids), then this
 // function will return the hex device ID as a string.
 //
-// - Returns STATUS_SUCCESS when call was successful.
-// - Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
-// - Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
-// - Returns STATUS_INSUFFICIENT_SIZE when the vendor name is longer than defaultRsmiStringLength characters.
+// Returns STATUS_SUCCESS when call was successful.
+// Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
+// Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
+// Returns STATUS_INSUFFICIENT_SIZE when the vendor name is longer than defaultRsmiStringLength characters.
 func (Device DeviceHandle) GetName() (string, RSMI_status) {
 	return DeviceGetName(Device)
 }
@@ -246,9 +246,9 @@ func (Device DeviceHandle) GetName() (string, RSMI_status) {
 // Note: There are versions of the rocm_smi library which do not export the function rsmi_dev_sku_get. Therefore the bindings
 //       perform a symbol lookup at initialization. If it is not available, the deviceGetSkuFake function is assigned to DeviceGetSku
 //
-// - Returns STATUS_SUCCESS when call was successful.
-// - Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
-// - Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
+// Returns STATUS_SUCCESS when call was successful.
+// Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
+// Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
 var DeviceGetSku = deviceGetSkuFake
 
 // DeviceGetSkuReal is the actual reading function for the SKU. But it is not supported by some devices.
@@ -273,9 +273,9 @@ func deviceGetSkuFake(Device DeviceHandle) (string, RSMI_status) {
 // Note: There are versions of the rocm_smi library which do not export the function rsmi_dev_sku_get. Therefore the bindings
 //       perform a symbol lookup at initialization. If it is not available, the deviceGetSkuFake function is assigned to DeviceGetSku
 //
-// - Returns STATUS_SUCCESS when call was successful.
-// - Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
-// - Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
+// Returns STATUS_SUCCESS when call was successful.
+// Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
+// Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
 func (Device DeviceHandle) GetSku() (string, RSMI_status) {
 	return DeviceGetSku(Device)
 }
@@ -285,10 +285,10 @@ func (Device DeviceHandle) GetSku() (string, RSMI_status) {
 // the system files containing device name information (e.g. /usr/share/misc/pci.ids),
 // then this function will return the hex vendor ID as a string.
 //
-// - Returns STATUS_SUCCESS when call was successful.
-// - Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
-// - Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
-// - Returns STATUS_INSUFFICIENT_SIZE when the vendor name is longer than defaultRsmiStringLength characters.
+// Returns STATUS_SUCCESS when call was successful.
+// Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
+// Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
+// Returns STATUS_INSUFFICIENT_SIZE when the vendor name is longer than defaultRsmiStringLength characters.
 func DeviceGetVendorName(Device DeviceHandle) (string, RSMI_status) {
 	if _, ok := Device.supported["rsmi_dev_vendor_name_get"]; !ok {
 		return "", STATUS_NOT_SUPPORTED
@@ -304,19 +304,19 @@ func DeviceGetVendorName(Device DeviceHandle) (string, RSMI_status) {
 // the system files containing device name information (e.g. /usr/share/misc/pci.ids),
 // then this function will return the hex vendor ID as a string.
 //
-// - Returns STATUS_SUCCESS when call was successful.
-// - Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
-// - Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
-// - Returns STATUS_INSUFFICIENT_SIZE when the vendor name is longer than defaultRsmiStringLength characters.
+// Returns STATUS_SUCCESS when call was successful.
+// Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
+// Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
+// Returns STATUS_INSUFFICIENT_SIZE when the vendor name is longer than defaultRsmiStringLength characters.
 func (Device DeviceHandle) GetVendorName() (string, RSMI_status) {
 	return DeviceGetVendorName(Device)
 }
 
 // DeviceGetVendorId gets the device vendor id associated with the device
 //
-// - Returns STATUS_SUCCESS when call was successful.
-// - Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
-// - Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
+// Returns STATUS_SUCCESS when call was successful.
+// Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
+// Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
 func DeviceGetVendorId(Device DeviceHandle) (uint16, RSMI_status) {
 	var id uint16 = 0
 	if _, ok := Device.supported["rsmi_dev_vendor_id_get"]; !ok {
@@ -329,17 +329,17 @@ func DeviceGetVendorId(Device DeviceHandle) (uint16, RSMI_status) {
 
 // GetVendorId gets the device vendor id associated with the device
 //
-// - Returns STATUS_SUCCESS when call was successful.
-// - Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
-// - Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
+// Returns STATUS_SUCCESS when call was successful.
+// Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
+// Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
 func (Device DeviceHandle) GetVendorId() (uint16, RSMI_status) {
 	return DeviceGetVendorId(Device)
 }
 
 // DeviceGetVramVendor gets the vram vendor string of a gpu device.
 //
-// - Returns STATUS_SUCCESS when call was successful.
-// - Returns STATUS_INSUFFICIENT_SIZE when the vram vendor name is longer than defaultRsmiStringLength characters.
+// Returns STATUS_SUCCESS when call was successful.
+// Returns STATUS_INSUFFICIENT_SIZE when the vram vendor name is longer than defaultRsmiStringLength characters.
 func DeviceGetVramVendor(Device DeviceHandle) (string, RSMI_status) {
 	if _, ok := Device.supported["rsmi_dev_vram_vendor_get"]; !ok {
 		return "", STATUS_NOT_SUPPORTED
@@ -352,18 +352,18 @@ func DeviceGetVramVendor(Device DeviceHandle) (string, RSMI_status) {
 
 // GetVramVendor gets the vram vendor string of a gpu device.
 //
-// - Returns STATUS_SUCCESS when call was successful.
-// - Returns STATUS_INSUFFICIENT_SIZE when the vram vendor name is longer than defaultRsmiStringLength characters.
+// Returns STATUS_SUCCESS when call was successful.
+// Returns STATUS_INSUFFICIENT_SIZE when the vram vendor name is longer than defaultRsmiStringLength characters.
 func (Device DeviceHandle) GetVramVendor() (string, RSMI_status) {
 	return DeviceGetVramVendor(Device)
 }
 
 // DeviceGetSerial gets the serial number string for a device
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_INSUFFICIENT_SIZE is returned if version string is larger than defaultRsmiStringLength bytes.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_INSUFFICIENT_SIZE is returned if version string is larger than defaultRsmiStringLength bytes.
 func DeviceGetSerialNumber(Device DeviceHandle) (string, RSMI_status) {
 	if _, ok := Device.supported["rsmi_dev_serial_number_get"]; !ok {
 		return "", STATUS_NOT_SUPPORTED
@@ -387,20 +387,20 @@ func DeviceGetSerialNumber(Device DeviceHandle) (string, RSMI_status) {
 
 // GetSerialNumber gets the serial number string for a device
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_INSUFFICIENT_SIZE is returned if version string is larger than defaultRsmiStringLength bytes.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_INSUFFICIENT_SIZE is returned if version string is larger than defaultRsmiStringLength bytes.
 func (Device DeviceHandle) GetSerialNumber() (string, RSMI_status) {
 	return DeviceGetSerialNumber(Device)
 }
 
 // DeviceGetSubsystemName gets the name string for the device subsytem
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_INSUFFICIENT_SIZE is returned if version string is larger than defaultRsmiStringLength bytes.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_INSUFFICIENT_SIZE is returned if version string is larger than defaultRsmiStringLength bytes.
 func DeviceGetSubsystemName(Device DeviceHandle) (string, RSMI_status) {
 	if _, ok := Device.supported["rsmi_dev_subsystem_name_get"]; !ok {
 		return "", STATUS_NOT_SUPPORTED
@@ -413,19 +413,19 @@ func DeviceGetSubsystemName(Device DeviceHandle) (string, RSMI_status) {
 
 // GetSubsystemName gets the name string for the device subsytem
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_INSUFFICIENT_SIZE is returned if version string is larger than defaultRsmiStringLength bytes.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_INSUFFICIENT_SIZE is returned if version string is larger than defaultRsmiStringLength bytes.
 func (Device DeviceHandle) GetSubsystemName() (string, RSMI_status) {
 	return DeviceGetSubsystemName(Device)
 }
 
 // DeviceGetSubsystemId gets the subsystem device id associated with the device
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetSubsystemId(Device DeviceHandle) (uint16, RSMI_status) {
 	var id uint16 = 0
 	if _, ok := Device.supported["rsmi_dev_subsystem_id_get"]; !ok {
@@ -437,18 +437,18 @@ func DeviceGetSubsystemId(Device DeviceHandle) (uint16, RSMI_status) {
 
 // DeviceGetSubsystemId gets the subsystem device id associated with the device
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetSubsystemId() (uint16, RSMI_status) {
 	return DeviceGetSubsystemId(Device)
 }
 
 // DeviceGetDrmRenderMinor gets the drm minor number associated with the device
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetDrmRenderMinor(Device DeviceHandle) (uint32, RSMI_status) {
 	var minor uint32 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -460,9 +460,9 @@ func DeviceGetDrmRenderMinor(Device DeviceHandle) (uint32, RSMI_status) {
 
 // DeviceGetDrmRenderMinor gets the drm minor number associated with the device
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetDrmRenverMinor() (uint32, RSMI_status) {
 	return DeviceGetDrmRenderMinor(Device)
 }
@@ -470,9 +470,9 @@ func (Device DeviceHandle) GetDrmRenverMinor() (uint32, RSMI_status) {
 
 // DeviceGetUniqueId gets Unique ID
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetUniqueId(Device DeviceHandle) (uint64, RSMI_status) {
 	var id uint64 = 0
 	if _, ok := Device.supported["rsmi_dev_unique_id_get"]; !ok {
@@ -484,18 +484,18 @@ func DeviceGetUniqueId(Device DeviceHandle) (uint64, RSMI_status) {
 
 // DeviceGetUniqueId gets Unique ID
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetUniqueId() (uint64, RSMI_status) {
 	return DeviceGetUniqueId(Device)
 }
 
 // DeviceGetPciId gets the unique PCI device identifier associated with the device
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetPciId(Device DeviceHandle) (uint64, RSMI_status) {
 	var id uint64 = 0
 	if _, ok := Device.supported["rsmi_dev_pci_id_get"]; !ok {
@@ -507,9 +507,9 @@ func DeviceGetPciId(Device DeviceHandle) (uint64, RSMI_status) {
 
 // DeviceGetPciId gets the unique PCI device identifier associated with the device
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetPciId() (uint64, RSMI_status) {
 	return DeviceGetPciId(Device)
 }
@@ -525,9 +525,9 @@ type Pci_info struct {
 //
 // Note: This is an own addition to simply usage, it uses DeviceGetPciId to retrieve the actual PCI identifer and splits it into the parts.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetPciInfo(Device DeviceHandle) (Pci_info, RSMI_status) {
 	var id uint64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -551,16 +551,16 @@ func DeviceGetPciInfo(Device DeviceHandle) (Pci_info, RSMI_status) {
 //
 // Note: This is an own addition to simply usage, it uses DeviceGetPciId to retrieve the actual PCI identifer and splits it into the parts.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetPciInfo() (Pci_info, RSMI_status) {
 	return DeviceGetPciInfo(Device)
 }
 
 // DeviceGetPciBandwidth gets the list of possible PCIe bandwidths that are available.
 //
-// - STATUS_SUCCESS call was successful.
+// STATUS_SUCCESS call was successful.
 func DeviceGetPciBandwidth(Device DeviceHandle) (RSMI_pcie_bandwidth, RSMI_status) {
 	var info RSMI_pcie_bandwidth = RSMI_pcie_bandwidth {
 		Rate : RSMI_frequencies {
@@ -577,15 +577,15 @@ func DeviceGetPciBandwidth(Device DeviceHandle) (RSMI_pcie_bandwidth, RSMI_statu
 
 // GetPciBandwidth gets the list of possible PCIe bandwidths that are available.
 //
-// - STATUS_SUCCESS call was successful.
+// STATUS_SUCCESS call was successful.
 func (Device DeviceHandle) GetPciBandwidth() (RSMI_pcie_bandwidth, RSMI_status) {
 	return DeviceGetPciBandwidth(Device)
 }
 
 // DeviceSetPciBandwidth controls the set of allowed PCIe bandwidths that can be used.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_PERMISSION function requires root access
+// STATUS_SUCCESS call was successful.
+// STATUS_PERMISSION function requires root access.
 func DeviceSetPciBandwidth(Device DeviceHandle, Mask uint64) RSMI_status {
 	ret := STATUS_NOT_SUPPORTED
 	if _, ok := Device.supported["rsmi_dev_pci_bandwidth_set"]; ok {
@@ -596,8 +596,8 @@ func DeviceSetPciBandwidth(Device DeviceHandle, Mask uint64) RSMI_status {
 
 // SetPciBandwidth controls the set of allowed PCIe bandwidths that can be used.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_PERMISSION function requires root access
+// STATUS_SUCCESS call was successful.
+// STATUS_PERMISSION function requires root access.
 func (Device DeviceHandle) SetPciBandwidth(Mask uint64) RSMI_status {
 	return DeviceSetPciBandwidth(Device, Mask)
 }
@@ -607,8 +607,8 @@ func (Device DeviceHandle) SetPciBandwidth(Mask uint64) RSMI_status {
 //
 // Note: The function blocks execution for 1 second.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
 func DeviceGetPciThroughput(Device DeviceHandle) (uint64, uint64, uint64, RSMI_status) {
 	var sent uint64 = 0
 	var recv uint64 = 0
@@ -625,17 +625,17 @@ func DeviceGetPciThroughput(Device DeviceHandle) (uint64, uint64, uint64, RSMI_s
 //
 // Note: The function blocks execution for 1 second.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
 func (Device DeviceHandle) GetPciThroughput() (uint64, uint64, uint64, RSMI_status) {
 	return DeviceGetPciThroughput(Device)
 }
 
 // DeviceGetPciReplayCounter gets the PCIe replay counter.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetPciReplayCounter(Device DeviceHandle) (uint64, RSMI_status) {
 	var counter uint64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -647,18 +647,18 @@ func DeviceGetPciReplayCounter(Device DeviceHandle) (uint64, RSMI_status) {
 
 // GetPciReplayCounter gets the PCIe replay counter.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetPciReplayCounter() (uint64, RSMI_status) {
 	return DeviceGetPciReplayCounter(Device)
 }
 
 // DeviceGetNumaAffinity gets the NUMA node associated with a device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetNumaAffinity(Device DeviceHandle) (uint32, RSMI_status) {
 	var id uint32 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -670,18 +670,18 @@ func DeviceGetNumaAffinity(Device DeviceHandle) (uint32, RSMI_status) {
 
 // GetNumaAffinity gets the NUMA node associated with a device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetNumaAffinity() (uint32, RSMI_status) {
 	return DeviceGetNumaAffinity(Device)
 }
 
 // DeviceGetPowerAverage gets the average power consumption of the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetPowerAverage(Device DeviceHandle, Sensor uint32) (uint64, RSMI_status) {
 	var power uint64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -699,18 +699,18 @@ func DeviceGetPowerAverage(Device DeviceHandle, Sensor uint32) (uint64, RSMI_sta
 
 // GetPowerAverage gets the average power consumption of the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetPowerAverage(Sensor uint32) (uint64, RSMI_status) {
 	return DeviceGetPowerAverage(Device, Sensor)
 }
 
 // DeviceGetPowerCap gets the cap on power which, when reached, causes the system to take action to reduce power.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetPowerCap(Device DeviceHandle, Sensor uint32) (uint64, RSMI_status) {
 	var power uint64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -728,18 +728,18 @@ func DeviceGetPowerCap(Device DeviceHandle, Sensor uint32) (uint64, RSMI_status)
 
 // GetPowerCap gets the cap on power which, when reached, causes the system to take action to reduce power.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetPowerCap(Sensor uint32) (uint64, RSMI_status) {
 	return DeviceGetPowerCap(Device, Sensor)
 }
 
 // DeviceGetDefaultPowerCap gets the default power cap for the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetDefaultPowerCap(Device DeviceHandle) (uint64, RSMI_status) {
 	var power uint64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -760,18 +760,18 @@ func DeviceGetDefaultPowerCap(Device DeviceHandle) (uint64, RSMI_status) {
 
 // GetDefaultPowerCap gets the default power cap for the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetDefaultPowerCap() (uint64, RSMI_status) {
 	return DeviceGetDefaultPowerCap(Device)
 }
 
 // DeviceGetPowerCapRange gets the range of valid values (maximum and minimum) for the power cap.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetPowerCapRange(Device DeviceHandle, Sensor uint32) (uint64, uint64, RSMI_status) {
 	var mini uint64 = 0
 	var maxi uint64 = 0
@@ -790,9 +790,9 @@ func DeviceGetPowerCapRange(Device DeviceHandle, Sensor uint32) (uint64, uint64,
 
 // GetPowerCapRange gets the range of valid values (maximum and minimum) for the power cap.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetPowerCapRange(Sensor uint32) (uint64, uint64, RSMI_status) {
 	return DeviceGetPowerCapRange(Device, Sensor)
 }
@@ -800,9 +800,9 @@ func (Device DeviceHandle) GetPowerCapRange(Sensor uint32) (uint64, uint64, RSMI
 // DeviceGetEnergyCount gets the energy accumulator counter of the device.
 // It returns the power, the resolution and the timestamp.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetEnergyCount(Device DeviceHandle) (uint64, float32, uint64, RSMI_status) {
 	var power uint64 = 0
 	var resolution float32 = 0
@@ -821,19 +821,19 @@ func DeviceGetEnergyCount(Device DeviceHandle) (uint64, float32, uint64, RSMI_st
 // GetEnergyCount gets the energy accumulator counter of the device.
 // It returns the power, the resolution and the timestamp.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetEnergyCount() (uint64, float32, uint64, RSMI_status) {
 	return DeviceGetEnergyCount(Device)
 }
 
 // DeviceSetPowerCap sets the power cap value to a set of available settings selectable through a mask.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_PERMISSION function requires root access.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_PERMISSION function requires root access.
 func DeviceSetPowerCap(Device DeviceHandle, Sensor uint32, Mask uint64) RSMI_status {
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	if sensors, ok := Device.supported["rsmi_dev_power_cap_set"]; ok {
@@ -850,20 +850,20 @@ func DeviceSetPowerCap(Device DeviceHandle, Sensor uint32, Mask uint64) RSMI_sta
 
 // SetPowerCap sets the power cap value to a set of available settings selectable through a mask.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_PERMISSION function requires root access.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_PERMISSION function requires root access.
 func (Device DeviceHandle) SetPowerCap(Sensor uint32, Mask uint64) RSMI_status {
 	return DeviceSetPowerCap(Device, Sensor, Mask)
 }
 
 // DeviceSetPowerProfile set the power profile.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid. (not documented but likely)
-// - STATUS_PERMISSION function requires root access.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid. (not documented but likely).
+// STATUS_PERMISSION function requires root access.
 func DeviceSetPowerProfile(Device DeviceHandle, Preset RSMI_power_profile_preset_masks) RSMI_status {
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	if _, ok := Device.supported["rsmi_dev_power_profile_set"]; ok {
@@ -874,19 +874,19 @@ func DeviceSetPowerProfile(Device DeviceHandle, Preset RSMI_power_profile_preset
 
 // SetPowerProfile set the power profile.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid. (not documented but likely)
-// - STATUS_PERMISSION function requires root access.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid. (not documented but likely).
+// STATUS_PERMISSION function requires root access.
 func (Device DeviceHandle) SetPowerProfile(Preset RSMI_power_profile_preset_masks) RSMI_status {
 	return DeviceSetPowerProfile(Device, Preset)
 }
 
 // DeviceGetTotalMemory get the total amount of memory that exists.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetTotalMemory(Device DeviceHandle, Type RSMI_memory_type) (uint64, RSMI_status) {
 	var size uint64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -900,18 +900,18 @@ func DeviceGetTotalMemory(Device DeviceHandle, Type RSMI_memory_type) (uint64, R
 
 // GetTotalMemory get the total amount of memory that exists.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetTotalMemory(Type RSMI_memory_type) (uint64, RSMI_status) {
 	return DeviceGetTotalMemory(Device, Type)
 }
 
 // DeviceGetUsedMemory gets the current memory usage.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetUsedMemory(Device DeviceHandle, Type RSMI_memory_type) (uint64, RSMI_status) {
 	var size uint64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -925,18 +925,18 @@ func DeviceGetUsedMemory(Device DeviceHandle, Type RSMI_memory_type) (uint64, RS
 
 // GetUsedMemory gets the current memory usage.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetUsedMemory(Type RSMI_memory_type) (uint64, RSMI_status) {
 	return DeviceGetUsedMemory(Device, Type)
 }
 
 // DeviceGetMemoryUtilization gets the percentage of time any device memory is being used.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetMemoryUtilization(Device DeviceHandle) (uint32, RSMI_status) {
 	var percent uint32 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -948,19 +948,19 @@ func DeviceGetMemoryUtilization(Device DeviceHandle) (uint32, RSMI_status) {
 
 // GetMemoryUtilization gets the percentage of time any device memory is being used.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetMemoryUtilization() (uint32, RSMI_status) {
 	return DeviceGetMemoryUtilization(Device)
 }
 
 // DeviceGetMemoryReservedPages gets information about reserved ("retired") memory pages.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_INSUFFICIENT_SIZE should not happen, the size is retrieved and a big enough slice allocated. 
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_INSUFFICIENT_SIZE should not happen, the size is retrieved and a big enough slice allocated.
 func DeviceGetMemoryReservedPages(Device DeviceHandle) ([]RSMI_retired_page_record, RSMI_status) {
 	var num_records uint32 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -986,19 +986,19 @@ func DeviceGetMemoryReservedPages(Device DeviceHandle) ([]RSMI_retired_page_reco
 
 // GetMemoryReservedPages gets information about reserved ("retired") memory pages.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_INSUFFICIENT_SIZE should not happen, the size is retrieved and a big enough slice allocated. 
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_INSUFFICIENT_SIZE should not happen, the size is retrieved and a big enough slice allocated.
 func (Device DeviceHandle) GetMemoryReservedPages() ([]RSMI_retired_page_record, RSMI_status) {
 	return DeviceGetMemoryReservedPages(Device)
 }
 
 // DeviceGetFanRpms gets the fan speed in RPMs of the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetFanRpms(Device DeviceHandle, Sensor uint32) (int64, RSMI_status) {
 	var speed int64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1016,18 +1016,18 @@ func DeviceGetFanRpms(Device DeviceHandle, Sensor uint32) (int64, RSMI_status) {
 
 // GetFanRpms gets the fan speed in RPMs of the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetFanRpms(Sensor uint32) (int64, RSMI_status) {
 	return DeviceGetFanRpms(Device, Sensor)
 }
 
 // DeviceGetFanSpeed gets the fan speed for the specified device as a value relative to MAX_FAN_SPEED.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetFanSpeed(Device DeviceHandle, Sensor uint32) (int64, RSMI_status) {
 	var speed int64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1045,18 +1045,18 @@ func DeviceGetFanSpeed(Device DeviceHandle, Sensor uint32) (int64, RSMI_status) 
 
 // GetFanSpeed gets the fan speed for the specified device as a value relative to MAX_FAN_SPEED.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetFanSpeed(Sensor uint32) (int64, RSMI_status) {
 	return DeviceGetFanSpeed(Device, Sensor)
 }
 
 // DeviceGetMaxFanSpeed gets the max. fan speed of the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetMaxFanSpeed(Device DeviceHandle, Sensor uint32) (uint64, RSMI_status) {
 	var speed uint64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1074,18 +1074,18 @@ func DeviceGetMaxFanSpeed(Device DeviceHandle, Sensor uint32) (uint64, RSMI_stat
 
 // DeviceGetMaxFanSpeed gets the max. fan speed of the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetMaxFanSpeed(Sensor uint32) (uint64, RSMI_status) {
 	return DeviceGetMaxFanSpeed(Device, Sensor)
 }
 
 // DeviceGetTemperatureMetric gets the temperature metric value for the specified metric, from the specified temperature sensor on the specified device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetTemperatureMetric(Device DeviceHandle, Sensor RSMI_temperature_type, Metric RSMI_temperature_metric) (int64, RSMI_status) {
 	var temp int64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1112,9 +1112,9 @@ func DeviceGetTemperatureMetric(Device DeviceHandle, Sensor RSMI_temperature_typ
 
 // GetTemperatureMetric gets the temperature metric value for the specified metric, from the specified temperature sensor on the specified device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetTemperatureMetric(Sensor RSMI_temperature_type, Metric RSMI_temperature_metric) (int64, RSMI_status) {
 	return DeviceGetTemperatureMetric(Device, Sensor, Metric)
 }
@@ -1122,9 +1122,9 @@ func (Device DeviceHandle) GetTemperatureMetric(Sensor RSMI_temperature_type, Me
 // DeviceGetVoltageMetric gets the voltage metric value for the specified metric, from the
 // specified voltage sensor on the specified device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetVoltageMetric(Device DeviceHandle, Sensor RSMI_voltage_type, Metric RSMI_voltage_metric) (int64, RSMI_status) {
 	var voltage int64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1152,17 +1152,17 @@ func DeviceGetVoltageMetric(Device DeviceHandle, Sensor RSMI_voltage_type, Metri
 // GetVoltageMetric gets the voltage metric value for the specified metric, from the
 // specified voltage sensor on the specified device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetVoltageMetric(Sensor RSMI_voltage_type, Metric RSMI_voltage_metric) (int64, RSMI_status) {
 	return DeviceGetVoltageMetric(Device, Sensor, Metric)
 }
 
 // DeviceResetFan resets the fan to automatic driver control.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
 func DeviceResetFan(Device DeviceHandle, Sensor uint32) RSMI_status {
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	if sensors, ok := Device.supported["rsmi_dev_fan_reset"]; ok {
@@ -1175,17 +1175,17 @@ func DeviceResetFan(Device DeviceHandle, Sensor uint32) RSMI_status {
 
 // ResetFan resets the fan to automatic driver control.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
 func (Device DeviceHandle) ResetFan(Sensor uint32) RSMI_status {
 	return DeviceResetFan(Device, Sensor)
 }
 
 // DeviceSetFanSpeed sets the fan speed for the specified device with the provided speed, in RPMs.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_PERMISSION function requires root access.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_PERMISSION function requires root access.
 func DeviceSetFanSpeed(Device DeviceHandle, Sensor uint32, Speed uint64) RSMI_status {
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	if sensors, ok := Device.supported["rsmi_dev_fan_speed_set"]; ok {
@@ -1198,18 +1198,18 @@ func DeviceSetFanSpeed(Device DeviceHandle, Sensor uint32, Speed uint64) RSMI_st
 
 // SetFanSpeed sets the fan speed for the specified device with the provided speed, in RPMs.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_PERMISSION function requires root access.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_PERMISSION function requires root access.
 func (Device DeviceHandle) SetFanSpeed(Sensor uint32, Speed uint64) RSMI_status {
 	return DeviceSetFanSpeed(Device, Sensor, Speed)
 }
 
 // DeviceGetBusyPercent gets the percentage of time device is busy doing any processing.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetBusyPercent(Device DeviceHandle) (uint32, RSMI_status) {
 	var util uint32 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1221,18 +1221,18 @@ func DeviceGetBusyPercent(Device DeviceHandle) (uint32, RSMI_status) {
 
 // GetBusyPercent gets the percentage of time device is busy doing any processing.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetBusyPercent() (uint32, RSMI_status) {
 	return DeviceGetBusyPercent(Device)
 }
 
 // DeviceGetUtilizationCounters gets coarse grain utilization counter of the specified device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetUtilizationCounters(Device DeviceHandle) ([]RSMI_utilization_counter, uint64, RSMI_status) {
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	var util []RSMI_utilization_counter
@@ -1253,18 +1253,18 @@ func DeviceGetUtilizationCounters(Device DeviceHandle) ([]RSMI_utilization_count
 
 // GetUtilizationCounters gets coarse grain utilization counter of the specified device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetUtilizationCounters() ([]RSMI_utilization_counter, uint64, RSMI_status) {
 	return DeviceGetUtilizationCounters(Device)
 }
 
 // DeviceGetPerfLevel gets the performance level of the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetPerfLevel(Device DeviceHandle) (RSMI_dev_perf_level, RSMI_status) {
 	var level RSMI_dev_perf_level = DEV_PERF_LEVEL_UNKNOWN
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1276,9 +1276,9 @@ func DeviceGetPerfLevel(Device DeviceHandle) (RSMI_dev_perf_level, RSMI_status) 
 
 // GetPerfLevel gets the performance level of the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetPerfLevel() (RSMI_dev_perf_level, RSMI_status) {
 	return DeviceGetPerfLevel(Device)
 }
@@ -1290,9 +1290,9 @@ func (Device DeviceHandle) GetPerfLevel() (RSMI_dev_perf_level, RSMI_status) {
 // performance variation minimal.
 // The performance level is set to DEV_PERF_LEVEL_DETERMINISM.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceSetDeterminismMode(Device DeviceHandle, Clock uint64) RSMI_status {
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	if _, ok := Device.supported["rsmi_perf_determinism_mode_set"]; ok {
@@ -1308,18 +1308,18 @@ func DeviceSetDeterminismMode(Device DeviceHandle, Clock uint64) RSMI_status {
 // performance variation minimal.
 // The performance level is set to DEV_PERF_LEVEL_DETERMINISM.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) SetDeterminismMode(Clock uint64) RSMI_status {
 	return DeviceSetDeterminismMode(Device, Clock)
 }
 
 // DeviceGetOverdriveLevel gets the overdrive percent associated with the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetOverdriveLevel(Device DeviceHandle) (uint32, RSMI_status) {
 	var level uint32 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1331,9 +1331,9 @@ func DeviceGetOverdriveLevel(Device DeviceHandle) (uint32, RSMI_status) {
 
 // GetOverdriveLevel gets the overdrive percent associated with the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetOverdriveLevel() (uint32, RSMI_status) {
 	return DeviceGetOverdriveLevel(Device)
 }
@@ -1341,9 +1341,9 @@ func (Device DeviceHandle) GetOverdriveLevel() (uint32, RSMI_status) {
 // DeviceGetClockFrequency gets the list of possible system clock speeds of device for a
 // specified clock type.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetClockFrequency(Device DeviceHandle, Clock RSMI_clk_type) (RSMI_frequencies, RSMI_status) {
 	var freqs RSMI_frequencies = RSMI_frequencies{
 		Supported: 0,
@@ -1365,18 +1365,18 @@ func DeviceGetClockFrequency(Device DeviceHandle, Clock RSMI_clk_type) (RSMI_fre
 // GetClockFrequency gets the list of possible system clock speeds of device for a
 // specified clock type.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetClockFrequency(Clock RSMI_clk_type) (RSMI_frequencies, RSMI_status) {
 	return DeviceGetClockFrequency(Device, Clock)
 }
 
 // DeviceReset resets the GPU associated with the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceReset(Device DeviceHandle) RSMI_status {
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	if _, ok := Device.supported["rsmi_dev_gpu_reset"]; ok {
@@ -1387,18 +1387,18 @@ func DeviceReset(Device DeviceHandle) RSMI_status {
 
 // Reset resets the GPU associated with the device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) Reset() RSMI_status {
 	return DeviceReset(Device)
 }
 
 // DeviceGetVoltageFrequencyCurve retrieves the voltage/frequency curve information.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetVoltageFrequencyCurve(Device DeviceHandle) (RSMI_od_volt_freq_data, RSMI_status) {
 	var data RSMI_od_volt_freq_data = RSMI_od_volt_freq_data{
 		Num_regions: 0,
@@ -1412,18 +1412,18 @@ func DeviceGetVoltageFrequencyCurve(Device DeviceHandle) (RSMI_od_volt_freq_data
 
 // DeviceGetVoltageFrequencyCurve retrieves the voltage/frequency curve information.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetVoltageFrequencyCurve() (RSMI_od_volt_freq_data, RSMI_status) {
 	return DeviceGetVoltageFrequencyCurve(Device)
 }
 
 // DeviceGetMetrics retrieves the GPU metrics information.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetMetrics(Device DeviceHandle) (RSMI_gpu_metrics, RSMI_status) {
 	var data RSMI_gpu_metrics
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1435,9 +1435,9 @@ func DeviceGetMetrics(Device DeviceHandle) (RSMI_gpu_metrics, RSMI_status) {
 
 // GetMetrics retrieves the GPU metrics information.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetMetrics() (RSMI_gpu_metrics, RSMI_status) {
 	return DeviceGetMetrics(Device)
 }
@@ -1445,9 +1445,9 @@ func (Device DeviceHandle) GetMetrics() (RSMI_gpu_metrics, RSMI_status) {
 // DeviceSetClockRange sets the clock range information.
 // Only usable with clock types CLK_TYPE_SYS and CLK_TYPE_MEM.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceSetClockRange(Device DeviceHandle, MinFreq uint64, MaxFreq uint64, Clock RSMI_clk_type) RSMI_status {
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	if clocks, ok := Device.supported["rsmi_dev_clk_range_set"]; ok {
@@ -1466,9 +1466,9 @@ func DeviceSetClockRange(Device DeviceHandle, MinFreq uint64, MaxFreq uint64, Cl
 // SetClockRange sets the clock range information.
 // Only usable with clock types CLK_TYPE_SYS and CLK_TYPE_MEM.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) SetClockRange(MinFreq uint64, MaxFreq uint64, Clock RSMI_clk_type) RSMI_status {
 	return DeviceSetClockRange(Device, MinFreq, MaxFreq, Clock)
 }
@@ -1476,9 +1476,9 @@ func (Device DeviceHandle) SetClockRange(MinFreq uint64, MaxFreq uint64, Clock R
 // DeviceSetClockInfo sets the clock frequency information.
 // Only usable with clock types CLK_TYPE_SYS and CLK_TYPE_MEM.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceSetClockInfo(Device DeviceHandle, Level RSMI_freq_ind, ClockFreq uint64, Clock RSMI_clk_type) RSMI_status {
 	ret := rsmi_dev_od_clk_info_set(Device.index, Level, ClockFreq, Clock)
 	return ret
@@ -1487,9 +1487,9 @@ func DeviceSetClockInfo(Device DeviceHandle, Level RSMI_freq_ind, ClockFreq uint
 // SetClockInfo sets the clock frequency information.
 // Only usable with clock types CLK_TYPE_SYS and CLK_TYPE_MEM.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) SetClockInfo(Level RSMI_freq_ind, ClockFreq uint64, Clock RSMI_clk_type) RSMI_status {
 	return DeviceSetClockInfo(Device, Level, ClockFreq, Clock)
 }
@@ -1497,9 +1497,9 @@ func (Device DeviceHandle) SetClockInfo(Level RSMI_freq_ind, ClockFreq uint64, C
 // DeviceSetVoltageInfo sets the voltage curve points.
 // the Vpoint argument can be 1,2 or 3 or STATUS_NOT_SUPPORTED is returned.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceSetVoltageInfo(Device DeviceHandle, Vpoint uint32, ClockFreq uint64, Voltage uint64) RSMI_status {
     if Vpoint < 1 || Vpoint > 3 {
         return STATUS_NOT_SUPPORTED
@@ -1511,18 +1511,18 @@ func DeviceSetVoltageInfo(Device DeviceHandle, Vpoint uint32, ClockFreq uint64, 
 // SetVoltageInfo sets the voltage curve points.
 // the Vpoint argument can be 1,2 or 3 or STATUS_NOT_SUPPORTED is returned.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) SetVoltageInfo(Vpoint uint32, ClockFreq uint64, Voltage uint64) RSMI_status {
 	return DeviceSetVoltageInfo(Device, Vpoint, ClockFreq, Voltage)
 }
 
 // DeviceGetVoltageFrequencyCurveRegions retrieves the current valid regions in the frequency/voltage space.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetVoltageFrequencyCurveRegions(Device DeviceHandle) ([]RSMI_freq_volt_region, RSMI_status) {
 	var num_regions uint32 = 0
 	regions := make([]RSMI_freq_volt_region, 0)
@@ -1536,9 +1536,9 @@ func DeviceGetVoltageFrequencyCurveRegions(Device DeviceHandle) ([]RSMI_freq_vol
 
 // GetVoltageFrequencyCurveRegions retrieves the current valid regions in the frequency/voltage space.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetVoltageFrequencyCurveRegions() ([]RSMI_freq_volt_region, RSMI_status) {
 	return DeviceGetVoltageFrequencyCurveRegions(Device)
 }
@@ -1546,9 +1546,9 @@ func (Device DeviceHandle) GetVoltageFrequencyCurveRegions() ([]RSMI_freq_volt_r
 // DeviceGetPowerProfile gets the list of available preset power profiles and an indication of
 // which profile is currently active.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetPowerProfile(Device DeviceHandle, Sensor uint32) (RSMI_power_profile_status, RSMI_status) {
 	var status RSMI_power_profile_status = RSMI_power_profile_status{
 		Available_profiles: 0,
@@ -1573,9 +1573,9 @@ func DeviceGetPowerProfile(Device DeviceHandle, Sensor uint32) (RSMI_power_profi
 // GetPowerProfile gets the list of available preset power profiles and an indication of
 // which profile is currently active.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetPowerProfile(Sensor uint32) (RSMI_power_profile_status, RSMI_status) {
 	return DeviceGetPowerProfile(Device, Sensor)
 }
@@ -1585,9 +1585,9 @@ func (Device DeviceHandle) GetPowerProfile(Sensor uint32) (RSMI_power_profile_st
 // Note: The RSMI library provides two functions to set the performance level. Which function is called by DeviceSetPerfLevel is
 //       determined at initialization.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_PERMISSION function requires root access.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_PERMISSION function requires root access.
 var DeviceSetPerfLevel = deviceSetPerfLevel_v1
 
 func deviceSetPerfLevel_v0(Device DeviceHandle, Level RSMI_dev_perf_level) RSMI_status {
@@ -1609,9 +1609,9 @@ func deviceSetPerfLevel_v1(Device DeviceHandle, Level RSMI_dev_perf_level) RSMI_
 // Note: The RSMI library provides two functions to set the performance level. Which function is called by SetPerfLevel is
 //       determined at initialization.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_PERMISSION function requires root access.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_PERMISSION function requires root access.
 func (Device DeviceHandle) SetPerfLevel(Level RSMI_dev_perf_level) RSMI_status {
 	return DeviceSetPerfLevel(Device, Level)
 }
@@ -1621,9 +1621,9 @@ func (Device DeviceHandle) SetPerfLevel(Level RSMI_dev_perf_level) RSMI_status {
 // Note: The RSMI library provides two functions to set the overdrive level. Which function is called by DeviceSetOverdriveLevel is
 //       determined at initialization.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_PERMISSION function requires root access.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_PERMISSION function requires root access.
 var DeviceSetOverdriveLevel = deviceSetOverdriveLevel_v1
 
 
@@ -1643,18 +1643,18 @@ func deviceSetOverdriveLevel_v1(Device DeviceHandle, Overdrive uint32) RSMI_stat
 // Note: The RSMI library provides two functions to set the overdrive level. Which function is called by SetOverdriveLevel is
 //       determined at initialization.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_PERMISSION function requires root access.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_PERMISSION function requires root access.
 func (Device DeviceHandle) SetOverdriveLevel(Overdrive uint32) RSMI_status {
 	return DeviceSetOverdriveLevel(Device, Overdrive)
 }
 
 // DeviceSetClockFrequency controls the set of allowed frequencies that can be used for the specified clock.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_PERMISSION function requires root access.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_PERMISSION function requires root access.
 func DeviceSetClockFrequency(Device DeviceHandle, Clock RSMI_clk_type, FreqMask uint64) RSMI_status {
 	ret := rsmi_dev_gpu_clk_freq_set(Device.index, Clock, FreqMask)
 	return ret
@@ -1662,18 +1662,18 @@ func DeviceSetClockFrequency(Device DeviceHandle, Clock RSMI_clk_type, FreqMask 
 
 // SetClockFrequency controls the set of allowed frequencies that can be used for the specified clock.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_PERMISSION function requires root access.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_PERMISSION function requires root access.
 func (Device DeviceHandle) SetClockFrequency(Clock RSMI_clk_type, FreqMask uint64) RSMI_status {
 	return DeviceSetClockFrequency(Device, Clock, FreqMask)
 }
 
 // DeviceGetVbiosVersionString gets the VBIOS identifer string.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetVbiosVersionString(Device DeviceHandle) (string, RSMI_status) {
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	var version []byte = make([]byte, defaultRsmiStringLength)
@@ -1686,18 +1686,18 @@ func DeviceGetVbiosVersionString(Device DeviceHandle) (string, RSMI_status) {
 
 // GetVbiosVersionString gets the VBIOS identifer string.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetVbiosVersionString() (string, RSMI_status) {
 	return DeviceGetVbiosVersionString(Device)
 }
 
 // DeviceGetFirmwareVersion gets the firmware versions for a device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetFirmwareVersion(Device DeviceHandle, Block RSMI_fw_block) (uint64, RSMI_status) {
 	var version uint64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1715,18 +1715,18 @@ func DeviceGetFirmwareVersion(Device DeviceHandle, Block RSMI_fw_block) (uint64,
 
 // GetFirmwareVersion gets the firmware versions for a device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetFirmwareVersion(Block RSMI_fw_block) (uint64, RSMI_status) {
 	return DeviceGetFirmwareVersion(Device, Block)
 }
 
 // DeviceGetEccCount retrieves the error counts for a GPU block.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetEccCount(Device DeviceHandle, Block RSMI_gpu_block) (RSMI_error_count, RSMI_status) {
 	var counts RSMI_error_count = RSMI_error_count{
 		Correctable_err: 0,
@@ -1747,18 +1747,18 @@ func DeviceGetEccCount(Device DeviceHandle, Block RSMI_gpu_block) (RSMI_error_co
 
 // GetEccCount retrieves the error counts for a GPU block.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetEccCount(Block RSMI_gpu_block) (RSMI_error_count, RSMI_status) {
 	return DeviceGetEccCount(Device, Block)
 }
 
 // DeviceGetEccStatus retrieves the ECC status for a GPU block.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetEccStatus(Device DeviceHandle, Block RSMI_gpu_block) (RSMI_ras_err_state, RSMI_status) {
 	var state RSMI_ras_err_state = RAS_ERR_STATE_INVALID
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1781,18 +1781,18 @@ func DeviceGetEccStatus(Device DeviceHandle, Block RSMI_gpu_block) (RSMI_ras_err
 
 // GetEccStatus retrieves the ECC status for a GPU block.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetEccStatus(Block RSMI_gpu_block) (RSMI_ras_err_state, RSMI_status) {
 	return DeviceGetEccStatus(Device, Block)
 }
 
 // DeviceGetEccMask retrieved the enabled ECC bit-mask.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetEccMask(Device DeviceHandle) (uint64, RSMI_status) {
 	var mask uint64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1804,9 +1804,9 @@ func DeviceGetEccMask(Device DeviceHandle) (uint64, RSMI_status) {
 
 // GetEccMask retrieved the enabled ECC bit-mask.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetEccMask() (uint64, RSMI_status) {
 	return DeviceGetEccMask(Device)
 }
@@ -1817,9 +1817,9 @@ func (Device DeviceHandle) GetEccMask() (uint64, RSMI_status) {
 
 // DeviceXgmiErrorStatus retrieves the XGMI error status for a device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceXgmiErrorStatus(Device DeviceHandle) (RSMI_xgmi_status, RSMI_status) {
 	var status RSMI_xgmi_status = XGMI_STATUS_NO_ERRORS
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1832,16 +1832,16 @@ func DeviceXgmiErrorStatus(Device DeviceHandle) (RSMI_xgmi_status, RSMI_status) 
 
 // XgmiErrorStatus retrieves the XGMI error status for a device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) XgmiErrorStatus() (RSMI_xgmi_status, RSMI_status) {
 	return DeviceXgmiErrorStatus(Device)
 }
 
 // DeviceXgmiErrorReset resets the XGMI error status for a device.
 //
-// - STATUS_SUCCESS call was successful.
+// STATUS_SUCCESS call was successful.
 func DeviceXgmiErrorReset(Device DeviceHandle) RSMI_status {
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	// if _, ok := Device.supported["rsmi_dev_xgmi_error_reset"]; ok {
@@ -1853,16 +1853,16 @@ func DeviceXgmiErrorReset(Device DeviceHandle) RSMI_status {
 
 // XgmiErrorReset resets the XGMI error status for a device.
 //
-// - STATUS_SUCCESS call was successful.
+// STATUS_SUCCESS call was successful.
 func (Device DeviceHandle) XgmiErrorReset() RSMI_status {
 	return DeviceXgmiErrorReset(Device)
 }
 
 // DeviceXgmiHiveId retrieves the XGMI hive id for a device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceXgmiHiveId(Device DeviceHandle) (uint64, RSMI_status) {
 	var id uint64 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1876,9 +1876,9 @@ func DeviceXgmiHiveId(Device DeviceHandle) (uint64, RSMI_status) {
 
 // XgmiHiveId retrieves the XGMI hive id for a device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) XgmiHiveId() (uint64, RSMI_status) {
 	return DeviceXgmiHiveId(Device)
 }
@@ -1887,8 +1887,8 @@ func (Device DeviceHandle) XgmiHiveId() (uint64, RSMI_status) {
 
 // DeviceGetNumaNode retrieves the NUMA CPU node number for a device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetNumaNode(Device DeviceHandle) (uint32, RSMI_status) {
 	var node uint32 = 0
 	ret := rsmi_topo_get_numa_node_number(Device.index, &node)
@@ -1897,16 +1897,16 @@ func DeviceGetNumaNode(Device DeviceHandle) (uint32, RSMI_status) {
 
 // GetNumaNode retrieves the NUMA CPU node number for a device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetNumaNode() (uint32, RSMI_status) {
 	return DeviceGetNumaNode(Device)
 }
 
 // DeviceGetLinkWeight retrieves the weight for a connection between 2 GPUs.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetLinkWeight(SrcDevice DeviceHandle, DstDevice DeviceHandle) (uint64, RSMI_status) {
 	var weight uint64 = 0
 	ret := rsmi_topo_get_link_weight(SrcDevice.index, DstDevice.index, &weight)
@@ -1915,16 +1915,16 @@ func DeviceGetLinkWeight(SrcDevice DeviceHandle, DstDevice DeviceHandle) (uint64
 
 // GetLinkWeight retrieves the weight for a connection between 2 GPUs.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetLinkWeight(DstDevice DeviceHandle) (uint64, RSMI_status) {
 	return DeviceGetLinkWeight(Device, DstDevice)
 }
 
 // DeviceGetMinMaxBandwidth retreives minimal and maximal IO link bandwidth between 2 GPUs.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetMinMaxBandwidth(SrcDevice DeviceHandle, DstDevice DeviceHandle) (uint64, uint64, RSMI_status) {
 	var mini uint64 = 0
 	var maxi uint64 = 0
@@ -1934,16 +1934,16 @@ func DeviceGetMinMaxBandwidth(SrcDevice DeviceHandle, DstDevice DeviceHandle) (u
 
 // GetMinMaxBandwidth retreives minimal and maximal IO link bandwidth between 2 GPUs.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetMinMaxBandwidth(DstDevice DeviceHandle) (uint64, uint64, RSMI_status) {
 	return DeviceGetMinMaxBandwidth(Device, DstDevice)
 }
 
 // DeviceGetLinkType retrieves the hops and the connection type between 2 GPUs.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetLinkType(SrcDevice DeviceHandle, DstDevice DeviceHandle) (uint64, RSMI_IO_LINK_TYPE, RSMI_status) {
 	var hops uint64 = 0
 	var linkType RSMI_IO_LINK_TYPE = IOLINK_TYPE_UNDEFINED
@@ -1953,16 +1953,16 @@ func DeviceGetLinkType(SrcDevice DeviceHandle, DstDevice DeviceHandle) (uint64, 
 
 // GetLinkType retrieves the hops and the connection type between 2 GPUs.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) GetLinkType(DstDevice DeviceHandle) (uint64, RSMI_IO_LINK_TYPE, RSMI_status) {
 	return DeviceGetLinkType(Device, DstDevice)
 }
 
 // DeviceIsP2PAccessible returns the P2P availability status between 2 GPUs.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceIsP2PAccessible(SrcDevice DeviceHandle, DstDevice DeviceHandle) (bool, RSMI_status) {
 	var access bool = false
 	ret := rsmi_is_P2P_accessible(SrcDevice.index, DstDevice.index, &access)
@@ -1971,8 +1971,8 @@ func DeviceIsP2PAccessible(SrcDevice DeviceHandle, DstDevice DeviceHandle) (bool
 
 // IsP2PAccessible returns the P2P availability status between 2 GPUs.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) IsP2PAccessible(DstDevice DeviceHandle) (bool, RSMI_status) {
 	return DeviceIsP2PAccessible(Device, DstDevice)
 }
@@ -1982,7 +1982,7 @@ func (Device DeviceHandle) IsP2PAccessible(DstDevice DeviceHandle) (bool, RSMI_s
 
 // DeviceInitEventNotification prepares to collect event notifications for a GPU.
 //
-// - STATUS_SUCCESS call was successful.
+// STATUS_SUCCESS call was successful.
 func DeviceInitEventNotification(Device DeviceHandle) RSMI_status {
 	ret := rsmi_event_notification_init(Device.index)
 	return ret
@@ -1990,7 +1990,7 @@ func DeviceInitEventNotification(Device DeviceHandle) RSMI_status {
 
 // InitEventNotification prepares to collect event notifications for a GPU.
 //
-// - STATUS_SUCCESS call was successful.
+// STATUS_SUCCESS call was successful.
 func (Device DeviceHandle) InitEventNotification() RSMI_status {
 	return DeviceInitEventNotification(Device)
 }
@@ -1998,8 +1998,8 @@ func (Device DeviceHandle) InitEventNotification() RSMI_status {
 // DeviceSetEventNotificationMask specifies which events to collect for a device. The events
 // set in mask are OR'd together.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INIT_ERROR is returned if DeviceInitEventNotification() has not been called before
+// STATUS_SUCCESS call was successful.
+// STATUS_INIT_ERROR is returned if DeviceInitEventNotification() has not been called before.
 func DeviceSetEventNotificationMask(Device DeviceHandle, Mask uint64) RSMI_status {
 	ret := rsmi_event_notification_mask_set(Device.index, Mask)
 	return ret
@@ -2008,16 +2008,16 @@ func DeviceSetEventNotificationMask(Device DeviceHandle, Mask uint64) RSMI_statu
 // SetEventNotificationMask specifies which events to collect for a device. The events
 // set in mask are OR'd together.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INIT_ERROR is returned if DeviceInitEventNotification() has not been called before
+// STATUS_SUCCESS call was successful.
+// STATUS_INIT_ERROR is returned if DeviceInitEventNotification() has not been called before.
 func (Device DeviceHandle) SetEventNotificationMask(Mask uint64) RSMI_status {
 	return DeviceSetEventNotificationMask(Device, Mask)
 }
 
 // GetEventNotification collects event notifications, waiting a specified amount of time.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NO_DATA No events were found to collect.
+// STATUS_SUCCESS call was successful.
+// STATUS_NO_DATA No events were found to collect.
 func GetEventNotification(TimeoutMs int32) ([]RSMI_evt_notification_data, RSMI_status) {
 	var num_events uint32 = 0
 	data := make([]RSMI_evt_notification_data, 0)
@@ -2032,8 +2032,8 @@ func GetEventNotification(TimeoutMs int32) ([]RSMI_evt_notification_data, RSMI_s
 // DeviceStopEventNotification closes any file handles and free any resources used by event
 // notification for a GPU.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS resources for the given device have either already been freed, or were never allocated by DeviceInitEventNotification.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS resources for the given device have either already been freed, or were never allocated by DeviceInitEventNotification.
 func DeviceStopEventNotification(Device DeviceHandle) RSMI_status {
 	ret := rsmi_event_notification_stop(Device.index)
 	return ret
@@ -2042,8 +2042,8 @@ func DeviceStopEventNotification(Device DeviceHandle) RSMI_status {
 // StopEventNotification closes any file handles and free any resources used by event
 // notification for a GPU.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS resources for the given device have either already been freed, or were never allocated by DeviceInitEventNotification.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS resources for the given device have either already been freed, or were never allocated by DeviceInitEventNotification.
 func (Device DeviceHandle) StopEventNotification() RSMI_status {
 	return DeviceStopEventNotification(Device)
 }

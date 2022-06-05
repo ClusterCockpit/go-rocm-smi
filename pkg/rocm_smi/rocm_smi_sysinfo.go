@@ -22,9 +22,9 @@ package rocm_smi
 
 // ComputeProcesses gets process information about processes currently using GPU.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_INSUFFICIENT_SIZE should not happen as the size is retrieved and a big enough slice allocated.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_INSUFFICIENT_SIZE should not happen as the size is retrieved and a big enough slice allocated.
 func ComputeProcesses() ([]RSMI_process_info, RSMI_status) {
 	var ret RSMI_status = STATUS_SUCCESS
 	var num_procs uint32 = 0
@@ -42,9 +42,9 @@ func ComputeProcesses() ([]RSMI_process_info, RSMI_status) {
 }
 // ComputeProcessByPid gets process information about a specific process.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_NOT_FOUND is returned if there was no process information found for the provided Pid
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_NOT_FOUND is returned if there was no process information found for the provided Pid.
 func ComputeProcessByPid(Pid uint32) (RSMI_process_info, RSMI_status) {
 	var proc RSMI_process_info
 	ret := rsmi_compute_process_info_by_pid_get(Pid, &proc)
@@ -53,9 +53,9 @@ func ComputeProcessByPid(Pid uint32) (RSMI_process_info, RSMI_status) {
 
 // ComputeProcessGpus gets the device indices currently being used by a process
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_INSUFFICIENT_SIZE should not happen as the size is retrieved and a big enough slice allocated.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_INSUFFICIENT_SIZE should not happen as the size is retrieved and a big enough slice allocated.
 func ComputeProcessGpus(Pid uint32) ([]uint32, RSMI_status) {
 	var num_devs uint32 = 0
 	var devs []uint32

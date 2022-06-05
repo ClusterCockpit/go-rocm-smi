@@ -70,9 +70,13 @@ func (d *DeviceHandle) ID() uint16 {
 }
 
 // Supported returns the supported functions and their arguments. The structure is
-// - Go or C function name (like DeviceGetName and rsmi_dev_name_get)
+//
+// Go or C function name (like DeviceGetName and rsmi_dev_name_get)
+//
 //     - Default variant identifier (DEFAULT_VARIANT) or a value usable for temperature, memory and other types listed in the const.go
+//
 //         - If the parent is DEFAULT_VARIANT: List with single entry containing the default usable value for temperature, memory, etc. type
+//
 //         - If it is a usable value: There might be a list of sub_values which relate to the second argument like DeviceGetTemperatureMetric with its RSMI_temperature_type and RSMI_temperature_metric, first the sensors and second min, max or current.
 //
 // This information is used when calling one of the functions listed and the arguments are compared to avoid (maybe) costly calls to the RSMI library.
@@ -105,9 +109,11 @@ func Init() RSMI_status {
 // including those corresponding to sources of information that SMI provides. This version
 // uses the Flags argument as RSMI_init_flags:
 // 
-// - INIT_FLAG_ALL_GPUS: Attempt to add all GPUs found (including non-AMD) to the list of devices from which SMI information can be retrieved. By default, only AMD devices are  enumerated by RSMI.
+// INIT_FLAG_ALL_GPUS: Attempt to add all GPUs found (including non-AMD) to the list of devices from which SMI information can be retrieved. By default, only AMD devices are  enumerated by RSMI.
 // 
-// - STATUS_SUCCESS is returned upon successful call.
+// STATUS_SUCCESS is returned upon successful call.
+//
+// The function panics if the ROCm SMI library cannot be found or opened. 
 func InitWithFlags(Flags uint64) RSMI_status {
 	lib := dl.New(rocmSmiLibraryName, rocmSmiLibraryLoadFlags)
 	if lib == nil {
@@ -125,6 +131,8 @@ func InitWithFlags(Flags uint64) RSMI_status {
 }
 
 // Shutdown shuts down ROCm SMI and does any necessary clean up.
+//
+// The function panics if the ROCm SMI library cannot be closed. 
 func Shutdown() RSMI_status {
 	ret := rsmi_shut_down()
 	if ret != STATUS_SUCCESS {
@@ -141,7 +149,7 @@ func Shutdown() RSMI_status {
 
 // Version gets the major, minor, patch and build string for the currently running build of RSMI.
 //
-// - STATUS_SUCCESS is returned upon successful call.
+// STATUS_SUCCESS is returned upon successful call.
 func Version() (RSMI_version, RSMI_status) {
 	var v RSMI_version
 	ret := rsmi_version_get(&v)
@@ -152,10 +160,10 @@ func Version() (RSMI_version, RSMI_status) {
 // ComponentVersionString gets the driver version string for the current system.
 // Given a software component, this function will return the driver version string for the current system.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_INSUFFICIENT_SIZE is returned if version string is larger than defaultRsmiStringLength bytes.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_INSUFFICIENT_SIZE is returned if version string is larger than defaultRsmiStringLength bytes.
 func ComponentVersionString(Component RSMI_sw_component) (string, RSMI_status) {
 	var version []byte = make([]byte, defaultRsmiStringLength)
 	vptr := &version[0]
@@ -167,7 +175,7 @@ func ComponentVersionString(Component RSMI_sw_component) (string, RSMI_status) {
 //
 // Note: Created manually since the the c-for-go parser does not generate a version with &cStr.
 //
-// - STATUS_SUCCESS is returned upon successful call.
+// STATUS_SUCCESS is returned upon successful call.
 func StatusString(Status RSMI_status) (string, RSMI_status) {
 	var cStr *C.char
 	cStatus, cStatusAllocMap := (C.rsmi_status_t)(Status), cgoAllocsUnknown
@@ -182,7 +190,7 @@ func StatusString(Status RSMI_status) (string, RSMI_status) {
 //
 // Note: Created manually since the the c-for-go parser does not generate a version with &cStr
 //
-// - STATUS_SUCCESS is returned upon successful call.
+// STATUS_SUCCESS is returned upon successful call.
 func StatusStringNoError(Status RSMI_status) string {
 	var cStr *C.char
 	cStatus, cStatusAllocMap := (C.rsmi_status_t)(Status), cgoAllocsUnknown

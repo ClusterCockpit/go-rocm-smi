@@ -26,8 +26,8 @@ package rocm_smi
 
 // DeviceCounterGroupSupported tells if an event group is supported by a given device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
 func DeviceCounterGroupSupported(Device DeviceHandle, EventGroup RSMI_event_group) (RSMI_status) {
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	if _, ok := Device.supported["rsmi_dev_counter_group_supported"]; ok {
@@ -38,19 +38,19 @@ func DeviceCounterGroupSupported(Device DeviceHandle, EventGroup RSMI_event_grou
 
 // CounterGroupSupported tells if an event group is supported by a given device.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
 func (Device DeviceHandle) CounterGroupSupported(EventGroup RSMI_event_group) (RSMI_status) {
 	return DeviceCounterGroupSupported(Device, EventGroup)
 }
 
 // DeviceCounterCreate creates a performance counter object.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_OUT_OF_RESOURCES unable to allocate memory for counter
-// - STATUS_PERMISSION function requires root access
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_OUT_OF_RESOURCES unable to allocate memory for counter.
+// STATUS_PERMISSION function requires root access.
 func DeviceCounterCreate(Device DeviceHandle, Type RSMI_event_type) (RSMI_event_handle, RSMI_status) {
 	var event RSMI_event_handle = RSMI_event_handle(0)
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -62,20 +62,20 @@ func DeviceCounterCreate(Device DeviceHandle, Type RSMI_event_type) (RSMI_event_
 
 // CounterCreate creates a performance counter object.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_OUT_OF_RESOURCES unable to allocate memory for counter
-// - STATUS_PERMISSION function requires root access
+// STATUS_SUCCESS call was successful.
+// STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_OUT_OF_RESOURCES unable to allocate memory for counter.
+// STATUS_PERMISSION function requires root access.
 func (Device DeviceHandle) CounterCreate(Type RSMI_event_type) (RSMI_event_handle, RSMI_status) {
 	return DeviceCounterCreate(Device, Type)
 }
 
 // CounterDestroy deallocates a performance counter object.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_PERMISSION function requires root access
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_PERMISSION function requires root access.
 func CounterDestroy(Handle RSMI_event_handle) (RSMI_status) {
 	ret := rsmi_dev_counter_destroy(Handle)
 	return ret
@@ -83,18 +83,18 @@ func CounterDestroy(Handle RSMI_event_handle) (RSMI_status) {
 
 // CounterDestroy deallocates a performance counter object.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_PERMISSION function requires root access
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_PERMISSION function requires root access.
 func (Handle RSMI_event_handle) CounterDestroy() (RSMI_status) {
 	return CounterDestroy(Handle)
 }
 
 // CounterControl issues performance counter control commands.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_PERMISSION function requires root access
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_PERMISSION function requires root access.
 func CounterControl(Handle RSMI_event_handle, Cmd RSMI_counter_command) (RSMI_status) {
 	ret := rsmi_counter_control(Handle, Cmd, nil)
 	return ret
@@ -102,18 +102,18 @@ func CounterControl(Handle RSMI_event_handle, Cmd RSMI_counter_command) (RSMI_st
 
 // CounterControl issues performance counter control commands.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_PERMISSION function requires root access
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_PERMISSION function requires root access.
 func (Handle RSMI_event_handle) CounterControl(Cmd RSMI_counter_command) (RSMI_status) {
 	return CounterControl(Handle, Cmd)
 }
 
 // CounterRead reads the current value of a performance counter.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_PERMISSION function requires root access
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_PERMISSION function requires root access.
 func CounterRead(Handle RSMI_event_handle) (RSMI_counter_value, RSMI_status) {
 	var count RSMI_counter_value = RSMI_counter_value{
 		Value: 0,
@@ -126,17 +126,17 @@ func CounterRead(Handle RSMI_event_handle) (RSMI_counter_value, RSMI_status) {
 
 // CounterRead reads the current value of a performance counter.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
-// - STATUS_PERMISSION function requires root access
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_PERMISSION function requires root access.
 func (Handle RSMI_event_handle) CounterRead() (RSMI_counter_value, RSMI_status) {
 	return CounterRead(Handle)
 }
 
 // DeviceCounterGetAvailable gets the number of currently available counters.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceCounterGetAvailable(Device DeviceHandle, EventGroup RSMI_event_group) (uint32, RSMI_status) {
 	var count uint32 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -150,8 +150,8 @@ func DeviceCounterGetAvailable(Device DeviceHandle, EventGroup RSMI_event_group)
 
 // DeviceCounterGetAvailable gets the number of currently available counters.
 //
-// - STATUS_SUCCESS call was successful.
-// - STATUS_INVALID_ARGS the provided arguments are not valid.
+// STATUS_SUCCESS call was successful.
+// STATUS_INVALID_ARGS the provided arguments are not valid.
 func (Device DeviceHandle) CounterGetAvailable(EventGroup RSMI_event_group) (uint32, RSMI_status) {
 	return DeviceCounterGetAvailable(Device, EventGroup)
 }
