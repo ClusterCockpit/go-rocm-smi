@@ -1,23 +1,27 @@
-name: Go
+name: Go rocm-smi Build Tests
 
 on:  
   push:
     tags:
       - '*'
 
-
-
 jobs:
-
-  build-1-18:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        golang-ver:
+          - 1.16
+          - 1.17
+          - 1.18
     steps:
     - uses: actions/checkout@v3
 
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: 1.18
+        go-version: ${{matrix.golang-ver}}
 
     - name: Install c-for-go
       run: |
@@ -26,59 +30,6 @@ jobs:
          go get github.com/xlab/c-for-go
          go install github.com/xlab/c-for-go
    
-    - name: Get depdencies
-      run: go get
-
-    - name: Generate
-      run: make
-
-    - name: Build
-      run: make build
-    
-
-  build-1-17:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.17
-
-    - name: Install c-for-go
-      run: |
-         export PATH=$(go env GOTOOLDIR):$PATH
-         go mod download github.com/NVIDIA/go-nvml
-         go get github.com/xlab/c-for-go
-         go install github.com/xlab/c-for-go
-
-    - name: Get depdencies
-      run: go get
-
-    - name: Generate
-      run: make
-
-    - name: Build
-      run: make build
-  
-  build-1-16:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.16
-
-    - name: Install c-for-go
-      run: |
-         export PATH=$(go env GOTOOLDIR):$PATH
-         go mod download github.com/NVIDIA/go-nvml
-         go get github.com/xlab/c-for-go
-         go install github.com/xlab/c-for-go
-
     - name: Get depdencies
       run: go get
 
