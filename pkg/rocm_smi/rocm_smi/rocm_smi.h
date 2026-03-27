@@ -3,7 +3,7 @@
  * The University of Illinois/NCSA
  * Open Source License (NCSA)
  *
- * Copyright (c) 2017, Advanced Micro Devices, Inc.
+ * Copyright (c) 2017-2023, Advanced Micro Devices, Inc.
  * All rights reserved.
  *
  * Developed by:
@@ -40,8 +40,9 @@
  * DEALINGS WITH THE SOFTWARE.
  *
  */
-#ifndef INCLUDE_ROCM_SMI_ROCM_SMI_H_
-#define INCLUDE_ROCM_SMI_ROCM_SMI_H_
+
+#ifndef ROCM_SMI_ROCM_SMI_H_
+#define ROCM_SMI_ROCM_SMI_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,7 +71,8 @@ extern "C" {
  */
 
 //! Guaranteed maximum possible number of supported frequencies
-#define RSMI_MAX_NUM_FREQUENCIES 32
+//! (32 normal + 1 sleep frequency)
+#define RSMI_MAX_NUM_FREQUENCIES 33
 
 //! Maximum possible value for fan speed. Should be used as the denominator
 //! when determining fan speed percentage.
@@ -78,6 +80,7 @@ extern "C" {
 
 //! The number of points that make up a voltage-frequency curve definition
 #define RSMI_NUM_VOLTAGE_CURVE_POINTS 3
+
 
 /**
  * @brief Error codes retured by rocm_smi_lib functions
@@ -124,8 +127,15 @@ typedef enum {
   RSMI_STATUS_BUSY,                      //!< A resource or mutex could not be
                                          //!< acquired because it is already
                                          //!< being used
-  RSMI_STATUS_REFCOUNT_OVERFLOW,          //!< An internal reference counter
+  RSMI_STATUS_REFCOUNT_OVERFLOW,         //!< An internal reference counter
                                          //!< exceeded INT32_MAX
+  RSMI_STATUS_SETTING_UNAVAILABLE,       //!< Requested setting is unavailable
+                                         //!< for the current device
+  RSMI_STATUS_AMDGPU_RESTART_ERR,        //!< Could not successfully restart
+                                         //!< the amdgpu driver
+  RSMI_STATUS_DRM_ERROR,                 //!< Error when call libdrm
+  RSMI_STATUS_FAIL_LOAD_MODULE,          //!< Fail to load lib
+  RSMI_STATUS_FAIL_LOAD_SYMBOL,          //!< Fail to load symbol
 
   RSMI_STATUS_UNKNOWN_ERROR = 0xFFFFFFFF,  //!< An unknown error occurred
 } rsmi_status_t;
@@ -143,6 +153,7 @@ typedef enum {
                                          //!< information can be retrieved. By
                                          //!< default, only AMD devices are
                                          //!<  enumerated by RSMI.
+  RSMI_INIT_FLAG_THRAD_ONLY_MUTEX = 0x400000000000000,   //!< The mutex limit to thread
   RSMI_INIT_FLAG_RESRV_TEST1 = 0x800000000000000,  //!< Reserved for test
 } rsmi_init_flags_t;
 
@@ -293,10 +304,10 @@ typedef enum {
  * Counter value
  */
 typedef struct {
-  unsigned long long value;            //!< Counter value
-  unsigned long long time_enabled;     //!< Time that the counter was enabled
+  uint64_t value;            //!< Counter value
+  uint64_t time_enabled;     //!< Time that the counter was enabled
                              //!< (in nanoseconds)
-  unsigned long long time_running;     //!< Time that the counter was running
+  uint64_t time_running;     //!< Time that the counter was running
                              //!< (in nanoseconds)
 } rsmi_counter_value_t;
 
@@ -304,13 +315,21 @@ typedef struct {
  * Event notification event types
  */
 typedef enum {
+  RSMI_EVT_NOTIF_NONE = KFD_SMI_EVENT_NONE,        //!< Unused
   RSMI_EVT_NOTIF_VMFAULT = KFD_SMI_EVENT_VMFAULT,  //!< VM page fault
   RSMI_EVT_NOTIF_FIRST = RSMI_EVT_NOTIF_VMFAULT,
   RSMI_EVT_NOTIF_THERMAL_THROTTLE = KFD_SMI_EVENT_THERMAL_THROTTLE,
   RSMI_EVT_NOTIF_GPU_PRE_RESET = KFD_SMI_EVENT_GPU_PRE_RESET,
   RSMI_EVT_NOTIF_GPU_POST_RESET = KFD_SMI_EVENT_GPU_POST_RESET,
-
-  RSMI_EVT_NOTIF_LAST = RSMI_EVT_NOTIF_GPU_POST_RESET
+  RSMI_EVT_NOTIF_EVENT_MIGRATE_START =  KFD_SMI_EVENT_MIGRATE_START,
+  RSMI_EVT_NOTIF_EVENT_MIGRATE_END = KFD_SMI_EVENT_MIGRATE_END,
+  RSMI_EVT_NOTIF_EVENT_PAGE_FAULT_START = KFD_SMI_EVENT_PAGE_FAULT_START,
+  RSMI_EVT_NOTIF_EVENT_PAGE_FAULT_END = KFD_SMI_EVENT_PAGE_FAULT_END,
+  RSMI_EVT_NOTIF_EVENT_QUEUE_EVICTION = KFD_SMI_EVENT_QUEUE_EVICTION,
+  RSMI_EVT_NOTIF_EVENT_QUEUE_RESTORE = KFD_SMI_EVENT_QUEUE_RESTORE,
+  RSMI_EVT_NOTIF_EVENT_UNMAP_FROM_GPU = KFD_SMI_EVENT_UNMAP_FROM_GPU,
+  RSMI_EVT_NOTIF_EVENT_ALL_PROCESS = KFD_SMI_EVENT_ALL_PROCESS,
+  RSMI_EVT_NOTIF_LAST = KFD_SMI_EVENT_ALL_PROCESS
 } rsmi_evt_notification_type_t;
 
 /**
@@ -319,7 +338,8 @@ typedef enum {
 #define RSMI_EVENT_MASK_FROM_INDEX(i) (1ULL << ((i) - 1))
 
 //! Maximum number of characters an event notification message will be
-#define MAX_EVENT_NOTIFICATION_MSG_SIZE 64
+// matches kfd message max size
+#define MAX_EVENT_NOTIFICATION_MSG_SIZE 96
 
 /**
  * Event notification data returned from event notification API
@@ -341,6 +361,7 @@ typedef enum {
   RSMI_CLK_TYPE_DCEF,                 //!< Display Controller Engine clock
   RSMI_CLK_TYPE_SOC,                  //!< SOC clock
   RSMI_CLK_TYPE_MEM,                  //!< Memory clock
+  RSMI_CLK_TYPE_PCIE,                 //!< PCIE clock
 
   // Add new clocks to the end (not in the middle) and update
   // RSMI_CLK_TYPE_LAST
@@ -349,6 +370,51 @@ typedef enum {
 } rsmi_clk_type_t;
 /// \cond Ignore in docs.
 typedef rsmi_clk_type_t rsmi_clk_type;
+/// \endcond
+
+/**
+ * @brief Compute Partition. This enum is used to identify
+ * various compute partitioning settings.
+ */
+typedef enum {
+  RSMI_COMPUTE_PARTITION_INVALID = 0,
+  RSMI_COMPUTE_PARTITION_SPX, //!< Single GPU mode (SPX)- All XCCs work
+                              //!< together with shared memory
+  RSMI_COMPUTE_PARTITION_DPX, //!< Dual GPU mode (DPX)- Half XCCs work
+                              //!< together with shared memory
+  RSMI_COMPUTE_PARTITION_TPX, //!< Triple GPU mode (TPX)- One-third XCCs
+                              //!< work together with shared memory
+  RSMI_COMPUTE_PARTITION_QPX, //!< Quad GPU mode (QPX)- Quarter XCCs
+                              //!< work together with shared memory
+  RSMI_COMPUTE_PARTITION_CPX  //!< Core mode (CPX)- Per-chip XCC with
+                              //!< shared memory
+} rsmi_compute_partition_type_t;
+/// \cond Ignore in docs.
+typedef rsmi_compute_partition_type_t rsmi_compute_partition_type;
+/// \endcond
+
+/**
+ * @brief Memory Partitions. This enum is used to identify various
+ * memory partition types.
+ */
+typedef enum {
+  RSMI_MEMORY_PARTITION_UNKNOWN = 0,
+  RSMI_MEMORY_PARTITION_NPS1,  //!< NPS1 - All CCD & XCD data is interleaved
+                               //!< accross all 8 HBM stacks (all stacks/1).
+  RSMI_MEMORY_PARTITION_NPS2,  //!< NPS2 - 2 sets of CCDs or 4 XCD interleaved
+                               //!< accross the 4 HBM stacks per AID pair
+                               //!< (8 stacks/2).
+  RSMI_MEMORY_PARTITION_NPS4,  //!< NPS4 - Each XCD data is interleaved accross
+                               //!< accross 2 (or single) HBM stacks
+                               //!< (8 stacks/8 or 8 stacks/4).
+  RSMI_MEMORY_PARTITION_NPS8,  //!< NPS8 - Each XCD uses a single HBM stack
+                               //!< (8 stacks/8). Or each XCD uses a single
+                               //!< HBM stack & CCDs share 2 non-interleaved
+                               //!< HBM stacks on its AID
+                               //!< (AID[1,2,3] = 6 stacks/6).
+} rsmi_memory_partition_type_t;
+/// \cond Ignore in docs.
+typedef rsmi_memory_partition_type_t rsmi_memory_partition_type;
 /// \endcond
 
 /**
@@ -415,6 +481,19 @@ typedef enum {
   RSMI_TEMP_TYPE_LAST = RSMI_TEMP_TYPE_HBM_3,
   RSMI_TEMP_TYPE_INVALID = 0xFFFFFFFF          //!< Invalid type
 } rsmi_temperature_type_t;
+
+/**
+ * @brief Activity (Utilization) Metrics.  This enum is used to identify
+ * various activity metrics.
+ *
+ */
+typedef enum {
+  /* Utilization */
+  RSMI_ACTIVITY_GFX = (0x1 << 0),
+  RSMI_ACTIVITY_UMC = (0x1 << 1),   //!< memory controller
+  RSMI_ACTIVITY_MM  = (0x1 << 2)    //!< UVD or VCN
+} rsmi_activity_metric_t;
+
 
 /**
  * @brief Voltage Metrics.  This enum is used to identify various
@@ -562,6 +641,8 @@ typedef enum {
   RSMI_FW_BLOCK_ME,
   RSMI_FW_BLOCK_MEC,
   RSMI_FW_BLOCK_MEC2,
+  RSMI_FW_BLOCK_MES,
+  RSMI_FW_BLOCK_MES_KIQ,
   RSMI_FW_BLOCK_PFP,
   RSMI_FW_BLOCK_RLC,
   RSMI_FW_BLOCK_RLC_SRLC,
@@ -592,7 +673,7 @@ typedef enum {
 /**
  * @brief Bitfield used in various RSMI calls
  */
-typedef unsigned long long rsmi_bit_field_t;
+typedef uint64_t rsmi_bit_field_t;
 /// \cond Ignore in docs.
 typedef rsmi_bit_field_t rsmi_bit_field;
 /// \endcond
@@ -614,11 +695,15 @@ typedef enum {
  */
 typedef enum _RSMI_IO_LINK_TYPE {
   RSMI_IOLINK_TYPE_UNDEFINED      = 0,          //!< unknown type.
-  RSMI_IOLINK_TYPE_PCIEXPRESS     = 1,          //!< PCI Express
-  RSMI_IOLINK_TYPE_XGMI           = 2,          //!< XGMI
+  RSMI_IOLINK_TYPE_PCIEXPRESS,                  //!< PCI Express
+  RSMI_IOLINK_TYPE_XGMI,                        //!< XGMI
   RSMI_IOLINK_TYPE_NUMIOLINKTYPES,              //!< Number of IO Link types
   RSMI_IOLINK_TYPE_SIZE           = 0xFFFFFFFF  //!< Max of IO Link types
 } RSMI_IO_LINK_TYPE;
+
+//! The CPU node index which will be used in rsmi_topo_get_link_type
+//! to query the link type between GPU and CPU
+#define CPU_NODE_INDEX 0xFFFFFFFF
 
 /**
  * @brief The utilization counter type
@@ -632,19 +717,28 @@ typedef enum {
 } RSMI_UTILIZATION_COUNTER_TYPE;
 
 /**
+ * @brief Power types
+ */
+typedef enum {
+  RSMI_AVERAGE_POWER = 0,            //!< Average Power
+  RSMI_CURRENT_POWER,                //!< Current / Instant Power
+  RSMI_INVALID_POWER = 0xFFFFFFFF    //!< Invalid / Undetected Power
+} RSMI_POWER_TYPE;
+
+/**
  * @brief The utilization counter data
  */
 typedef struct  {
   RSMI_UTILIZATION_COUNTER_TYPE type;   //!< Utilization counter type
-  unsigned long long value;                       //!< Utilization counter value
+  uint64_t value;                       //!< Utilization counter value
 } rsmi_utilization_counter_t;
 
 /**
  * @brief Reserved Memory Page Record
  */
 typedef struct {
-  unsigned long long page_address;                  //!< Start address of page
-  unsigned long long page_size;                     //!< Page size
+  uint64_t page_address;                  //!< Start address of page
+  uint64_t page_size;                     //!< Page size
   rsmi_memory_page_status_t status;       //!< Page "reserved" status
 } rsmi_retired_page_record_t;
 
@@ -683,6 +777,11 @@ typedef rsmi_power_profile_status_t rsmi_power_profile_status;
  */
 typedef struct {
     /**
+     * Deep Sleep frequency is only supported by some GPUs
+     */
+    _Bool has_deep_sleep;
+
+    /**
      * The number of supported frequencies
      */
     uint32_t num_supported;
@@ -696,7 +795,7 @@ typedef struct {
      * List of frequencies.
      * Only the first num_supported frequencies are valid.
      */
-    unsigned long long frequency[RSMI_MAX_NUM_FREQUENCIES];
+    uint64_t frequency[RSMI_MAX_NUM_FREQUENCIES];
 } rsmi_frequencies_t;
 /// \cond Ignore in docs.
 typedef rsmi_frequencies_t rsmi_frequencies;
@@ -725,6 +824,17 @@ typedef rsmi_pcie_bandwidth_t rsmi_pcie_bandwidth;
 /// \endcond
 
 /**
+ * @brief This structure holds information about the possible activity
+ * averages. Specifically, the utilization counters.
+ */
+typedef struct {
+  /* Utilization */
+  uint16_t average_gfx_activity;  //!< Average graphics activity
+  uint16_t average_umc_activity;  //!< memory controller
+  uint16_t average_mm_activity;   //!< UVD or VCN
+} rsmi_activity_metric_counter_t;
+
+/**
  * @brief This structure holds version information.
  */
 typedef struct {
@@ -740,8 +850,8 @@ typedef rsmi_version_t rsmi_version;
  * @brief This structure represents a range (e.g., frequencies or voltages).
  */
 typedef struct {
-    unsigned long long lower_bound;      //!< Lower bound of range
-    unsigned long long upper_bound;      //!< Upper bound of range
+    uint64_t lower_bound;      //!< Lower bound of range
+    uint64_t upper_bound;      //!< Upper bound of range
 } rsmi_range_t;
 /// \cond Ignore in docs.
 typedef rsmi_range_t rsmi_range;
@@ -751,8 +861,8 @@ typedef rsmi_range_t rsmi_range;
  * @brief This structure represents a point on the frequency-voltage plane.
  */
 typedef struct {
-    unsigned long long frequency;      //!< Frequency coordinate (in Hz)
-    unsigned long long voltage;        //!< Voltage coordinate (in mV)
+    uint64_t frequency;      //!< Frequency coordinate (in Hz)
+    uint64_t voltage;        //!< Voltage coordinate (in mV)
 } rsmi_od_vddc_point_t;
 /// \cond Ignore in docs.
 typedef rsmi_od_vddc_point_t rsmi_od_vddc_point;
@@ -815,93 +925,307 @@ typedef rsmi_od_volt_freq_data_t rsmi_od_volt_freq_data;
  */
 struct metrics_table_header_t {
   // TODO(amd) Doxygen documents
+  // Note: This should match: AMDGpuMetricsHeader_v1_t
   /// \cond Ignore in docs.
   uint16_t      structure_size;
   uint8_t       format_revision;
   uint8_t       content_revision;
   /// \endcond
 };
+/// \cond Ignore in docs.
+typedef struct metrics_table_header_t metrics_table_header_t;
+/// \endcond
 
 /**
- * @brief The following structure holds the gpu metrics values for a device.
+ * @brief Unit conversion factor for HBM temperatures
  */
-// Below is the assumed version of gpu_metric data on the device. If the device
-// is using this version, we can read data directly into rsmi_gpu_metrics_t.
-// If the device is using an older format, a conversion of formats will be
-// required.
-// DGPU targets have a format version of 1. APU targets have a format version of
-// 2. Currently, only version 1 (DGPU) gpu_metrics is supported.
-#define RSMI_GPU_METRICS_API_FORMAT_VER 1
-// The content version increments when gpu_metrics is extended with new and/or
-// existing field sizes are changed.
-#define RSMI_GPU_METRICS_API_CONTENT_VER_1 1
-#define RSMI_GPU_METRICS_API_CONTENT_VER_2 2
-#define RSMI_GPU_METRICS_API_CONTENT_VER_3 3
+#define CENTRIGRADE_TO_MILLI_CENTIGRADE 1000
 
-// This should match NUM_HBM_INSTANCES
+/**
+ * @brief This should match kRSMI_MAX_NUM_HBM_INSTANCES
+ */
 #define RSMI_NUM_HBM_INSTANCES 4
 
-// Unit conversion factor for HBM temperatures
-#define CENTRIGRADE_TO_MILLI_CENTIGRADE 1000
+/**
+ * @brief This should match kRSMI_MAX_NUM_VCNS
+ */
+#define RSMI_MAX_NUM_VCNS 4
+
+/**
+ * @brief This should match kRSMI_MAX_JPEG_ENGINES
+ */
+#define RSMI_MAX_NUM_JPEG_ENGS 32
+
+/**
+ * @brief This should match kRSMI_MAX_NUM_CLKS
+ */
+#define RSMI_MAX_NUM_CLKS 4
+
+/**
+ * @brief This should match kRSMI_MAX_NUM_XGMI_LINKS
+ */
+#define RSMI_MAX_NUM_XGMI_LINKS 8
+
+/**
+ * @brief This should match kRSMI_MAX_NUM_GFX_CLKS
+ */
+#define RSMI_MAX_NUM_GFX_CLKS 8
+
+/**
+ * @brief This should match kRSMI_MAX_NUM_XCC;
+ * XCC - Accelerated Compute Core, the collection of compute units,
+ * ACE (Asynchronous Compute Engines), caches,
+ * and global resources organized as one unit.
+ *
+ * Refer to amd.com documentation for more detail:
+ * https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf
+ */
+#define RSMI_MAX_NUM_XCC 8
+
+/**
+ * @brief This should match kRSMI_MAX_NUM_XCP;
+ * XCP - Accelerated Compute Processor,
+ * also referred to as the Graphics Compute Partitions.
+ * Each physical gpu could have a maximum of 8 separate partitions
+ * associated with each (depending on ASIC support).
+ *
+ * Refer to amd.com documentation for more detail:
+ * https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/white-papers/amd-cdna-3-white-paper.pdf
+ */
+#define RSMI_MAX_NUM_XCP 8
+
+/**
+ * @brief The following structures hold the gpu statistics for a device.
+ */
+struct amdgpu_xcp_metrics_t {
+  /*
+  * v1.6 additions
+  */
+  /* Utilization Instantaneous (%) */
+  uint32_t gfx_busy_inst[RSMI_MAX_NUM_XCC];
+  uint16_t jpeg_busy[RSMI_MAX_NUM_JPEG_ENGS];
+  uint16_t vcn_busy[RSMI_MAX_NUM_VCNS];
+
+  /* Utilization Accumulated (%) */
+  uint64_t gfx_busy_acc[RSMI_MAX_NUM_XCC];
+
+  /*
+  * v1.7 additions
+  */
+  /* Total App Clock Counter Accumulated */
+  uint64_t gfx_below_host_limit_acc[RSMI_MAX_NUM_XCC];
+};
 
 typedef struct {
   // TODO(amd) Doxygen documents
+  // Note:  This structure is extended to fit the needs of different GPU metric
+  //        versions when exposing data through the structure.
+  //        Depending on the version, some data members will hold data, and
+  //        some will not. A good example is the set of 'current clocks':
+  //          - current_gfxclk, current_socclk, current_vclk0, current_dclk0
+  //        These are single-valued data members, up to version 1.3.
+  //        For version 1.4 and up these are multi-valued data members (arrays)
+  //        and their counterparts;
+  //          - current_gfxclks[], current_socclks[], current_vclk0s[],
+  //            current_dclk0s[]
+  //        will hold the data
   /// \cond Ignore in docs.
+
+  /*
+   * v1.0 Base
+   */
   struct metrics_table_header_t common_header;
 
-/* Temperature */
-  uint16_t      temperature_edge;
-  uint16_t      temperature_hotspot;
-  uint16_t      temperature_mem;
-  uint16_t      temperature_vrgfx;
-  uint16_t      temperature_vrsoc;
-  uint16_t      temperature_vrmem;
+  // Temperature (C)
+  uint16_t temperature_edge;
+  uint16_t temperature_hotspot;
+  uint16_t temperature_mem;
+  uint16_t temperature_vrgfx;
+  uint16_t temperature_vrsoc;
+  uint16_t temperature_vrmem;
 
-/* Utilization */
-  uint16_t      average_gfx_activity;
-  uint16_t      average_umc_activity;  // memory controller
-  uint16_t      average_mm_activity;   // UVD or VCN
+  // Utilization (%)
+  uint16_t average_gfx_activity;
+  uint16_t average_umc_activity;    // memory controller
+  uint16_t average_mm_activity;     // UVD or VCN
 
-/* Power/Energy */
-  uint16_t      average_socket_power;
-  unsigned long long      energy_accumulator;      // v1 mod. (32->64)
+  // Power (W) /Energy (15.259uJ per 1ns)
+  uint16_t average_socket_power;
+  uint64_t energy_accumulator;      // v1 mod. (32->64)
 
-/* Driver attached timestamp (in ns) */
-  unsigned long long      system_clock_counter;   // v1 mod. (moved from top of struct)
+  // Driver attached timestamp (in ns)
+  uint64_t system_clock_counter;    // v1 mod. (moved from top of struct)
 
-/* Average clocks */
-  uint16_t      average_gfxclk_frequency;
-  uint16_t      average_socclk_frequency;
-  uint16_t      average_uclk_frequency;
-  uint16_t      average_vclk0_frequency;
-  uint16_t      average_dclk0_frequency;
-  uint16_t      average_vclk1_frequency;
-  uint16_t      average_dclk1_frequency;
+  // Average clocks (MHz)
+  uint16_t average_gfxclk_frequency;
+  uint16_t average_socclk_frequency;
+  uint16_t average_uclk_frequency;
+  uint16_t average_vclk0_frequency;
+  uint16_t average_dclk0_frequency;
+  uint16_t average_vclk1_frequency;
+  uint16_t average_dclk1_frequency;
 
-/* Current clocks */
-  uint16_t      current_gfxclk;
-  uint16_t      current_socclk;
-  uint16_t      current_uclk;
-  uint16_t      current_vclk0;
-  uint16_t      current_dclk0;
-  uint16_t      current_vclk1;
-  uint16_t      current_dclk1;
+  // Current clocks (MHz)
+  uint16_t current_gfxclk;
+  uint16_t current_socclk;
+  uint16_t current_uclk;
+  uint16_t current_vclk0;
+  uint16_t current_dclk0;
+  uint16_t current_vclk1;
+  uint16_t current_dclk1;
 
-/* Throttle status */
-  uint32_t      throttle_status;
+  // Throttle status
+  uint32_t throttle_status;
 
-/* Fans */
-  uint16_t      current_fan_speed;
+  // Fans (RPM)
+  uint16_t current_fan_speed;
 
-/* Link width/speed */
-  uint16_t       pcie_link_width;  // v1 mod.(8->16)
-  uint16_t       pcie_link_speed;  // in 0.1 GT/s; v1 mod. (8->16)
+  // Link width (number of lanes) /speed (0.1 GT/s)
+  uint16_t pcie_link_width;         // v1 mod.(8->16)
+  uint16_t pcie_link_speed;         // in 0.1 GT/s; v1 mod. (8->16)
 
-  uint16_t       padding;          // new in v1
 
-  uint32_t       gfx_activity_acc;   // new in v1
-  uint32_t       mem_actvity_acc;     // new in v1
-  uint16_t       temperature_hbm[RSMI_NUM_HBM_INSTANCES];  // new in v1
+  /*
+   * v1.1 additions
+   */
+  uint32_t gfx_activity_acc;        // new in v1
+  uint32_t mem_activity_acc;        // new in v1
+  uint16_t temperature_hbm[RSMI_NUM_HBM_INSTANCES];  // new in v1
+
+
+  /*
+   * v1.2 additions
+   */
+  // PMFW attached timestamp (10ns resolution)
+  uint64_t firmware_timestamp;
+
+
+  /*
+   * v1.3 additions
+   */
+  // Voltage (mV)
+  uint16_t voltage_soc;
+  uint16_t voltage_gfx;
+  uint16_t voltage_mem;
+
+  // Throttle status
+  uint64_t indep_throttle_status;
+
+
+  /*
+   * v1.4 additions
+   */
+  // Power (Watts)
+  uint16_t current_socket_power;
+
+  // Utilization (%)
+  uint16_t vcn_activity[RSMI_MAX_NUM_VCNS];  // VCN instances activity percent (encode/decode)
+
+  // Clock Lock Status. Each bit corresponds to clock instance
+  uint32_t gfxclk_lock_status;
+
+  // XGMI bus width and bitrate (in GB/s)
+  uint16_t xgmi_link_width;
+  uint16_t xgmi_link_speed;
+
+  // PCIE accumulated bandwidth (GB/sec)
+  uint64_t pcie_bandwidth_acc;
+
+  // PCIE instantaneous bandwidth (GB/sec)
+  uint64_t pcie_bandwidth_inst;
+
+  // PCIE L0 to recovery state transition accumulated count
+  uint64_t pcie_l0_to_recov_count_acc;
+
+  // PCIE replay accumulated count
+  uint64_t pcie_replay_count_acc;
+
+  // PCIE replay rollover accumulated count
+  uint64_t pcie_replay_rover_count_acc;
+
+  // XGMI accumulated data transfer size(KiloBytes)
+  uint64_t xgmi_read_data_acc[RSMI_MAX_NUM_XGMI_LINKS];
+  uint64_t xgmi_write_data_acc[RSMI_MAX_NUM_XGMI_LINKS];
+
+  // XGMI accumulated data transfer size(KiloBytes)
+  uint16_t current_gfxclks[RSMI_MAX_NUM_GFX_CLKS];
+  uint16_t current_socclks[RSMI_MAX_NUM_CLKS];
+  uint16_t current_vclk0s[RSMI_MAX_NUM_CLKS];
+  uint16_t current_dclk0s[RSMI_MAX_NUM_CLKS];
+
+  /*
+   * v1.5 additions
+   */
+  // JPEG activity percent (encode/decode)
+  uint16_t jpeg_activity[RSMI_MAX_NUM_JPEG_ENGS];
+
+  // PCIE NAK sent accumulated count
+  uint32_t pcie_nak_sent_count_acc;
+
+  // PCIE NAK received accumulated count
+  uint32_t pcie_nak_rcvd_count_acc;
+
+  /*
+   * v1.6 additions
+   */
+  /* Accumulation cycle counter */
+  uint64_t accumulation_counter;
+
+  /**
+   * Accumulated throttler residencies
+   */
+  uint64_t prochot_residency_acc;
+  /**
+   * Accumulated throttler residencies
+   *
+   * Prochot (thermal) - PPT (power)
+   * Package Power Tracking (PPT) violation % (greater than 0% is a violation);
+   * aka PVIOL
+   *
+   * Ex. PVIOL/TVIOL calculations
+   * Where A and B are measurments recorded at prior points in time.
+   * Typically A is the earlier measured value and B is the latest measured value.
+   *
+   * PVIOL % = (PptResidencyAcc (B) - PptResidencyAcc (A)) * 100/ (AccumulationCounter (B) - AccumulationCounter (A))
+   * TVIOL % = (SocketThmResidencyAcc (B) -  SocketThmResidencyAcc (A)) * 100 / (AccumulationCounter (B) - AccumulationCounter (A))
+  */
+  uint64_t ppt_residency_acc;
+  /**
+   * Accumulated throttler residencies
+   *
+   * Socket (thermal) -
+   * Socket thermal violation % (greater than 0% is a violation);
+   * aka TVIOL
+   *
+   * Ex. PVIOL/TVIOL calculations
+   * Where A and B are measurments recorded at prior points in time.
+   * Typically A is the earlier measured value and B is the latest measured value.
+   *
+   * PVIOL % = (PptResidencyAcc (B) - PptResidencyAcc (A)) * 100/ (AccumulationCounter (B) - AccumulationCounter (A))
+   * TVIOL % = (SocketThmResidencyAcc (B) -  SocketThmResidencyAcc (A)) * 100 / (AccumulationCounter (B) - AccumulationCounter (A))
+  */
+  uint64_t socket_thm_residency_acc;
+  uint64_t vr_thm_residency_acc;
+  uint64_t hbm_thm_residency_acc;
+
+  /* Number of current partition */
+  uint16_t num_partition;
+
+  /* XCP (Graphic Cluster Partitions) metrics stats */
+  struct amdgpu_xcp_metrics_t xcp_stats[RSMI_MAX_NUM_XCP];
+
+  /* PCIE other end recovery counter */
+  uint32_t pcie_lc_perf_other_end_recovery;
+
+  /*
+  * v1.7 additions
+  */
+  /* VRAM max bandwidth at max memory clock (GB/s) */
+  uint64_t vram_max_bandwidth;
+
+  /* XGMI link status(up/down) */
+  uint16_t xgmi_link_status[RSMI_MAX_NUM_XGMI_LINKS];
+
   /// \endcond
 } rsmi_gpu_metrics_t;
 
@@ -909,8 +1233,8 @@ typedef struct {
  * @brief This structure holds error counts.
  */
 typedef struct {
-    unsigned long long correctable_err;            //!< Accumulated correctable errors
-    unsigned long long uncorrectable_err;          //!< Accumulated uncorrectable errors
+    uint64_t correctable_err;            //!< Accumulated correctable errors
+    uint64_t uncorrectable_err;          //!< Accumulated uncorrectable errors
 } rsmi_error_count_t;
 
 /**
@@ -919,11 +1243,13 @@ typedef struct {
 typedef struct {
     uint32_t process_id;      //!< Process ID
     uint32_t pasid;           //!< PASID
-    unsigned long long vram_usage;      //!< VRAM usage
-    unsigned long long sdma_usage;      //!< SDMA usage in microseconds
+    uint64_t vram_usage;      //!< VRAM usage
+    uint64_t sdma_usage;      //!< SDMA usage in microseconds
     uint32_t cu_occupancy;    //!< Compute Unit usage in percent
 } rsmi_process_info_t;
 
+//! CU occupancy invalidation value for the GFX revisions not providing cu_occupancy debugfs method
+#define CU_OCCUPANCY_INVALID 0xFFFFFFFF
 
 /**
  * @brief Opaque handle to function-support object
@@ -940,26 +1266,54 @@ typedef struct rsmi_func_id_iter_handle * rsmi_func_id_iter_handle_t;
  * such as ::rsmi_memory_type_t, ::rsmi_temperature_metric_t, etc.
  */
 typedef union id_rename {
-        unsigned long long id;           //!< unsigned long long representation of value
+        uint64_t id;           //!< uint64_t representation of value
         const char *name;      //!< name string (applicable to functions only)
         union {
-            //!< Used for ::rsmi_memory_type_t variants
+            /** Used for ::rsmi_memory_type_t variants */
             rsmi_memory_type_t memory_type;
-            //!< Used for ::rsmi_temperature_metric_t variants
+            /** Used for ::rsmi_temperature_metric_t variants */
             rsmi_temperature_metric_t temp_metric;
-            //!< Used for ::rsmi_event_type_t variants
+            /** Used for ::rsmi_event_type_t variants */
             rsmi_event_type_t evnt_type;
-            //!< Used for ::rsmi_event_group_t variants
+            /** Used for ::rsmi_event_group_t variants */
             rsmi_event_group_t evnt_group;
-            //!< Used for ::rsmi_clk_type_t variants
+            /** Used for ::rsmi_clk_type_t variants */
             rsmi_clk_type_t clk_type;
-            //!< Used for ::rsmi_fw_block_t variants
+            /** Used for ::rsmi_fw_block_t variants */
             rsmi_fw_block_t fw_block;
-            //!< Used for ::rsmi_gpu_block_t variants
+            /** Used for ::rsmi_gpu_block_t variants */
             rsmi_gpu_block_t gpu_block_type;
         };
 } rsmi_func_id_value_t;
 
+/**
+ * @struct rsmi_device_identifiers_t
+ * @brief Structure to hold various identifiers for a GPU device.
+ *
+ * @details This structure contains fields that uniquely identify a GPU device,
+ * including its card index, DRM render minor, PCI Bus/Device/Function ID (BDFID),
+ * KFD GPU ID, partition ID, and SMI device ID.
+ */
+typedef struct {
+  //!< The card index of the device.
+  uint32_t card_index;
+  //!< The DRM render minor number of the device.
+  uint32_t drm_render_minor;
+
+  //!< The PCI Bus/Device/Function identifier (BDFID) of the device.
+  uint64_t bdfid;
+
+  //!< The KFD (Kernel Fusion Driver) GPU ID of the device.
+  uint64_t kfd_gpu_id;
+
+  //!< The partition ID of the device.
+  uint32_t partition_id;
+
+  //!< The SMI (System Management Interface) device ID.
+  uint32_t smi_device_id;
+
+  uint32_t reserved[10];
+} rsmi_device_identifiers_t;
 
 /*****************************************************************************/
 /** @defgroup InitShutAdmin Initialization and Shutdown
@@ -979,7 +1333,7 @@ typedef union id_rename {
  *
  *  @retval ::RSMI_STATUS_SUCCESS is returned upon successful call.
  */
-rsmi_status_t rsmi_init(unsigned long long init_flags);
+rsmi_status_t rsmi_init(uint64_t init_flags);
 
 /**
  *  @brief Shutdown ROCm SMI.
@@ -1014,7 +1368,7 @@ rsmi_status_t rsmi_num_monitor_devices(uint32_t *num_devices);
  *  index.
  *
  *  @details Given a device index @p dv_ind and a pointer to a uint32_t @p id,
- *  this function will write the device id value to the unsigned long long pointed to by
+ *  this function will write the device id value to the uint64_t pointed to by
  *  @p id. This ID is an identification of the type of device, so calling this
  *  function for different devices will give the same value if they are kind
  *  of device. Consequently, this function should not be used to distinguish
@@ -1023,7 +1377,7 @@ rsmi_status_t rsmi_num_monitor_devices(uint32_t *num_devices);
  *
  *  @param[in] dv_ind a device index
  *
- *  @param[inout] id a pointer to unsigned long long to which the device id will be
+ *  @param[inout] id a pointer to uint64_t to which the device id will be
  *  written
  * If this parameter is nullptr, this function will return
  * ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -1038,6 +1392,21 @@ rsmi_status_t rsmi_num_monitor_devices(uint32_t *num_devices);
  */
 rsmi_status_t rsmi_dev_id_get(uint32_t dv_ind, uint16_t *id);
 
+/**
+ *  @brief Get the device revision associated with the device
+ *
+ *  @details Given a device index @p dv_ind and a pointer to a uint32_t to
+ *  which the revision will be written
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] revision a pointer to uint32_t to which the device revision
+ *  will be written
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS is returned upon successful call.
+ *
+ */
+rsmi_status_t rsmi_dev_revision_get(uint32_t dv_ind, uint16_t *revision);
 
 /**
  *  @brief Get the SKU for a desired device associated with the device with
@@ -1063,19 +1432,19 @@ rsmi_status_t rsmi_dev_id_get(uint32_t dv_ind, uint16_t *id);
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  *
  */
-rsmi_status_t rsmi_dev_sku_get(uint32_t dv_ind, char *sku);
+rsmi_status_t rsmi_dev_sku_get(uint32_t dv_ind, uint16_t *sku);
 
 /**
  *  @brief Get the device vendor id associated with the device with provided
  *  device index.
  *
  *  @details Given a device index @p dv_ind and a pointer to a uint32_t @p id,
- *  this function will write the device vendor id value to the unsigned long long pointed
+ *  this function will write the device vendor id value to the uint64_t pointed
  *  to by @p id.
  *
  *  @param[in] dv_ind a device index
  *
- *  @param[inout] id a pointer to unsigned long long to which the device vendor id will
+ *  @param[inout] id a pointer to uint64_t to which the device vendor id will
  *  be written
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -1194,8 +1563,35 @@ rsmi_status_t rsmi_dev_brand_get(uint32_t dv_ind, char *brand, uint32_t len);
  *  be written.
  *
  */
-rsmi_status_t rsmi_dev_vendor_name_get(uint32_t dv_ind, char *name,
-                                                                  size_t len);
+rsmi_status_t rsmi_dev_vendor_name_get(uint32_t dv_ind, char *name, size_t len);
+
+
+/**
+ *  @brief Get the device's market name
+ *
+ *  @details Given a device index @p dv_ind, a pointer to a caller provided
+ *  char buffer @p market_name, and a length of this buffer @p len, this function will
+ *  write the name of the market name (up to @p len characters) buffer @p market_name.
+ *
+ *  @param[inout] market_name a pointer to a caller provided char buffer to which the
+ *  market name will be written
+ *  If this parameter is nullptr, this function will return
+ *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
+ *  arguments and ::RSMI_STATUS_DRM_ERROR if a DRM error occurs
+ *
+ *  @param[in] len the length of the caller provided buffer @p name.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function with the given arguments
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *  @retval ::RSMI_STATUS_DRM_ERROR if a DRM error occurs
+ *  @retval ::RSMI_STATUS_INSUFFICIENT_SIZE is returned if @p len bytes is not
+ *  large enough to hold the entire name. In this case, only @p len bytes will
+ *  be written.
+ *
+ */
+rsmi_status_t rsmi_dev_market_name_get(uint32_t dv_ind, char *market_name, uint32_t len);
 
 /**
  *  @brief Get the vram vendor string of a gpu device.
@@ -1257,12 +1653,12 @@ rsmi_status_t rsmi_dev_serial_number_get(uint32_t dv_ind,
  *  provided device index.
  *
  *  @details Given a device index @p dv_ind and a pointer to a uint32_t @p id,
- *  this function will write the subsystem device id value to the unsigned long long
+ *  this function will write the subsystem device id value to the uint64_t
  *  pointed to by @p id.
  *
  *  @param[in] dv_ind a device index
  *
- *  @param[inout] id a pointer to unsigned long long to which the subsystem device id
+ *  @param[inout] id a pointer to uint64_t to which the subsystem device id
  *  will be written
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -1340,11 +1736,11 @@ rsmi_dev_drm_render_minor_get(uint32_t dv_ind, uint32_t *minor);
  *
  *  @details Given a device index @p dv_ind and a pointer to a uint32_t @p id,
  *  this function will write the device subsystem vendor id value to the
- *  unsigned long long pointed to by @p id.
+ *  uint64_t pointed to by @p id.
  *
  *  @param[in] dv_ind a device index
  *
- *  @param[inout] id a pointer to unsigned long long to which the device subsystem vendor
+ *  @param[inout] id a pointer to uint64_t to which the device subsystem vendor
  *  id will be written
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -1361,13 +1757,13 @@ rsmi_status_t rsmi_dev_subsystem_vendor_id_get(uint32_t dv_ind, uint16_t *id);
 /**
  *  @brief Get Unique ID
  *
- *  @details Given a device index @p dv_ind and a pointer to a unsigned long long @p
+ *  @details Given a device index @p dv_ind and a pointer to a uint64_t @p
  *  id, this function will write the unique ID of the GPU pointed to @p
  *  id.
  *
  *  @param[in] dv_ind a device index
  *
- *  @param[inout] id a pointer to unsigned long long to which the unique ID of the GPU
+ *  @param[inout] id a pointer to uint64_t to which the unique ID of the GPU
  *  is written
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -1379,7 +1775,101 @@ rsmi_status_t rsmi_dev_subsystem_vendor_id_get(uint32_t dv_ind, uint16_t *id);
  *  support this function with the given arguments
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  */
-rsmi_status_t rsmi_dev_unique_id_get(uint32_t dv_ind, unsigned long long *id);
+rsmi_status_t rsmi_dev_unique_id_get(uint32_t dv_ind, uint64_t *id);
+
+/**
+ *  @brief Get the XGMI physical id associated with the device
+ *
+ *  @details Given a device index @p dv_ind and a pointer to a uint32_t to
+ *  which the XGMI physical id will be written
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] id a pointer to uint32_t to which the XGMI physical id
+ *  will be written
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS is returned upon successful call.
+ *
+ */
+rsmi_status_t rsmi_dev_xgmi_physical_id_get(uint32_t dv_ind, uint16_t *id);
+
+/**
+ *  @brief Get the GUID, also known as the GPU device id,
+ *  associated with the provided device index indicated by KFD.
+ *
+ *  @details Given a device index @p dv_ind and a pointer to a uint64_t
+ *  @p guid, this function will write the KFD GPU id value to the
+ *  uint64_t pointed to by @p guid.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] guid a pointer to uint64_t to which the KFD gpu id will be
+ *  written. If the @p guid parameter is nullptr, this function will return
+ *  ::RSMI_STATUS_INVALID_ARGS. If the GPU ID is not supported with
+ *  the device index queried, gpu_id will return MAX UINT64 value an
+ *  arguments and ::RSMI_STATUS_NOT_SUPPORTED as a response.
+ *
+ * @retval ::RSMI_STATUS_SUCCESS call was successful
+ * @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ * support this function with the given arguments
+ * @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *
+ */
+rsmi_status_t rsmi_dev_guid_get(uint32_t dv_ind, uint64_t *guid);
+
+/**
+ *  @brief Get the node id associated with the provided device index
+ *  indicated by KFD.
+ *
+ *  @details Given a device index @p dv_ind and a pointer to a uint32_t
+ *  @p node_id, this function will write the KFD node id value to the
+ *  uint32_t pointed to by @p node_id.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] node_id a pointer to uint64_t to which the KFD gpu id will be
+ *  written. If the @p node_id parameter is nullptr, this function will return
+ *  ::RSMI_STATUS_INVALID_ARGS. If @p node_id is not supported with
+ *  the device index queried, @p node_id will return MAX UINT64 value as an
+ *  argument and ::RSMI_STATUS_NOT_SUPPORTED as a response.
+ *
+ * @retval ::RSMI_STATUS_SUCCESS call was successful
+ * @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ * support this function with the given arguments
+ * @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *
+ */
+rsmi_status_t rsmi_dev_node_id_get(uint32_t dv_ind, uint32_t *node_id);
+
+/**
+ * @brief Retrieves the device identifiers for a specific GPU device.
+ *
+ * @details This function retrieves various identifiers for a GPU device, such as
+ * the card index, DRM render minor, BDFID, KFD GPU ID, partition ID, and SMI device ID.
+ * The identifiers are written to the provided `rsmi_device_identifiers_t` structure.
+ *
+ * @param[in] dv_ind a device index.
+ *
+ * @param[out] identifiers A pointer to a structure of type `rsmi_device_identifiers_t`
+ *                         where the device identifiers will be stored. The structure
+ *                         contains fields such as:
+ *                         - `card_index`: The card index of the device.
+ *                         - `drm_render_minor`: The DRM render minor number.
+ *                         - `bdfid`: The Bus/Device/Function PCI identifier.
+ *                         - `kfd_gpu_id`: The KFD GPU ID.
+ *                         - `partition_id`: The partition ID of the device.
+ *                         - `smi_device_id`: The SMI device ID.
+ *
+ * @retval ::RSMI_STATUS_SUCCESS The call was successful, and the device identifiers were retrieved.
+ * @retval ::RSMI_STATUS_NOT_SUPPORTED The installed software or hardware does not support this function
+ *                                     with the given arguments.
+ * @retval ::RSMI_STATUS_INVALID_ARGS The provided arguments are invalid.
+ *
+ * @note Ensure that the `identifiers` pointer is valid and points to a properly allocated structure
+ *       before calling this function.
+ */
+rsmi_status_t rsmi_dev_device_identifiers_get(uint32_t dv_ind,
+                                              rsmi_device_identifiers_t *identifiers);
 
 /** @} */  // end of IDQuer
 
@@ -1403,6 +1893,8 @@ rsmi_status_t rsmi_dev_unique_id_get(uint32_t dv_ind, unsigned long long *id);
  *  written
  *
  *  @retval ::RSMI_STATUS_SUCCESS is returned upon successful call.
+ *  @retval ::RSMI_STATUS_UNEXPECTED_DATA Data read or provided was not as
+ *  expected
  *
  */
 rsmi_status_t
@@ -1411,27 +1903,39 @@ rsmi_dev_pci_bandwidth_get(uint32_t dv_ind, rsmi_pcie_bandwidth_t *bandwidth);
 /**
  *  @brief Get the unique PCI device identifier associated for a device
  *
- *  @details Give a device index @p dv_ind and a pointer to a unsigned long long @p
+ *  @details Give a device index @p dv_ind and a pointer to a uint64_t @p
  *  bdfid, this function will write the Bus/Device/Function PCI identifier
  *  (BDFID) associated with device @p dv_ind to the value pointed to by
  *  @p bdfid.
  *
  *  The format of @p bdfid will be as follows:
  *
- *      BDFID = ((DOMAIN & 0xffffffff) << 32) | ((BUS & 0xff) << 8) |
- *                                   ((DEVICE & 0x1f) <<3 ) | (FUNCTION & 0x7)
+ *      BDFID = ((DOMAIN & 0xFFFFFFFF) << 32) | ((Partition & 0xF) << 28)
+ *              | ((BUS & 0xFF) << 8) | ((DEVICE & 0x1F) <<3 )
+ *              | (FUNCTION & 0x7)
  *
- *  | Name     | Field   |
- *  ---------- | ------- |
- *  | Domain   | [64:32] |
- *  | Reserved | [31:16] |
- *  | Bus      | [15: 8] |
- *  | Device   | [ 7: 3] |
- *  | Function | [ 2: 0] |
+ *  \code{.unparsed}
+ *  | Name         | Field   | KFD property       KFD -> PCIe ID (uint64_t)
+ *  -------------- | ------- | ---------------- | ---------------------------- |
+ *  | Domain       | [63:32] | "domain"         | (DOMAIN & 0xFFFFFFFF) << 32  |
+ *  | Partition id | [31:28] | "location id"    | (LOCATION & 0xF0000000)      |
+ *  | Reserved     | [27:16] | "location id"    | N/A                          |
+ *  | Bus          | [15: 8] | "location id"    | (LOCATION & 0xFF00)          |
+ *  | Device       | [ 7: 3] | "location id"    | (LOCATION & 0xF8)            |
+ *  | Function     | [ 2: 0] | "location id"    | (LOCATION & 0x7)             |
+ *  \endcode
+ *
+ *  Note: In some devices, the partition ID may be stored in the function bits
+ *  BDFID[2:0] instead of BDFID[31:28].
+ *
+ *  Note: For MI series devices, the function bits are only used to store the
+ *  partition ID, but this modified BDF is internal to the ROCm stack.
+ *  To the OS, partitions share the same BDF as the unpartitioned device and
+ *  have function bits = 0, which can be verified through lspci.
  *
  *  @param[in] dv_ind a device index
  *
- *  @param[inout] bdfid a pointer to unsigned long long to which the device bdfid value
+ *  @param[inout] bdfid a pointer to uint64_t to which the device bdfid value
  *  will be written
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -1443,7 +1947,7 @@ rsmi_dev_pci_bandwidth_get(uint32_t dv_ind, rsmi_pcie_bandwidth_t *bandwidth);
  *  support this function with the given arguments
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  */
-rsmi_status_t rsmi_dev_pci_id_get(uint32_t dv_ind, unsigned long long *bdfid);
+rsmi_status_t rsmi_dev_pci_id_get(uint32_t dv_ind, uint64_t *bdfid);
 
 /**
  *  @brief Get the NUMA node associated with a device
@@ -1467,12 +1971,12 @@ rsmi_status_t rsmi_dev_pci_id_get(uint32_t dv_ind, unsigned long long *bdfid);
  *  support this function with the given arguments
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  */
-rsmi_status_t rsmi_topo_numa_affinity_get(uint32_t dv_ind, uint32_t *numa_node);
+rsmi_status_t rsmi_topo_numa_affinity_get(uint32_t dv_ind, int32_t *numa_node);
 
 /**
  *  @brief Get PCIe traffic information
  *
- *  @details Give a device index @p dv_ind and pointers to a unsigned long long's, @p
+ *  @details Give a device index @p dv_ind and pointers to a uint64_t's, @p
  *  sent, @p received and @p max_pkt_sz, this function will write the number
  *  of bytes sent and received in 1 second to @p sent and @p received,
  *  respectively. The maximum possible packet size will be written to
@@ -1480,33 +1984,33 @@ rsmi_status_t rsmi_topo_numa_affinity_get(uint32_t dv_ind, uint32_t *numa_node);
  *
  *  @param[in] dv_ind a device index
  *
- *  @param[inout] sent a pointer to unsigned long long to which the number of bytes sent
+ *  @param[inout] sent a pointer to uint64_t to which the number of bytes sent
  *  will be written in 1 second. If pointer is NULL, it will be ignored.
  *
- *  @param[inout] received a pointer to unsigned long long to which the number of bytes
+ *  @param[inout] received a pointer to uint64_t to which the number of bytes
  *  received will be written. If pointer is NULL, it will be ignored.
  *
- *  @param[inout] max_pkt_sz a pointer to unsigned long long to which the maximum packet
+ *  @param[inout] max_pkt_sz a pointer to uint64_t to which the maximum packet
  *  size will be written. If pointer is NULL, it will be ignored.
  *
  *  @retval ::RSMI_STATUS_SUCCESS is returned upon successful call.
  *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
  *  support this function with the given arguments
  */
-rsmi_status_t rsmi_dev_pci_throughput_get(uint32_t dv_ind, unsigned long long *sent,
-                                    unsigned long long *received, unsigned long long *max_pkt_sz);
+rsmi_status_t rsmi_dev_pci_throughput_get(uint32_t dv_ind, uint64_t *sent,
+                                    uint64_t *received, uint64_t *max_pkt_sz);
 
 /**
  *  @brief Get PCIe replay counter
  *
- *  @details Given a device index @p dv_ind and a pointer to a unsigned long long @p
+ *  @details Given a device index @p dv_ind and a pointer to a uint64_t @p
  *  counter, this function will write the sum of the number of NAK's received
  *  by the GPU and the NAK's generated by the GPU to memory pointed to by @p
  *  counter.
  *
  *  @param[in] dv_ind a device index
  *
- *  @param[inout] counter a pointer to unsigned long long to which the sum of the NAK's
+ *  @param[inout] counter a pointer to uint64_t to which the sum of the NAK's
  *  received and generated by the GPU is written
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -1519,7 +2023,7 @@ rsmi_status_t rsmi_dev_pci_throughput_get(uint32_t dv_ind, unsigned long long *s
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  */
 rsmi_status_t rsmi_dev_pci_replay_counter_get(uint32_t dv_ind,
-                                                           unsigned long long *counter);
+                                                           uint64_t *counter);
 
 /** @} */  // end of PCIeQuer
 /*****************************************************************************/
@@ -1557,7 +2061,7 @@ rsmi_status_t rsmi_dev_pci_replay_counter_get(uint32_t dv_ind,
  *  @retval ::RSMI_STATUS_PERMISSION function requires root access
  *
  */
-rsmi_status_t rsmi_dev_pci_bandwidth_set(uint32_t dv_ind, unsigned long long bw_bitmask);
+rsmi_status_t rsmi_dev_pci_bandwidth_set(uint32_t dv_ind, uint64_t bw_bitmask);
 
 /** @} */  // end of PCIeCont
 
@@ -1570,16 +2074,21 @@ rsmi_status_t rsmi_dev_pci_bandwidth_set(uint32_t dv_ind, unsigned long long bw_
  *  @brief Get the average power consumption of the device with provided
  *  device index.
  *
- *  @details Given a device index @p dv_ind and a pointer to a unsigned long long
+ *  @details Given a device index @p dv_ind and a pointer to a uint64_t
  *  @p power, this function will write the current average power consumption
- *  (in microwatts) to the unsigned long long pointed to by @p power.
+ *  (in microwatts) to the uint64_t pointed to by @p power.
+ *
+ *  @deprecated ::rsmi_dev_power_get() is preferred due to providing
+ *  backwards compatibility, which looks at both average and current power
+ *  values. Whereas ::rsmi_dev_power_ave_get only looks for average power
+ *  consumption. Newer ASICs will support current power only.
  *
  *  @param[in] dv_ind a device index
  *
  *  @param[in] sensor_ind a 0-based sensor index. Normally, this will be 0.
  *  If a device has more than one sensor, it could be greater than 0.
  *
- *  @param[inout] power a pointer to unsigned long long to which the average power
+ *  @param[inout] power a pointer to uint64_t to which the average power
  *  consumption will be written
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -1592,16 +2101,77 @@ rsmi_status_t rsmi_dev_pci_bandwidth_set(uint32_t dv_ind, unsigned long long bw_
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  */
 rsmi_status_t
-rsmi_dev_power_ave_get(uint32_t dv_ind, uint32_t sensor_ind, unsigned long long *power);
+rsmi_dev_power_ave_get(uint32_t dv_ind, uint32_t sensor_ind, uint64_t *power);
+
+/**
+ *  @brief Get the current socket power (also known as instant
+ *  power) of the device index provided.
+ *
+ *  @details Given a device index @p dv_ind and a pointer to a uint64_t
+ *  @p socket_power, this function will write the current socket power
+ *  (in microwatts) to the uint64_t pointed to by @p socket_power.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] socket_power a pointer to uint64_t to which the current
+ *  socket power will be written to. If this parameter is nullptr,
+ *  this function will return ::RSMI_STATUS_INVALID_ARGS if the function is
+ *  supported with the provided, arguments and ::RSMI_STATUS_NOT_SUPPORTED
+ *  if it is not supported with the provided arguments.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function with the given arguments
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ */
+rsmi_status_t
+rsmi_dev_current_socket_power_get(uint32_t dv_ind, uint64_t *socket_power);
+
+/**
+ *  @brief A generic get which attempts to retieve current socket power
+ *  (also known as instant power) of the device index provided, if not
+ *  supported tries to get average power consumed by device. Current
+ *  socket power is typically supported by newer devices, whereas average
+ *  power is generally reported on older devices. This function
+ *  aims to provide backwards compatability depending on device support.
+ *
+ *  @details Given a device index @p dv_ind, a pointer to a uint64_t
+ *  @p power, and @p type this function will write the current socket or
+ *  average power (in microwatts) to the uint64_t pointed to by @p power and
+ *  a pointer to its @p type RSMI_POWER_TYPE read.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] power a pointer to uint64_t to which the current or average
+ *  power will be written to. If this parameter is nullptr,
+ *  this function will return ::RSMI_STATUS_INVALID_ARGS if the function is
+ *  supported with the provided, arguments and ::RSMI_STATUS_NOT_SUPPORTED
+ *  if it is not supported with the provided arguments.
+ *
+ *  @param[inout] type a pointer to RSMI_POWER_TYPE object. Returns the type
+ *  of power retrieved from the device. Current power is ::RSMI_CURRENT_POWER
+ *  and average power is ::RSMI_AVERAGE_POWER. If an error occurs,
+ *  returns an invalid power type ::RSMI_INVALID_POWER - example device
+ *  neither supports average power or current power.
+ *  If this parameter is nullptr, this function will return
+ *  ::RSMI_STATUS_INVALID_ARGS.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function with the given arguments
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ */
+rsmi_status_t rsmi_dev_power_get(uint32_t dv_ind, uint64_t *power,
+                                 RSMI_POWER_TYPE *type);
 
 /**
  *  @brief Get the energy accumulator counter of the device with provided
  *  device index.
  *
- *  @details Given a device index @p dv_ind, a pointer to a unsigned long long
- *  @p power, and a pointer to a unsigned long long @p timestamp, this function will write
- *  amount of energy consumed to the unsigned long long pointed to by @p power,
- *  and the timestamp to the unsigned long long pointed to by @p timestamp.
+ *  @details Given a device index @p dv_ind, a pointer to a uint64_t
+ *  @p power, and a pointer to a uint64_t @p timestamp, this function will write
+ *  amount of energy consumed to the uint64_t pointed to by @p power,
+ *  and the timestamp to the uint64_t pointed to by @p timestamp.
  *  The rsmi_dev_power_ave_get() is an average of a short time. This function
  *  accumulates all energy consumed.
  *
@@ -1609,14 +2179,14 @@ rsmi_dev_power_ave_get(uint32_t dv_ind, uint32_t sensor_ind, unsigned long long 
  *  @param[inout] counter_resolution resolution of the counter @p power in
  *  micro Joules
  *
- *  @param[inout] power a pointer to unsigned long long to which the energy
+ *  @param[inout] power a pointer to uint64_t to which the energy
  *  counter will be written
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
  *  and ::RSMI_STATUS_NOT_SUPPORTED if it is not supported with the
  *  provided arguments.
  *
- *  @param[inout] timestamp a pointer to unsigned long long to which the timestamp
+ *  @param[inout] timestamp a pointer to uint64_t to which the timestamp
  *  will be written. Resolution: 1 ns.
  *
  *  @retval ::RSMI_STATUS_SUCCESS call was successful
@@ -1625,8 +2195,8 @@ rsmi_dev_power_ave_get(uint32_t dv_ind, uint32_t sensor_ind, unsigned long long 
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  */
 rsmi_status_t
-rsmi_dev_energy_count_get(uint32_t dv_ind, unsigned long long *power,
-                          float *counter_resolution, unsigned long long *timestamp);
+rsmi_dev_energy_count_get(uint32_t dv_ind, uint64_t *power,
+                          float *counter_resolution, uint64_t *timestamp);
 
 /**
  *  @brief Get the cap on power which, when reached, causes the system to take
@@ -1641,7 +2211,7 @@ rsmi_dev_energy_count_get(uint32_t dv_ind, unsigned long long *power,
  *  @param[in] sensor_ind a 0-based sensor index. Normally, this will be 0.
  *  If a device has more than one sensor, it could be greater than 0.
  *
- *  @param[inout] cap a pointer to a unsigned long long that indicates the power cap,
+ *  @param[inout] cap a pointer to a uint64_t that indicates the power cap,
  *  in microwatts
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -1654,7 +2224,7 @@ rsmi_dev_energy_count_get(uint32_t dv_ind, unsigned long long *power,
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  */
 rsmi_status_t
-rsmi_dev_power_cap_get(uint32_t dv_ind, uint32_t sensor_ind, unsigned long long *cap);
+rsmi_dev_power_cap_get(uint32_t dv_ind, uint32_t sensor_ind, uint64_t *cap);
 
 /**
  *  @brief Get the default power cap for the device specified by @p dv_ind.
@@ -1665,7 +2235,7 @@ rsmi_dev_power_cap_get(uint32_t dv_ind, uint32_t sensor_ind, unsigned long long 
  *
  *  @param[in] dv_ind a device index
  *
- *  @param[inout] default_cap a pointer to a unsigned long long that indicates the default
+ *  @param[inout] default_cap a pointer to a uint64_t that indicates the default
  *  power cap, in microwatts
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -1678,7 +2248,7 @@ rsmi_dev_power_cap_get(uint32_t dv_ind, uint32_t sensor_ind, unsigned long long 
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  */
 rsmi_status_t
-rsmi_dev_power_cap_default_get(uint32_t dv_ind, unsigned long long *default_cap);
+rsmi_dev_power_cap_default_get(uint32_t dv_ind, uint64_t *default_cap);
 
 /**
  *  @brief Get the range of valid values for the power cap
@@ -1691,14 +2261,14 @@ rsmi_dev_power_cap_default_get(uint32_t dv_ind, unsigned long long *default_cap)
  *  @param[in] sensor_ind a 0-based sensor index. Normally, this will be 0.
  *  If a device has more than one sensor, it could be greater than 0.
  *
- *  @param[inout] max a pointer to a unsigned long long that indicates the maximum
+ *  @param[inout] max a pointer to a uint64_t that indicates the maximum
  *  possible power cap, in microwatts
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
  *  arguments and ::RSMI_STATUS_NOT_SUPPORTED if it is not supported with the
  *  provided arguments.
  *
- *  @param[inout] min a pointer to a unsigned long long that indicates the minimum
+ *  @param[inout] min a pointer to a uint64_t that indicates the minimum
  *  possible power cap, in microwatts
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -1713,7 +2283,7 @@ rsmi_dev_power_cap_default_get(uint32_t dv_ind, unsigned long long *default_cap)
  */
 rsmi_status_t
 rsmi_dev_power_cap_range_get(uint32_t dv_ind, uint32_t sensor_ind,
-                                                unsigned long long *max, unsigned long long *min);
+                                                uint64_t *max, uint64_t *min);
 
 /** @} */  // end of PowerQuer
 
@@ -1734,7 +2304,7 @@ rsmi_dev_power_cap_range_get(uint32_t dv_ind, uint32_t sensor_ind,
  *  @param[in] sensor_ind a 0-based sensor index. Normally, this will be 0.
  *  If a device has more than one sensor, it could be greater than 0.
  *
- *  @param[in] cap a unsigned long long that indicates the desired power cap, in
+ *  @param[in] cap a uint64_t that indicates the desired power cap, in
  *  microwatts
  *
  *  @retval ::RSMI_STATUS_SUCCESS is returned upon successful call.
@@ -1743,7 +2313,7 @@ rsmi_dev_power_cap_range_get(uint32_t dv_ind, uint32_t sensor_ind,
  *
  */
 rsmi_status_t
-rsmi_dev_power_cap_set(uint32_t dv_ind, uint32_t sensor_ind, unsigned long long cap);
+rsmi_dev_power_cap_set(uint32_t dv_ind, uint32_t sensor_ind, uint64_t cap);
 
 /**
  *  @brief Set the power profile
@@ -1782,7 +2352,7 @@ rsmi_dev_power_profile_set(uint32_t dv_ind, uint32_t reserved,
  *  @brief Get the total amount of memory that exists
  *
  *  @details Given a device index @p dv_ind, a type of memory @p mem_type, and
- *  a pointer to a unsigned long long @p total, this function will write the total amount
+ *  a pointer to a uint64_t @p total, this function will write the total amount
  *  of @p mem_type memory that exists to the location pointed to by @p total.
  *
  *  @param[in] dv_ind a device index
@@ -1790,7 +2360,7 @@ rsmi_dev_power_profile_set(uint32_t dv_ind, uint32_t reserved,
  *  @param[in] mem_type The type of memory for which the total amount will be
  *  found
  *
- *  @param[inout] total a pointer to unsigned long long to which the total amount of
+ *  @param[inout] total a pointer to uint64_t to which the total amount of
  *  memory will be written
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -1805,13 +2375,13 @@ rsmi_dev_power_profile_set(uint32_t dv_ind, uint32_t reserved,
  */
 rsmi_status_t
 rsmi_dev_memory_total_get(uint32_t dv_ind, rsmi_memory_type_t mem_type,
-                                                             unsigned long long *total);
+                                                             uint64_t *total);
 
 /**
  *  @brief Get the current memory usage
  *
  *  @details Given a device index @p dv_ind, a type of memory @p mem_type, and
- *  a pointer to a unsigned long long @p usage, this function will write the amount of
+ *  a pointer to a uint64_t @p usage, this function will write the amount of
  *  @p mem_type memory that that is currently being used to the location
  *  pointed to by @p used.
  *
@@ -1820,7 +2390,7 @@ rsmi_dev_memory_total_get(uint32_t dv_ind, rsmi_memory_type_t mem_type,
  *  @param[in] mem_type The type of memory for which the amount being used will
  *  be found
  *
- *  @param[inout] used a pointer to unsigned long long to which the amount of memory
+ *  @param[inout] used a pointer to uint64_t to which the amount of memory
  *  currently being used will be written
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -1835,7 +2405,7 @@ rsmi_dev_memory_total_get(uint32_t dv_ind, rsmi_memory_type_t mem_type,
  */
 rsmi_status_t
 rsmi_dev_memory_usage_get(uint32_t dv_ind, rsmi_memory_type_t mem_type,
-                                                              unsigned long long *used);
+                                                              uint64_t *used);
 
 /**
  *  @brief Get percentage of time any device memory is being used
@@ -1934,7 +2504,7 @@ rsmi_dev_memory_reserved_pages_get(uint32_t dv_ind, uint32_t *num_pages,
  *
  */
 rsmi_status_t rsmi_dev_fan_rpms_get(uint32_t dv_ind, uint32_t sensor_ind,
-                                                              long long *speed);
+                                                              int64_t *speed);
 
 /**
  *  @brief Get the fan speed for the specified device as a value relative to
@@ -1964,7 +2534,7 @@ rsmi_status_t rsmi_dev_fan_rpms_get(uint32_t dv_ind, uint32_t sensor_ind,
  *
  */
 rsmi_status_t rsmi_dev_fan_speed_get(uint32_t dv_ind,
-                                        uint32_t sensor_ind, long long *speed);
+                                        uint32_t sensor_ind, int64_t *speed);
 
 /**
  *  @brief Get the max. fan speed of the device with provided device index.
@@ -1992,14 +2562,14 @@ rsmi_status_t rsmi_dev_fan_speed_get(uint32_t dv_ind,
  *
  */
 rsmi_status_t rsmi_dev_fan_speed_max_get(uint32_t dv_ind,
-                                    uint32_t sensor_ind, unsigned long long *max_speed);
+                                    uint32_t sensor_ind, uint64_t *max_speed);
 
 /**
  *  @brief Get the temperature metric value for the specified metric, from the
  *  specified temperature sensor on the specified device.
  *
  *  @details Given a device index @p dv_ind, a sensor type @p sensor_type, a
- *  ::rsmi_temperature_metric_t @p metric and a pointer to an long long @p
+ *  ::rsmi_temperature_metric_t @p metric and a pointer to an int64_t @p
  *  temperature, this function will write the value of the metric indicated by
  *  @p metric and @p sensor_type to the memory location @p temperature.
  *
@@ -2011,7 +2581,7 @@ rsmi_status_t rsmi_dev_fan_speed_max_get(uint32_t dv_ind,
  *  @param[in] metric enum indicated which temperature value should be
  *  retrieved
  *
- *  @param[inout] temperature a pointer to long long to which the temperature
+ *  @param[inout] temperature a pointer to int64_t to which the temperature
  *  will be written, in millidegrees Celcius.
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -2025,14 +2595,14 @@ rsmi_status_t rsmi_dev_fan_speed_max_get(uint32_t dv_ind,
  *
  */
 rsmi_status_t rsmi_dev_temp_metric_get(uint32_t dv_ind, uint32_t sensor_type,
-                      rsmi_temperature_metric_t metric, long long *temperature);
+                      rsmi_temperature_metric_t metric, int64_t *temperature);
 
 /**
  *  @brief Get the voltage metric value for the specified metric, from the
  *  specified voltage sensor on the specified device.
  *
  *  @details Given a device index @p dv_ind, a sensor type @p sensor_type, a
- *  ::rsmi_voltage_metric_t @p metric and a pointer to an long long @p
+ *  ::rsmi_voltage_metric_t @p metric and a pointer to an int64_t @p
  *  voltage, this function will write the value of the metric indicated by
  *  @p metric and @p sensor_type to the memory location @p voltage.
  *
@@ -2044,7 +2614,7 @@ rsmi_status_t rsmi_dev_temp_metric_get(uint32_t dv_ind, uint32_t sensor_type,
  *  @param[in] metric enum indicated which voltage value should be
  *  retrieved
  *
- *  @param[inout] voltage a pointer to long long to which the voltage
+ *  @param[inout] voltage a pointer to int64_t to which the voltage
  *  will be written, in millivolts.
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -2059,7 +2629,7 @@ rsmi_status_t rsmi_dev_temp_metric_get(uint32_t dv_ind, uint32_t sensor_type,
  */
 rsmi_status_t rsmi_dev_volt_metric_get(uint32_t dv_ind,
                                rsmi_voltage_type_t sensor_type,
-                              rsmi_voltage_metric_t metric, long long *voltage);
+                              rsmi_voltage_metric_t metric, int64_t *voltage);
 /** @} */  // end of PhysQuer
 
 /*****************************************************************************/
@@ -2107,7 +2677,7 @@ rsmi_status_t rsmi_dev_fan_reset(uint32_t dv_ind, uint32_t sensor_ind);
  *
  */
 rsmi_status_t rsmi_dev_fan_speed_set(uint32_t dv_ind, uint32_t sensor_ind,
-                                                              unsigned long long speed);
+                                                              uint64_t speed);
 
 /** @} */  // end of PhysCont
 /*****************************************************************************/
@@ -2163,7 +2733,7 @@ rsmi_dev_busy_percent_get(uint32_t dv_ind, uint32_t *busy_percent);
  *  If the function reutrns RSMI_STATUS_SUCCESS, the counter will be set in the value field of
  *  the rsmi_utilization_counter_t.
  *
- *  @param[in] count The size of @utilization_counters array.
+ *  @param[in] count The size of utilization_counters array.
  *
  *  @param[inout] timestamp The timestamp when the counter is retreived. Resolution: 1 ns.
  *  @retval ::RSMI_STATUS_SUCCESS call was successful
@@ -2176,7 +2746,58 @@ rsmi_status_t
 rsmi_utilization_count_get(uint32_t dv_ind,
                 rsmi_utilization_counter_t utilization_counters[],
                 uint32_t count,
-                unsigned long long *timestamp);
+                uint64_t *timestamp);
+
+/**
+ *  @brief Get activity metric average utilization counter of the specified device
+ *
+ *  @details Given a device index @p dv_ind, the activity metric type,
+ *  this function returns the requested utilization counters
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[in] activity_metric_type a metric type
+ *
+ *  @param[inout] activity_metric_counter Multiple utilization counters can be retrieved with a single
+ *  call. The caller must allocate enough space to the rsmi_activity_metric_counter_t structure.
+ *
+ *  If the function returns RSMI_STATUS_SUCCESS, the requested type will be set in the corresponding
+ *  field of the counter will be set in the value field of
+ *  the activity_metric_counter_t.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function with the given arguments
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *
+ */
+rsmi_status_t
+rsmi_dev_activity_metric_get(uint32_t dv_ind,
+                             rsmi_activity_metric_t activity_metric_type,
+                             rsmi_activity_metric_counter_t* activity_metric_counter);
+
+/**
+ *  @brief Get activity metric bandwidth average utilization counter of the specified device
+ *
+ *  @details Given a device index @p dv_ind, the activity metric type,
+ *  this function returns the requested utilization counters
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] avg_activity average bandwidth utilization counters can be retrieved
+ *
+ *  If the function returns RSMI_STATUS_SUCCESS, the requested type will be set in the corresponding
+ *  field of the counter will be set in the value field of
+ *  the activity_metric_counter_t.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function with the given arguments
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *
+ */
+rsmi_status_t
+rsmi_dev_activity_avg_mm_get(uint32_t dv_ind, uint16_t* avg_activity);
 
 /**
  *  @brief Get the performance level of the device with provided
@@ -2225,8 +2846,9 @@ rsmi_status_t rsmi_dev_perf_level_get(uint32_t dv_ind,
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  *
  */
+rsmi_status_t rsmi_perf_determinism_mode_set(uint32_t dv_ind,
+                                             uint64_t clkvalue);
 
-rsmi_status_t rsmi_perf_determinism_mode_set(uint32_t dv_ind, unsigned long long clkvalue);
 /**
  *  @brief Get the overdrive percent associated with the device with provided
  *  device index.
@@ -2250,8 +2872,32 @@ rsmi_status_t rsmi_perf_determinism_mode_set(uint32_t dv_ind, unsigned long long
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  *
  */
-
 rsmi_status_t rsmi_dev_overdrive_level_get(uint32_t dv_ind, uint32_t *od);
+
+/**
+ *  @brief Get the memory clock overdrive percent associated with the device
+ *  with provided device index.
+ *
+ *  @details Given a device index @p dv_ind and a pointer to a uint32_t @p od,
+ *  this function will write the memory overdrive percentage to the uint32_t
+ *  pointed to by @p od
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] od a pointer to uint32_t to which the overdrive percentage
+ *  will be written
+ *  If this parameter is nullptr, this function will return
+ *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
+ *  arguments and ::RSMI_STATUS_NOT_SUPPORTED if it is not supported with the
+ *  provided arguments.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function with the given arguments
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *
+ */
+rsmi_status_t rsmi_dev_mem_overdrive_level_get(uint32_t dv_ind, uint32_t *od);
 
 /**
  *  @brief Get the list of possible system clock speeds of device for a
@@ -2273,11 +2919,16 @@ rsmi_status_t rsmi_dev_overdrive_level_get(uint32_t dv_ind, uint32_t *od);
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
  *  arguments and ::RSMI_STATUS_NOT_SUPPORTED if it is not supported with the
  *  provided arguments.
+ *  If multiple current frequencies are found, a warning is shown. If no
+ *  current frequency is found, it is reflected as -1. If frequencies are not
+ *  read from low to high a warning is shown as well.
  *
  *  @retval ::RSMI_STATUS_SUCCESS call was successful
  *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
  *  support this function with the given arguments
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *  @retval ::RSMI_STATUS_UNEXPECTED_DATA Data read or provided was not as
+ *  expected
  *
  */
 rsmi_status_t rsmi_dev_gpu_clk_freq_get(uint32_t dv_ind,
@@ -2296,7 +2947,7 @@ rsmi_status_t rsmi_dev_gpu_clk_freq_get(uint32_t dv_ind,
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  *
  */
-rsmi_status_t rsmi_dev_gpu_reset(int32_t dv_ind);
+rsmi_status_t rsmi_dev_gpu_reset(uint32_t dv_ind);
 
 /**
  *  @brief This function retrieves the voltage/frequency curve information
@@ -2366,8 +3017,33 @@ rsmi_status_t rsmi_dev_gpu_metrics_info_get(uint32_t dv_ind,
  *  support this function with the given arguments
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  */
-rsmi_status_t rsmi_dev_clk_range_set(uint32_t dv_ind, unsigned long long minclkvalue,
-                                       unsigned long long maxclkvalue,
+rsmi_status_t rsmi_dev_clk_range_set(uint32_t dv_ind, uint64_t minclkvalue,
+                                       uint64_t maxclkvalue,
+                                       rsmi_clk_type_t clkType);
+
+/**
+ *  @brief This function sets the clock min/max level
+ *
+ *  @details Given a device index @p dv_ind, a clock value @p minclkvalue,
+ *  a maximum clock value @p maxclkvalue and a clock type @p clkType this function
+ *  will set the sclk|mclk range
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[in] level RSMI_FREQ_IND_MIN|RSMI_FREQ_IND_MAX
+ *
+ *  @param[in] clkvalue value to apply to the clock level. Frequency values
+ *  are in MHz.
+ *
+ *  @param[in] clkType RSMI_CLK_TYPE_SYS | RSMI_CLK_TYPE_MEM level type
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function with the given arguments
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ */
+rsmi_status_t rsmi_dev_clk_extremum_set(uint32_t dv_ind, rsmi_freq_ind_t level,
+                                       uint64_t clkvalue,
                                        rsmi_clk_type_t clkType);
 
 /**
@@ -2393,7 +3069,7 @@ rsmi_status_t rsmi_dev_clk_range_set(uint32_t dv_ind, unsigned long long minclkv
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  */
 rsmi_status_t rsmi_dev_od_clk_info_set(uint32_t dv_ind, rsmi_freq_ind_t level,
-                                       unsigned long long clkvalue,
+                                       uint64_t clkvalue,
                                        rsmi_clk_type_t clkType);
 
 /**
@@ -2418,7 +3094,7 @@ rsmi_status_t rsmi_dev_od_clk_info_set(uint32_t dv_ind, rsmi_freq_ind_t level,
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  */
 rsmi_status_t rsmi_dev_od_volt_info_set(uint32_t dv_ind, uint32_t vpoint,
-                                        unsigned long long clkvalue, unsigned long long voltvalue);
+                                        uint64_t clkvalue, uint64_t voltvalue);
 
 /**
  *  @brief This function will retrieve the current valid regions in the
@@ -2530,7 +3206,7 @@ rsmi_dev_power_profile_presets_get(uint32_t dv_ind, uint32_t sensor_ind,
  *
  */
 rsmi_status_t
-rsmi_dev_perf_level_set(int32_t dv_ind, rsmi_dev_perf_level_t perf_lvl);
+rsmi_dev_perf_level_set(uint32_t dv_ind, rsmi_dev_perf_level_t perf_lvl);
 
 /**
  *  @brief Set the PowerPlay performance level associated with the device with
@@ -2596,7 +3272,7 @@ rsmi_dev_perf_level_set_v1(uint32_t dv_ind, rsmi_dev_perf_level_t perf_lvl);
  *  @retval ::RSMI_STATUS_PERMISSION function requires root access
  *
  */
-rsmi_status_t rsmi_dev_overdrive_level_set(int32_t dv_ind, uint32_t od);
+rsmi_status_t rsmi_dev_overdrive_level_set(uint32_t dv_ind, uint32_t od);
 
 /**
  *  @brief Set the overdrive percent associated with the device with provided
@@ -2674,7 +3350,7 @@ rsmi_status_t rsmi_dev_overdrive_level_set_v1(uint32_t dv_ind, uint32_t od);
  *
  */
 rsmi_status_t rsmi_dev_gpu_clk_freq_set(uint32_t dv_ind,
-                             rsmi_clk_type_t clk_type, unsigned long long freq_bitmask);
+                             rsmi_clk_type_t clk_type, uint64_t freq_bitmask);
 
 /** @} */  // end of PerfCont
 
@@ -2761,7 +3437,7 @@ rsmi_dev_vbios_version_get(uint32_t dv_ind, char *vbios, uint32_t len);
 /**
  *  @brief Get the firmware versions for a device
  *
- *  @details Given a device ID @p dv_ind, and a pointer to a unsigned long long,
+ *  @details Given a device ID @p dv_ind, and a pointer to a uint64_t,
  *  @p fw_version, this function will write the FW Versions as a string (up to @p len
  *  characters) for device @p dv_ind to @p vbios. The caller must ensure that
  *  it is safe to write at least @p len characters to @p vbios.
@@ -2784,7 +3460,30 @@ rsmi_dev_vbios_version_get(uint32_t dv_ind, char *vbios, uint32_t len);
  */
 rsmi_status_t
 rsmi_dev_firmware_version_get(uint32_t dv_ind, rsmi_fw_block_t block,
-                                                        unsigned long long *fw_version);
+                                                        uint64_t *fw_version);
+
+/**
+ *  @brief Get the target graphics version for a GPU device
+ *
+ *  @details Given a device ID @p dv_ind and a uint64_t pointer
+ *  @p gfx_version, this function will write the graphics version.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] gfx_version The device graphics version number indicated by
+ *  KFD. If this parameter is nullptr, this function will return
+ *  ::RSMI_STATUS_INVALID_ARGS. If device does not support this value,
+ *  will return ::RSMI_STATUS_NOT_SUPPORTED and a maximum UINT64 value as
+ *  @p gfx_version.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function with the given arguments
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *
+ */
+rsmi_status_t rsmi_dev_target_graphics_version_get(uint32_t dv_ind,
+                                                  uint64_t *gfx_version);
 
 /** @} */  // end of VersQuer
 
@@ -2826,7 +3525,7 @@ rsmi_status_t rsmi_dev_ecc_count_get(uint32_t dv_ind,
 /**
  *  @brief Retrieve the enabled ECC bit-mask
  *
- *  @details Given a device index @p dv_ind, and a pointer to a unsigned long long @p
+ *  @details Given a device index @p dv_ind, and a pointer to a uint64_t @p
  *  enabled_mask, this function will write bits to memory pointed to by
  *  @p enabled_blocks. Upon a successful call, @p enabled_blocks can then be
  *  AND'd with elements of the ::rsmi_gpu_block_t ennumeration to determine if
@@ -2838,7 +3537,7 @@ rsmi_status_t rsmi_dev_ecc_count_get(uint32_t dv_ind,
  *
  *  @param[in] dv_ind a device index
  *
- *  @param[inout] enabled_blocks A pointer to a unsigned long long to which the enabled
+ *  @param[inout] enabled_blocks A pointer to a uint64_t to which the enabled
  *  blocks bits will be written.
  *  If this parameter is nullptr, this function will return
  *  ::RSMI_STATUS_INVALID_ARGS if the function is supported with the provided,
@@ -2851,7 +3550,7 @@ rsmi_status_t rsmi_dev_ecc_count_get(uint32_t dv_ind,
  *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
  */
 rsmi_status_t rsmi_dev_ecc_enabled_get(uint32_t dv_ind,
-                                                    unsigned long long *enabled_blocks);
+                                                    uint64_t *enabled_blocks);
 
 /**
  *  @brief Retrieve the ECC status for a GPU block
@@ -3150,8 +3849,10 @@ rsmi_counter_available_counters_get(uint32_t dv_ind,
  *  @details Given a non-NULL pointer to an array @p procs of
  *  ::rsmi_process_info_t's, of length *@p num_items, this function will write
  *  up to *@p num_items instances of ::rsmi_process_info_t to the memory pointed
- *  to by @p procs. These instances contain information about each process
- *  utilizing a GPU. If @p procs is not NULL, @p num_items will be updated with
+ *  to by @p procs. These instances contain information about each GPU compute
+ *  process and their PASID for further analysis or monitoring via
+ *  ::rsmi_compute_process_info_by_pid_get().
+ *  If @p procs is not NULL, @p num_items will be updated with
  *  the number of processes actually written. If @p procs is NULL, @p num_items
  *  will be updated with the number of processes for which there is current
  *  process information. Calling this function with @p procs being NULL is a way
@@ -3238,7 +3939,30 @@ rsmi_compute_process_info_by_pid_get(uint32_t pid, rsmi_process_info_t *proc);
  */
 rsmi_status_t
 rsmi_compute_process_gpus_get(uint32_t pid, uint32_t *dv_indices,
-                                                       uint32_t *num_devices);
+                                            uint32_t *num_devices);
+
+/**
+ *  @brief Get the info of a process on a specific device.
+ *
+ *  @details Given a process id @p pid, a @p dv_ind, this function will
+ *  write the process information for pid on the device, if available, to
+ *  the memory pointed to by @p proc.
+ *
+ *  @param[in] pid The process id of the process for which the gpu
+ *  currently being used is requested.
+ *
+ *  @param[in] dv_ind a device index where the process running on.
+ *
+ *  @param[inout] proc a pointer to memory provided by the caller to which
+ *  process information will be written.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS is returned upon successful call
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *
+ */
+rsmi_status_t
+rsmi_compute_process_info_by_device_get(uint32_t pid, uint32_t dv_ind,
+                                                rsmi_process_info_t *proc);
 
 /** @} */  // end of SysInfo
 
@@ -3293,12 +4017,12 @@ rsmi_dev_xgmi_error_reset(uint32_t dv_ind);
  *  @brief Retrieve the XGMI hive id for a device
  *
  *  @details Given a device index @p dv_ind, and a pointer to an
- *  unsigned long long @p hive_id, this function will write the current XGMI
+ *  uint64_t @p hive_id, this function will write the current XGMI
  *  hive id for the device @p dv_ind to the memory pointed to by @p hive_id.
  *
  *  @param[in] dv_ind a device index
  *
- *  @param[inout] hive_id A pointer to an unsigned long long to which the XGMI hive id
+ *  @param[inout] hive_id A pointer to an uint64_t to which the XGMI hive id
  *  should be written
  *
  *  @retval ::RSMI_STATUS_SUCCESS call was successful
@@ -3308,7 +4032,7 @@ rsmi_dev_xgmi_error_reset(uint32_t dv_ind);
  *
  */
 rsmi_status_t
-rsmi_dev_xgmi_hive_id_get(uint32_t dv_ind, unsigned long long *hive_id);
+rsmi_dev_xgmi_hive_id_get(uint32_t dv_ind, uint64_t *hive_id);
 
 /** @} */  // end of SysInfo
 
@@ -3343,7 +4067,7 @@ rsmi_topo_get_numa_node_number(uint32_t dv_ind, uint32_t *numa_node);
  *
  *  @details Given a source device index @p dv_ind_src and
  *  a destination device index @p dv_ind_dst, and a pointer to an
- *  unsigned long long @p weight, this function will write the
+ *  uint64_t @p weight, this function will write the
  *  weight for the connection between the device @p dv_ind_src
  *  and @p dv_ind_dst to the memory pointed to by @p weight.
  *
@@ -3351,7 +4075,7 @@ rsmi_topo_get_numa_node_number(uint32_t dv_ind, uint32_t *numa_node);
  *
  *  @param[in] dv_ind_dst the destination device index
  *
- *  @param[inout] weight A pointer to an unsigned long long to which the
+ *  @param[inout] weight A pointer to an uint64_t to which the
  *  weight for the connection should be written.
  *
  *  @retval ::RSMI_STATUS_SUCCESS call was successful
@@ -3360,14 +4084,14 @@ rsmi_topo_get_numa_node_number(uint32_t dv_ind, uint32_t *numa_node);
  */
 rsmi_status_t
 rsmi_topo_get_link_weight(uint32_t dv_ind_src, uint32_t dv_ind_dst,
-                          unsigned long long *weight);
+                          uint64_t *weight);
 
 /**
  *  @brief Retreive minimal and maximal io link bandwidth between 2 GPUs
  *
  *  @details Given a source device index @p dv_ind_src and
  *  a destination device index @p dv_ind_dst,  pointer to an
- *  unsigned long long @p min_bandwidth, and a pointer to unsigned long long @p max_bandiwidth,
+ *  uint64_t @p min_bandwidth, and a pointer to uint64_t @p max_bandiwidth,
  *  this function will write theoretical minimal and maximal bandwidth limits.
  *  API works if src and dst are connected via xgmi and have 1 hop distance.
  *
@@ -3375,10 +4099,10 @@ rsmi_topo_get_link_weight(uint32_t dv_ind_src, uint32_t dv_ind_dst,
  *
  *  @param[in] dv_ind_dst the destination device index
  *
- *  @param[inout] min_bandwidth A pointer to an unsigned long long to which the
+ *  @param[inout] min_bandwidth A pointer to an uint64_t to which the
  *  minimal bandwidth for the connection should be written.
  *
- *  @param[inout] max_bandwidth A pointer to an unsigned long long to which the
+ *  @param[inout] max_bandwidth A pointer to an uint64_t to which the
  *  maximal bandwidth for the connection should be written.
  *
  *  @retval ::RSMI_STATUS_SUCCESS call was successful
@@ -3386,23 +4110,31 @@ rsmi_topo_get_link_weight(uint32_t dv_ind_src, uint32_t dv_ind_dst,
  */
 rsmi_status_t
 rsmi_minmax_bandwidth_get(uint32_t dv_ind_src, uint32_t dv_ind_dst,
-                          unsigned long long *min_bandwidth, unsigned long long *max_bandwidth);
+                          uint64_t *min_bandwidth, uint64_t *max_bandwidth);
 
 /**
- *  @brief Retrieve the hops and the connection type between 2 GPUs
+ *  @brief Retrieve the hops and the connection type between GPU to GPU/CPU
  *
  *  @details Given a source device index @p dv_ind_src and
  *  a destination device index @p dv_ind_dst, and a pointer to an
- *  unsigned long long @p hops and a pointer to an RSMI_IO_LINK_TYPE @p type,
+ *  uint64_t @p hops and a pointer to an RSMI_IO_LINK_TYPE @p type,
  *  this function will write the number of hops and the connection type
  *  between the device @p dv_ind_src and @p dv_ind_dst to the memory
+ *  pointed to by @p hops and @p type.
+ *
+ *  To query the link type between GPU and CPU, given a source GPU index
+ *  @p dev_ind_srcc and a destination device index @p dv_ind_dst
+ *  CPU_NODE_INDEX(0xFFFFFFFF), a pointer to an
+ *  uint64_t @p hops and a pointer to an RSMI_IO_LINK_TYPE @p type,
+ *  this function will write the number of hops and the connection type
+ *  between the device @p dv_ind_src and CPU to the memory
  *  pointed to by @p hops and @p type.
  *
  *  @param[in] dv_ind_src the source device index
  *
  *  @param[in] dv_ind_dst the destination device index
  *
- *  @param[inout] hops A pointer to an unsigned long long to which the
+ *  @param[inout] hops A pointer to an uint64_t to which the
  *  hops for the connection should be written.
  *
  *  @param[inout] type A pointer to an ::RSMI_IO_LINK_TYPE to which the
@@ -3414,14 +4146,14 @@ rsmi_minmax_bandwidth_get(uint32_t dv_ind_src, uint32_t dv_ind_dst,
  */
 rsmi_status_t
 rsmi_topo_get_link_type(uint32_t dv_ind_src, uint32_t dv_ind_dst,
-                        unsigned long long *hops, RSMI_IO_LINK_TYPE *type);
+                        uint64_t *hops, RSMI_IO_LINK_TYPE *type);
 
 /**
  *  @brief Return P2P availability status between 2 GPUs
  *
  *  @details Given a source device index @p dv_ind_src and
  *  a destination device index @p dv_ind_dst, and a pointer to a
- *  bool @accessible, this function will write the P2P connection status
+ *  bool @p accessible, this function will write the P2P connection status
  *  between the device @p dv_ind_src and @p dv_ind_dst to the memory
  *  pointed to by @p accessible.
  *
@@ -3438,9 +4170,243 @@ rsmi_topo_get_link_type(uint32_t dv_ind_src, uint32_t dv_ind_dst,
  */
 rsmi_status_t
 rsmi_is_P2P_accessible(uint32_t dv_ind_src, uint32_t dv_ind_dst,
-                       bool *accessible);
+                       _Bool *accessible);
 
 /** @} */  // end of HWTopo
+
+/*****************************************************************************/
+/** @defgroup ComputePartition Compute Partition Functions
+ *  These functions are used to configure and query the device's
+ *  compute parition setting.
+ *  @{
+ */
+
+/**
+ *  @brief Retrieves the current compute partitioning for a desired device
+ *
+ *  @details
+ *  Given a device index @p dv_ind and a string @p compute_partition ,
+ *  and uint32 @p len , this function will attempt to obtain the device's
+ *  current compute partition setting string. Upon successful retreival,
+ *  the obtained device's compute partition settings string shall be stored in
+ *  the passed @p compute_partition char string variable.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] compute_partition a pointer to a char string variable,
+ *  which the device's current compute partition will be written to.
+ *
+ *  @param[in] len the length of the caller provided buffer @p compute_partition
+ *  , suggested length is 4 or greater.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *  @retval ::RSMI_STATUS_UNEXPECTED_DATA data provided to function is not valid
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function
+ *  @retval ::RSMI_STATUS_INSUFFICIENT_SIZE is returned if @p len bytes is not
+ *  large enough to hold the entire compute partition value. In this case,
+ *  only @p len bytes will be written.
+ *
+ */
+rsmi_status_t
+rsmi_dev_compute_partition_get(uint32_t dv_ind, char *compute_partition,
+                               uint32_t len);
+
+/**
+ *  @brief Modifies a selected device's compute partition setting.
+ *
+ *  @details Given a device index @p dv_ind, a type of compute partition
+ *  @p compute_partition, this function will attempt to update the selected
+ *  device's compute partition setting.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[in] compute_partition using enum ::rsmi_compute_partition_type_t,
+ *  define what the selected device's compute partition setting should be
+ *  updated to.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_PERMISSION function requires root access
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *  @retval ::RSMI_STATUS_SETTING_UNAVAILABLE the provided setting is
+ *  unavailable for current device
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function
+ *  @retval ::RSMI_STATUS_BUSY A resource or mutex could not be acquired
+ *  because it is already being used - device is busy
+ *
+ */
+rsmi_status_t
+rsmi_dev_compute_partition_set(uint32_t dv_ind,
+                               rsmi_compute_partition_type_t compute_partition);
+
+/**
+ *  @brief Reverts a selected device's compute partition setting back to its
+ *  boot state.
+ *
+ *  @details Given a device index @p dv_ind , this function will attempt to
+ *  revert its compute partition setting back to its boot state.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_PERMISSION function requires root access
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function
+ *  @retval ::RSMI_STATUS_BUSY A resource or mutex could not be acquired
+ *  because it is already being used - device is busy
+ *
+ */
+rsmi_status_t rsmi_dev_compute_partition_reset(uint32_t dv_ind);
+
+/**
+ *  @brief Retrieves the partition_id for a desired device
+ *
+ *  @details
+ *  Given a device index @p dv_ind and a uint32_t pointer @p partition_id ,
+ *  this function will attempt to obtain the device's partition ID.
+ *  Upon successful retreival, the obtained device's partition will be stored
+ *  in the passed @p partition_id uint32_t variable. If device does
+ *  not support partitions or is in SPX, a @p partition_id ID of 0 shall
+ *  be returned.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] partition_id a uint32_t variable,
+ *  which the device's partition_id will be written to.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function
+ *
+ */
+rsmi_status_t rsmi_dev_partition_id_get(uint32_t dv_ind, uint32_t *partition_id);
+
+/** @} */  // end of ComputePartition
+
+/*****************************************************************************/
+/** @defgroup memory_partition The Memory Partition Functions
+ *  These functions are used to query and set the device's current memory
+ *  partition.
+ *  @{
+ */
+
+/**
+ *  @brief Retrieves the current memory partition for a desired device
+ *
+ *  @details
+ *  Given a device index @p dv_ind and a string @p memory_partition ,
+ *  and uint32 @p len , this function will attempt to obtain the device's
+ *  memory partition string. Upon successful retreival, the obtained device's
+ *  memory partition string shall be stored in the passed @p memory_partition
+ *  char string variable.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] memory_partition a pointer to a char string variable,
+ *  which the device's memory partition will be written to.
+ *
+ *  @param[in] len the length of the caller provided buffer @p memory_partition ,
+ *  suggested length is 5 or greater.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *  @retval ::RSMI_STATUS_UNEXPECTED_DATA data provided to function is not valid
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function
+ *  @retval ::RSMI_STATUS_INSUFFICIENT_SIZE is returned if @p len bytes is not
+ *  large enough to hold the entire memory partition value. In this case,
+ *  only @p len bytes will be written.
+ *
+ */
+rsmi_status_t
+rsmi_dev_memory_partition_get(uint32_t dv_ind, char *memory_partition,
+                              uint32_t len);
+
+/**
+ *  @brief Retrieves the available memory partition capabilities
+ *  for a desired device
+ *
+ *  @details
+ *  Given a device index @p dv_ind and a string @p memory_partition_caps ,
+ *  and uint32 @p len , this function will attempt to obtain the device's
+ *  available memory partition capabilities string. Upon successful
+ *  retreival, the obtained device's available memory partition capablilities
+ *  string shall be stored in the passed @p memory_partition_caps
+ *  char string variable.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] memory_partition_caps a pointer to a char string variable,
+ *  which the device's available memory partition capabilities will be written to.
+ *
+ *  @param[in] len the length of the caller provided buffer @p len ,
+ *  suggested length is 30 or greater.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *  @retval ::RSMI_STATUS_UNEXPECTED_DATA data provided to function is not valid
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function
+ *  @retval ::RSMI_STATUS_INSUFFICIENT_SIZE is returned if @p len bytes is not
+ *  large enough to hold the entire memory partition value. In this case,
+ *  only @p len bytes will be written.
+ *
+ */
+rsmi_status_t rsmi_dev_memory_partition_capabilities_get(
+                uint32_t dv_ind, char *memory_partition_caps, uint32_t len);
+
+/**
+ *  @brief Modifies a selected device's current memory partition setting.
+ *
+ *  @details Given a device index @p dv_ind and a type of memory partition
+ *  @p memory_partition, this function will attempt to update the selected
+ *  device's memory partition setting.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[in] memory_partition using enum ::rsmi_memory_partition_type_t,
+ *  define what the selected device's current mode setting should be updated to.
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_PERMISSION function requires root access
+ *  @retval ::RSMI_STATUS_INVALID_ARGS the provided arguments are not valid
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function
+ *  @retval ::RSMI_STATUS_AMDGPU_RESTART_ERR could not successfully restart
+ *  the amdgpu driver
+  *  @retval ::RSMI_STATUS_BUSY A resource or mutex could not be acquired
+ *  because it is already being used - device is busy
+ *
+ */
+rsmi_status_t
+rsmi_dev_memory_partition_set(uint32_t dv_ind,
+                              rsmi_memory_partition_type_t memory_partition);
+
+/**
+ *  @brief Reverts a selected device's memory partition setting back to its
+ *  boot state.
+ *
+ *  @details Given a device index @p dv_ind , this function will attempt to
+ *  revert its current memory partition setting back to its boot state.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS call was successful
+ *  @retval ::RSMI_STATUS_PERMISSION function requires root access
+ *  @retval ::RSMI_STATUS_NOT_SUPPORTED installed software or hardware does not
+ *  support this function
+ *  @retval ::RSMI_STATUS_AMDGPU_RESTART_ERR could not successfully restart
+ *  the amdgpu driver
+ *  @retval ::RSMI_STATUS_BUSY A resource or mutex could not be acquired
+ *  because it is already being used - device is busy
+ *
+ */
+rsmi_status_t rsmi_dev_memory_partition_reset(uint32_t dv_ind);
+
+/** @} */  // end of memory_partition
 
 /*****************************************************************************/
 /** @defgroup APISupport Supported Functions
@@ -3716,7 +4682,7 @@ rsmi_event_notification_init(uint32_t dv_ind);
  * @retval ::RSMI_STATUS_SUCCESS is returned upon successful call
  */
 rsmi_status_t
-rsmi_event_notification_mask_set(uint32_t dv_ind, unsigned long long mask);
+rsmi_event_notification_mask_set(uint32_t dv_ind, uint64_t mask);
 
 /**
  * @brief Collect event notifications, waiting a specified amount of time
@@ -3784,7 +4750,69 @@ rsmi_status_t rsmi_event_notification_stop(uint32_t dv_ind);
 
 /** @} */  // end of EvntNotif
 
+
+/*****************************************************************************/
+/** @defgroup GPU Metric Functions
+ *  These functions are used to get granular information about all counters
+ *  available in GPU Metrics.
+ *  @{
+ */
+
+/**
+ *  @brief Get the 'metrics_header_info' from the GPU metrics associated with the device
+ *
+ *  @details Given a device index @p dv_ind and a pointer to a metrics_table_header_t in which
+ *  the 'metrics_header_info' will stored
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] header_value a pointer to metrics_table_header_t to which the device gpu
+ *  metric unit will be stored
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS is returned upon successful call.
+ *          ::RSMI_STATUS_NOT_SUPPORTED is returned in case the metric unit
+ *            does not exist for the given device
+ *
+ */
+rsmi_status_t
+rsmi_dev_metrics_header_info_get(uint32_t dv_ind, metrics_table_header_t* header_value);
+
+/**
+ *  @brief Get the 'xcd_counter' from the GPU metrics associated with the device
+ *
+ *  @details Given a device index @p dv_ind and a pointer to a uint16_t in which
+ *  the 'xcd_counter' will stored
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @param[inout] xcd_counter_value a pointer to uint16_t to which the device gpu
+ *  metric unit will be stored
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS is returned upon successful call.
+ *          ::RSMI_STATUS_NOT_SUPPORTED is returned in case the metric unit
+ *            does not exist for the given device
+ *
+ */
+rsmi_status_t
+rsmi_dev_metrics_xcd_counter_get(uint32_t dv_ind, uint16_t* xcd_counter_value);
+
+/**
+ *  @brief Get the log from the GPU metrics associated with the device
+ *
+ *  @details Given a device index @p dv_ind it will log all the gpu metric info
+ *  related to the device. The 'logging' feature must be on.
+ *
+ *  @param[in] dv_ind a device index
+ *
+ *  @retval ::RSMI_STATUS_SUCCESS is returned upon successful call.
+ *
+ */
+rsmi_status_t
+rsmi_dev_metrics_log_get(uint32_t dv_ind);
+
+/** @} */  // end of DevMetricsHeaderInfoGet
+
 #ifdef __cplusplus
 }
 #endif  // __cplusplus
-#endif  // INCLUDE_ROCM_SMI_ROCM_SMI_H_
+#endif  // ROCM_SMI_ROCM_SMI_H_

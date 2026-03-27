@@ -48,9 +48,10 @@
 
 // This file is generated on build.
 
-#define rocm_smi_VERSION_MAJOR 5
-#define rocm_smi_VERSION_MINOR 0
+#define rocm_smi_VERSION_MAJOR 7
+#define rocm_smi_VERSION_MINOR 6
 #define rocm_smi_VERSION_PATCH 0
 #define rocm_smi_VERSION_BUILD "0"
+#define rocm_smi_VERSION_HASH "unknown"
 
 #endif  // INCLUDE_ROCM_SMI_ROCM_SMI64CONFIG_H_

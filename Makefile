@@ -1,26 +1,24 @@
-
-CFORGO = ${HOME}/go/bin/c-for-go
+CFORGO = c-for-go
 CGO = $(shell go env GOTOOLDIR)/cgo
 
 all: generate
 
-UINT64_TYPE = unsigned long long
-INT64_TYPE = long long
+UINT64_TYPE = uint64_t
+INT64_TYPE = int64_t
 TEST_VERBOSE = -v
 
 generate:
-	cd pkg && \
+	cd pkg/rocm_smi && \
 		sed -e "s/uint64_t/$(UINT64_TYPE)/g" \
 		    -e "s/int64_t/$(INT64_TYPE)/g" \
+		    -e "s/    bool/    _Bool/g" \
 		    -e "s/union id/union id_rename/g" \
-		    rocm_smi/rocm_smi/rocm_smi.h.orig > rocm_smi/rocm_smi/rocm_smi.h && \
-		$(CFORGO) -ccincl --ccdefs ../rocm_smi.yml && \
-		cd -
+		    rocm_smi/rocm_smi.h.orig > rocm_smi/rocm_smi.h
+	cd pkg/rocm_smi && $(CFORGO) -ccincl --ccdefs ../../rocm_smi.yml
 	cd pkg/rocm_smi && \
 		$(CGO) -godefs types.go > types.go.expand && \
 		mv types.go.expand types.go && \
-		rm -rf _obj && \
-		cd -
+		rm -f _cgo_2.o
 
 clean:
 	rm -f pkg/rocm_smi/cgo_helpers.go pkg/rocm_smi/cgo_helpers.h pkg/rocm_smi/cgo_helpers.c

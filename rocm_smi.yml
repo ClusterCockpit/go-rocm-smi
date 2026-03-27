@@ -44,15 +44,17 @@ GENERATOR:
     SOFTWARE.
   Includes: ["rocm_smi/rocm_smi.h", "rocm_smi/kfd_ioctl.h", "rocm_smi/rocm_smi_helpers.h"]
   SysIncludes:
-    - "stdlib.h"
     - "stdint.h"
-    - "unistd.h"
+    - "stddef.h"
+    - "stdbool.h"
   FlagGroups:
     - {name: "LDFLAGS", flags: ["-Wl,--unresolved-symbols=ignore-in-object-files"]}
     - {name: "CFLAGS", flags: [""]}
 PARSER:
   SourcesPaths: ["rocm_smi/rocm_smi.h", "rocm_smi/kfd_ioctl.h", "rocm_smi/rocm_smi_helpers.h"]
   IncludePaths: ["/usr/include"]
+  Defines:
+    nullptr: "((void *)0)"
 TRANSLATOR:
   ConstCharIsString: true
   ConstRules:
