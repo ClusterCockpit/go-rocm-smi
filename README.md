@@ -113,7 +113,6 @@ func (Device DeviceHandle) DeviceGetSerial() (string, RSMI_status) {
 ```
 
 
-
 # The device index and the "device handle"
 
 For most libraries which handle multiple devices ([`go-nvml`](https://github.com/NVIDIA/go-nvml) is an example), the user at first requests a handle for each device, mostly through the logical index in the list of available devices. The official `rocm_smi` library uses the logical index instead but in order to get everything right, you have to do quite some work to know what is supported. The `rocm_smi` provides a feature (`APISupport` in `rocm_smi.h`) to determine which functions are supported for a device and if a function accepts arguments, which ones are valid for this device. An example would be the function to get the firmware version and the list of GPU parts that provide such a version. The `go-rocm-smi` bindings introduce a virtual type `DeviceHandle`, retrivable through the logical index (so similar to [`go-nvml`](https://github.com/NVIDIA/go-nvml)), which encapsulates the `APISupport` lookup: `DeviceGetHandleByIndex()`. The `DeviceHandle` is used for all device related calls in `go-rocm-smi`. You can get the logical index by `deviceHandle.Index()`, the **not** unique ID of a GPU by `deviceHandle.ID()` and the list of supported functions through `deviceHandle.Supported()`
@@ -130,3 +129,7 @@ For most libraries which handle multiple devices ([`go-nvml`](https://github.com
   To drop the new status, use `StatusStringNoError()`.
 - I havn't found a way to access the `Build` field in `RSMI_version`.
   It is a `char*` in `rocm_smi` but [`c-for-go`](https://c.for-go.com/) generates an `*int8` entry for it.
+- [`c-for-go`](https://c.for-go.com/) doesn't handle enums correctly.
+  See https://github.com/xlab/c-for-go/issues/133.
+  In C the type of an enum is implementation defined, and in [`c-for-go`](https://c.for-go.com/) they are always defined as `int32`.
+  Because `rocm_smi.h` uses enums of the full uint32 range (and sometimes even uint64 range), we have to manually fixup the types in the Makefile.

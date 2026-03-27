@@ -222,7 +222,7 @@ func DeviceGetName(Device DeviceHandle) (string, RSMI_status) {
 	}
 	var name []byte = make([]byte, defaultRsmiStringLength)
 	nptr := &name[0]
-	ret := rsmi_dev_name_get(Device.index, nptr, defaultRsmiStringLength)
+	ret := rsmi_dev_name_get(Device.index, nptr, uint64(defaultRsmiStringLength))
 	return bytes2String(name), ret
 }
 
@@ -252,19 +252,19 @@ func (Device DeviceHandle) GetName() (string, RSMI_status) {
 var DeviceGetSku = deviceGetSkuFake
 
 // DeviceGetSkuReal is the actual reading function for the SKU. But it is not supported by some devices.
-func deviceGetSkuReal(Device DeviceHandle) (string, RSMI_status) {
-	var Sku []byte = make([]byte, defaultRsmiStringLength)
+func deviceGetSkuReal(Device DeviceHandle) (uint16, RSMI_status) {
+	var Sku uint16
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	if _, ok := Device.supported["rsmi_dev_sku_get"]; !ok {
-		sptr := &Sku[0]
+		sptr := &Sku
 		ret = rsmi_dev_sku_get(Device.index, sptr)
 	}
-	return bytes2String(Sku), ret
+	return Sku, ret
 }
 
 // DeviceGetSkuReal is returning 'NA' as SKU because the funtion is not supported by the device
-func deviceGetSkuFake(Device DeviceHandle) (string, RSMI_status) {
-	return "NA", STATUS_NOT_SUPPORTED
+func deviceGetSkuFake(Device DeviceHandle) (uint16, RSMI_status) {
+	return 0, STATUS_NOT_SUPPORTED
 }
 
 // GetSku gets the SKU for a device..
@@ -276,7 +276,7 @@ func deviceGetSkuFake(Device DeviceHandle) (string, RSMI_status) {
 // Returns STATUS_SUCCESS when call was successful.
 // Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
 // Returns STATUS_INVALID_ARGS when the provided arguments are not valid.
-func (Device DeviceHandle) GetSku() (string, RSMI_status) {
+func (Device DeviceHandle) GetSku() (uint16, RSMI_status) {
 	return DeviceGetSku(Device)
 }
 
@@ -295,7 +295,7 @@ func DeviceGetVendorName(Device DeviceHandle) (string, RSMI_status) {
 	}
 	var Name []byte = make([]byte, defaultRsmiStringLength)
 	nptr := &Name[0]
-	ret := rsmi_dev_vendor_name_get(Device.index, nptr, defaultRsmiStringLength)
+	ret := rsmi_dev_vendor_name_get(Device.index, nptr, uint64(defaultRsmiStringLength))
 	return bytes2String(Name), ret
 }
 
@@ -407,7 +407,7 @@ func DeviceGetSubsystemName(Device DeviceHandle) (string, RSMI_status) {
 	}
 	var Name []byte = make([]byte, defaultRsmiStringLength)
 	nptr := &Name[0]
-	ret := rsmi_dev_subsystem_name_get(Device.index, nptr, defaultRsmiStringLength)
+	ret := rsmi_dev_subsystem_name_get(Device.index, nptr, uint64(defaultRsmiStringLength))
 	return bytes2String(Name), ret
 }
 
@@ -564,7 +564,7 @@ func (Device DeviceHandle) GetPciInfo() (Pci_info, RSMI_status) {
 func DeviceGetPciBandwidth(Device DeviceHandle) (RSMI_pcie_bandwidth, RSMI_status) {
 	var info RSMI_pcie_bandwidth = RSMI_pcie_bandwidth {
 		Rate : RSMI_frequencies {
-			Supported: 0,
+			Num_supported: 0,
 			Current: 0,
 		},
 	}
@@ -659,8 +659,8 @@ func (Device DeviceHandle) GetPciReplayCounter() (uint64, RSMI_status) {
 // STATUS_SUCCESS call was successful.
 // STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
 // STATUS_INVALID_ARGS the provided arguments are not valid.
-func DeviceGetNumaAffinity(Device DeviceHandle) (uint32, RSMI_status) {
-	var id uint32 = 0
+func DeviceGetNumaAffinity(Device DeviceHandle) (int32, RSMI_status) {
+	var id int32 = 0
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	if _, ok := Device.supported["rsmi_topo_numa_affinity_get"]; ok {
 		ret = rsmi_topo_numa_affinity_get(Device.index, &id)
@@ -673,7 +673,7 @@ func DeviceGetNumaAffinity(Device DeviceHandle) (uint32, RSMI_status) {
 // STATUS_SUCCESS call was successful.
 // STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
 // STATUS_INVALID_ARGS the provided arguments are not valid.
-func (Device DeviceHandle) GetNumaAffinity() (uint32, RSMI_status) {
+func (Device DeviceHandle) GetNumaAffinity() (int32, RSMI_status) {
 	return DeviceGetNumaAffinity(Device)
 }
 
@@ -1346,7 +1346,7 @@ func (Device DeviceHandle) GetOverdriveLevel() (uint32, RSMI_status) {
 // STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetClockFrequency(Device DeviceHandle, Clock RSMI_clk_type) (RSMI_frequencies, RSMI_status) {
 	var freqs RSMI_frequencies = RSMI_frequencies{
-		Supported: 0,
+		Num_supported: 0,
 		Current: 0,
 	}
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1380,7 +1380,7 @@ func (Device DeviceHandle) GetClockFrequency(Clock RSMI_clk_type) (RSMI_frequenc
 func DeviceReset(Device DeviceHandle) RSMI_status {
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	if _, ok := Device.supported["rsmi_dev_gpu_reset"]; ok {
-		ret = rsmi_dev_gpu_reset(int32(Device.index))
+		ret = rsmi_dev_gpu_reset(Device.index)
 	}
 	return ret
 }
@@ -1591,7 +1591,7 @@ func (Device DeviceHandle) GetPowerProfile(Sensor uint32) (RSMI_power_profile_st
 var DeviceSetPerfLevel = deviceSetPerfLevel_v1
 
 func deviceSetPerfLevel_v0(Device DeviceHandle, Level RSMI_dev_perf_level) RSMI_status {
-	ret := rsmi_dev_perf_level_set(int32(Device.index), Level)
+	ret := rsmi_dev_perf_level_set(Device.index, Level)
 	return ret
 }
 
@@ -1628,7 +1628,7 @@ var DeviceSetOverdriveLevel = deviceSetOverdriveLevel_v1
 
 
 func deviceSetOverdriveLevel_v2(Device DeviceHandle, Overdrive uint32) RSMI_status {
-	ret := rsmi_dev_overdrive_level_set(int32(Device.index), Overdrive)
+	ret := rsmi_dev_overdrive_level_set(Device.index, Overdrive)
 	return ret
 }
 
