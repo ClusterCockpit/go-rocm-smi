@@ -14,9 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         golang-ver:
-          - 1.16
-          - 1.17
-          - 1.18
+          - 1.25
     steps:
     - uses: actions/checkout@v3
 
