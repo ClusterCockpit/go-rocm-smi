@@ -277,9 +277,9 @@ func TestDevice(t *testing.T) {
 		t.Errorf("DeviceGetPciBandwidth: %v", ret)
 	} else {
 		t.Logf("DeviceGetPciBandwidth: %v", ret)
-		t.Logf("  pci bandwidth rate num_supported: %v", pciBand.Rate.Supported)
+		t.Logf("  pci bandwidth rate num_supported: %v", pciBand.Rate.Num_supported)
 		for i, r := range pciBand.Rate.Frequency {
-			if i >= int(pciBand.Rate.Supported) {
+			if i >= int(pciBand.Rate.Num_supported) {
 				break
 			}
 			if i == int(pciBand.Rate.Current) {
@@ -289,7 +289,7 @@ func TestDevice(t *testing.T) {
 			}
 		}
 		for i, l := range pciBand.Lanes {
-			if i >= int(pciBand.Rate.Supported) {
+			if i >= int(pciBand.Rate.Num_supported) {
 				break
 			}
 			if i == int(pciBand.Rate.Current) {
@@ -620,8 +620,8 @@ func TestDevice(t *testing.T) {
 		t.Errorf("DeviceGetClockFrequency: %v", ret)
 	} else {
 		t.Logf("DeviceGetClockFrequency: %v", ret)
-		t.Logf("  Clock supported: %v", clock.Supported)
-		for i := 0; i < int(clock.Supported); i++ {
+		t.Logf("  Clock supported: %v", clock.Num_supported)
+		for i := 0; i < int(clock.Num_supported); i++ {
 			if i != int(clock.Current) {
 				t.Logf("  Clock current: %v", clock.Frequency[i])
 			} else {
