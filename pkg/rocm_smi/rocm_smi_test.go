@@ -83,9 +83,9 @@ func TestSysInfo(t *testing.T) {
 
 	procs, ret := ComputeProcesses()
 	if ret != STATUS_SUCCESS {
-		t.Errorf("ComputeProcesses: %v", ret)
+		t.Errorf("ComputeProcesses: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("ComputeProcesses: %v", ret)
+		t.Logf("ComputeProcesses: %v", StatusStringNoError(ret))
 		for _, p := range procs {
 			t.Logf("  vram usage: %v", p.Vram_usage)
 		}
@@ -98,25 +98,25 @@ func TestSystem(t *testing.T) {
 
 	version, ret := Version()
 	if ret != STATUS_SUCCESS {
-		t.Errorf("Version: %v", ret)
+		t.Errorf("Version: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("Version: %v", ret)
+		t.Logf("Version: %v", StatusStringNoError(ret))
 		t.Logf("  version: %v.%v.%v", version.Major, version.Minor, version.Patch)
 	}
 
 	vStr, ret := ComponentVersionString(SW_COMP_DRIVER)
 	if ret != STATUS_SUCCESS {
-		t.Errorf("ComponentVersionString: %v", ret)
+		t.Errorf("ComponentVersionString: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("ComponentVersionString: %v", ret)
+		t.Logf("ComponentVersionString: %v", StatusStringNoError(ret))
 		t.Logf("  version (SW_COMP_DRIVER): %v", vStr)
 	}
 
 	count, ret := NumMonitorDevices()
 	if ret != STATUS_SUCCESS {
-		t.Errorf("NumMonitorDevices: %v", ret)
+		t.Errorf("NumMonitorDevices: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("NumMonitorDevices: %v", ret)
+		t.Logf("NumMonitorDevices: %v", StatusStringNoError(ret))
 		t.Logf("  count: %v", count)
 	}
 }
@@ -127,9 +127,9 @@ func TestDevice(t *testing.T) {
 
 	deviceCount, ret := NumMonitorDevices()
 	if ret != STATUS_SUCCESS {
-		t.Errorf("NumMonitorDevices: %v", ret)
+		t.Errorf("NumMonitorDevices: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("NumMonitorDevices: %v", ret)
+		t.Logf("NumMonitorDevices: %v", StatusStringNoError(ret))
 		t.Logf("  count: %v", deviceCount)
 	}
 
@@ -139,131 +139,131 @@ func TestDevice(t *testing.T) {
 
 	devHandle, ret := DeviceGetHandleByIndex(0)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetHandleByIndex: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetHandleByIndex: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetHandleByIndex: %v", ret)
+		t.Errorf("DeviceGetHandleByIndex: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetHandleByIndex: %v", ret)
+		t.Logf("DeviceGetHandleByIndex: %v", StatusStringNoError(ret))
 		t.Logf("  handle: %v %v", devHandle.Index(), devHandle.ID())
 	}
 
 	brandName, ret := DeviceGetBrand(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetBrand: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetBrand: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetBrand: %v", ret)
+		t.Errorf("DeviceGetBrand: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetBrand: %v", ret)
+		t.Logf("DeviceGetBrand: %v", StatusStringNoError(ret))
 		t.Logf("  brand: %v", brandName)
 	}
 
 	name, ret := DeviceGetName(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetName: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetName: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetName: %v", ret)
+		t.Errorf("DeviceGetName: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetName: %v", ret)
+		t.Logf("DeviceGetName: %v", StatusStringNoError(ret))
 		t.Logf("  name: %v", name)
 	}
 
 	vendId, ret := DeviceGetVendorId(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetVendorId: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetVendorId: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetVendorId: %v", ret)
+		t.Errorf("DeviceGetVendorId: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetVendorId: %v", ret)
+		t.Logf("DeviceGetVendorId: %v", StatusStringNoError(ret))
 		t.Logf("  name: %v", vendId)
 	}
 
 	vendName, ret := DeviceGetVendorName(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetVendorName: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetVendorName: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetVendorName: %v", ret)
+		t.Errorf("DeviceGetVendorName: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetVendorName: %v", ret)
+		t.Logf("DeviceGetVendorName: %v", StatusStringNoError(ret))
 		t.Logf("  vendor name: %v", vendName)
 	}
 
 	vramName, ret := DeviceGetVramVendor(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetVramVendor: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetVramVendor: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetVramVendor: %v", ret)
+		t.Errorf("DeviceGetVramVendor: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetVramVendor: %v", ret)
+		t.Logf("DeviceGetVramVendor: %v", StatusStringNoError(ret))
 		t.Logf("  vram name: %v", vramName)
 	}
 
 	serial, ret := DeviceGetSerialNumber(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetSerialNumber: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetSerialNumber: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetSerialNumber: %v", ret)
+		t.Errorf("DeviceGetSerialNumber: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetSerialNumber: %v", ret)
+		t.Logf("DeviceGetSerialNumber: %v", StatusStringNoError(ret))
 		t.Logf("  serial: %v", serial)
 	}
 
 	sku, ret := DeviceGetSku(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetSku: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetSku: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetSku: %v", ret)
+		t.Errorf("DeviceGetSku: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetSku: %v", ret)
+		t.Logf("DeviceGetSku: %v", StatusStringNoError(ret))
 		t.Logf("  sku: %v", sku)
 	}
 
 	subId, ret := DeviceGetSubsystemId(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetSubsystemId: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetSubsystemId: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetSubsystemId: %v", ret)
+		t.Errorf("DeviceGetSubsystemId: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetSubsystemId: %v", ret)
+		t.Logf("DeviceGetSubsystemId: %v", StatusStringNoError(ret))
 		t.Logf("  subsystem id: %v", subId)
 	}
 
 	subSys, ret := DeviceGetSubsystemName(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetSubsystemName: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetSubsystemName: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetSubsystemName: %v", ret)
+		t.Errorf("DeviceGetSubsystemName: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetSubsystemName: %v", ret)
+		t.Logf("DeviceGetSubsystemName: %v", StatusStringNoError(ret))
 		t.Logf("  subsystem: %v", subSys)
 	}
 
 	drmMinor, ret := DeviceGetDrmRenderMinor(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetDrmRenderMinor: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetDrmRenderMinor: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetDrmRenderMinor: %v", ret)
+		t.Errorf("DeviceGetDrmRenderMinor: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetDrmRenderMinor: %v", ret)
+		t.Logf("DeviceGetDrmRenderMinor: %v", StatusStringNoError(ret))
 		t.Logf("  DRM minor: %v", drmMinor)
 	}
 
 	pciId, ret := DeviceGetPciId(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetPciId: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetPciId: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetPciId: %v", ret)
+		t.Errorf("DeviceGetPciId: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetPciId: %v", ret)
+		t.Logf("DeviceGetPciId: %v", StatusStringNoError(ret))
 		t.Logf("  pci id: 0x%X", pciId)
 	}
 
 	pciInfo, ret := DeviceGetPciInfo(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetPciInfo: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetPciInfo: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetPciInfo: %v", ret)
+		t.Errorf("DeviceGetPciInfo: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetPciInfo: %v", ret)
+		t.Logf("DeviceGetPciInfo: %v", StatusStringNoError(ret))
 		t.Logf("  pci domain: 0x%X", pciInfo.Domain)
 		t.Logf("  pci bus: 0x%X", pciInfo.Bus)
 		t.Logf("  pci device: 0x%X", pciInfo.Device)
@@ -272,11 +272,11 @@ func TestDevice(t *testing.T) {
 
 	pciBand, ret := DeviceGetPciBandwidth(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetPciBandwidth: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetPciBandwidth: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetPciBandwidth: %v", ret)
+		t.Errorf("DeviceGetPciBandwidth: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetPciBandwidth: %v", ret)
+		t.Logf("DeviceGetPciBandwidth: %v", StatusStringNoError(ret))
 		t.Logf("  pci bandwidth rate num_supported: %v", pciBand.Rate.Num_supported)
 		for i, r := range pciBand.Rate.Frequency {
 			if i >= int(pciBand.Rate.Num_supported) {
@@ -302,11 +302,11 @@ func TestDevice(t *testing.T) {
 
 	sent, recv, max_pkts_size, ret := DeviceGetPciThroughput(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetPciThroughput: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetPciThroughput: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetPciThroughput: %v", ret)
+		t.Errorf("DeviceGetPciThroughput: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetPciThroughput: %v", ret)
+		t.Logf("DeviceGetPciThroughput: %v", StatusStringNoError(ret))
 		t.Logf("  pci throughput sent: %v", sent)
 		t.Logf("  pci throughput recv: %v", recv)
 		t.Logf("  pci throughput max_pkts_size: %v", max_pkts_size)
@@ -314,71 +314,71 @@ func TestDevice(t *testing.T) {
 
 	replay, ret := DeviceGetPciReplayCounter(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetPciReplayCounter: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetPciReplayCounter: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetPciReplayCounter: %v", ret)
+		t.Errorf("DeviceGetPciReplayCounter: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetPciReplayCounter: %v", ret)
+		t.Logf("DeviceGetPciReplayCounter: %v", StatusStringNoError(ret))
 		t.Logf("  replay counter: %v", replay)
 	}
 
 	numaAffinity, ret := DeviceGetNumaAffinity(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetNumaAffinity: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetNumaAffinity: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetNumaAffinity: %v", ret)
+		t.Errorf("DeviceGetNumaAffinity: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetNumaAffinity: %v", ret)
+		t.Logf("DeviceGetNumaAffinity: %v", StatusStringNoError(ret))
 		t.Logf("  numa node: %v", numaAffinity)
 	}
 
 	avgPower, ret := DeviceGetPowerAverage(devHandle, 0)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetPowerAverage: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetPowerAverage: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetPowerAverage: %v", ret)
+		t.Errorf("DeviceGetPowerAverage: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetPowerAverage: %v", ret)
+		t.Logf("DeviceGetPowerAverage: %v", StatusStringNoError(ret))
 		t.Logf("  average power (sensor 0): %v [microwatts]", avgPower)
 	}
 
 	capPower, ret := DeviceGetPowerCap(devHandle, 0)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetPowerCap: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetPowerCap: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetPowerCap: %v", ret)
+		t.Errorf("DeviceGetPowerCap: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetPowerCap: %v", ret)
+		t.Logf("DeviceGetPowerCap: %v", StatusStringNoError(ret))
 		t.Logf("  power capping (sensor 0): %v [microwatts]", capPower)
 	}
 
 	defCapPower, ret := DeviceGetDefaultPowerCap(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetDefaultPowerCap: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetDefaultPowerCap: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetDefaultPowerCap: %v", ret)
+		t.Errorf("DeviceGetDefaultPowerCap: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetDefaultPowerCap: %v", ret)
+		t.Logf("DeviceGetDefaultPowerCap: %v", StatusStringNoError(ret))
 		t.Logf("  power capping (default): %v [microwatts]", defCapPower)
 	}
 
 	capPowerMax, capPowerMin, ret := DeviceGetPowerCapRange(devHandle, 0)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetPowerCapRange: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetPowerCapRange: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetPowerCapRange: %v", ret)
+		t.Errorf("DeviceGetPowerCapRange: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetPowerCapRange: %v", ret)
+		t.Logf("DeviceGetPowerCapRange: %v", StatusStringNoError(ret))
 		t.Logf("  power capping (sensor 0): %v - %v [microwatts]", capPowerMin, capPowerMax)
 	}
 
 	energy, resolution, timestamp, ret := DeviceGetEnergyCount(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetEnergyCount: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetEnergyCount: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetEnergyCount: %v", ret)
+		t.Errorf("DeviceGetEnergyCount: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetEnergyCount: %v", ret)
+		t.Logf("DeviceGetEnergyCount: %v", StatusStringNoError(ret))
 		t.Logf("  energy: %v [microJoules]", energy)
 		t.Logf("  resolution: %v [microJoules]", resolution)
 		t.Logf("  timestamp: %v [ns]", timestamp)
@@ -386,227 +386,227 @@ func TestDevice(t *testing.T) {
 
 	totalMemFirst, ret := DeviceGetTotalMemory(devHandle, MEM_TYPE_FIRST)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetTotalMemory: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetTotalMemory: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetTotalMemory: %v", ret)
+		t.Errorf("DeviceGetTotalMemory: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetTotalMemory: %v", ret)
+		t.Logf("DeviceGetTotalMemory: %v", StatusStringNoError(ret))
 		t.Logf("  total memory (MEM_TYPE_FIRST): %v", totalMemFirst)
 	}
 	totalMemLast, ret := DeviceGetTotalMemory(devHandle, MEM_TYPE_LAST)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetTotalMemory: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetTotalMemory: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetTotalMemory: %v", ret)
+		t.Errorf("DeviceGetTotalMemory: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetTotalMemory: %v", ret)
+		t.Logf("DeviceGetTotalMemory: %v", StatusStringNoError(ret))
 		t.Logf("  total memory (MEM_TYPE_LAST): %v", totalMemLast)
 	}
 
 	usedMemFirst, ret := DeviceGetUsedMemory(devHandle, MEM_TYPE_FIRST)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetUsedMemory: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetUsedMemory: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetUsedMemory: %v", ret)
+		t.Errorf("DeviceGetUsedMemory: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetUsedMemory: %v", ret)
+		t.Logf("DeviceGetUsedMemory: %v", StatusStringNoError(ret))
 		t.Logf("  used memory (MEM_TYPE_FIRST): %v", usedMemFirst)
 	}
 	usedMemLast, ret := DeviceGetUsedMemory(devHandle, MEM_TYPE_LAST)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetUsedMemory: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetUsedMemory: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetUsedMemory: %v", ret)
+		t.Errorf("DeviceGetUsedMemory: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetUsedMemory: %v", ret)
+		t.Logf("DeviceGetUsedMemory: %v", StatusStringNoError(ret))
 		t.Logf("  used memory (MEM_TYPE_LAST): %v", usedMemLast)
 	}
 
 	memUtil, ret := DeviceGetMemoryUtilization(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetMemoryUtilization: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetMemoryUtilization: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetMemoryUtilization: %v", ret)
+		t.Errorf("DeviceGetMemoryUtilization: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetMemoryUtilization: %v", ret)
+		t.Logf("DeviceGetMemoryUtilization: %v", StatusStringNoError(ret))
 		t.Logf("  memory utilization: %v [%%]", memUtil)
 	}
 
 	fanRpm, ret := DeviceGetFanRpms(devHandle, 0)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceGetFanRpms: %v", ret)
+		t.Logf("DeviceGetFanRpms: %v", StatusStringNoError(ret))
 		t.Logf("  fan speed (sensor 0): %v [rpm]", fanRpm)
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetFanRpms: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetFanRpms: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Errorf("DeviceGetFanRpms: %v", ret)
+		t.Errorf("DeviceGetFanRpms: %v", StatusStringNoError(ret))
 	}
 
 	fanSpeed, ret := DeviceGetFanSpeed(devHandle, 0)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceGetFanSpeed: %v", ret)
+		t.Logf("DeviceGetFanSpeed: %v", StatusStringNoError(ret))
 		t.Logf("  fan speed (sensor 0): %v", fanSpeed)
 		t.Logf("  fan speed (sensor 0): %v [%%]", float64(fanSpeed)/MAX_FAN_SPEED)
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetFanSpeed: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetFanSpeed: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Errorf("DeviceGetFanSpeed: %v", ret)
+		t.Errorf("DeviceGetFanSpeed: %v", StatusStringNoError(ret))
 	}
 
 	maxFanSpeed, ret := DeviceGetMaxFanSpeed(devHandle, 0)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceGetMaxFanSpeed: %v", ret)
+		t.Logf("DeviceGetMaxFanSpeed: %v", StatusStringNoError(ret))
 		t.Logf("  max fan speed (sensor 0): %v", maxFanSpeed)
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetMaxFanSpeed: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetMaxFanSpeed: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Errorf("DeviceGetMaxFanSpeed: %v", ret)
+		t.Errorf("DeviceGetMaxFanSpeed: %v", StatusStringNoError(ret))
 	}
 
 	tempCurMem, ret := DeviceGetTemperatureMetric(devHandle, TEMP_TYPE_EDGE, TEMP_CURRENT)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceGetTemperatureMetric: %v", ret)
+		t.Logf("DeviceGetTemperatureMetric: %v", StatusStringNoError(ret))
 		t.Logf("  temperature (memory, current): %v [millidegrees Celcius]", tempCurMem)
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetTemperatureMetric: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetTemperatureMetric: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Errorf("DeviceGetTemperatureMetric: %v", ret)
+		t.Errorf("DeviceGetTemperatureMetric: %v", StatusStringNoError(ret))
 	}
 	tempMinMem, ret := DeviceGetTemperatureMetric(devHandle, TEMP_TYPE_EDGE, TEMP_MIN)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceGetTemperatureMetric: %v", ret)
+		t.Logf("DeviceGetTemperatureMetric: %v", StatusStringNoError(ret))
 		t.Logf("  temperature (memory, min): %v [millidegrees Celcius]", tempMinMem)
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetTemperatureMetric: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetTemperatureMetric: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Errorf("DeviceGetTemperatureMetric: %v", ret)
+		t.Errorf("DeviceGetTemperatureMetric: %v", StatusStringNoError(ret))
 	}
 	tempMaxMem, ret := DeviceGetTemperatureMetric(devHandle, TEMP_TYPE_EDGE, TEMP_MAX)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceGetTemperatureMetric: %v", ret)
+		t.Logf("DeviceGetTemperatureMetric: %v", StatusStringNoError(ret))
 		t.Logf("  temperature (memory, max): %v [millidegrees Celcius]", tempMaxMem)
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetTemperatureMetric: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetTemperatureMetric: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Errorf("DeviceGetTemperatureMetric: %v", ret)
+		t.Errorf("DeviceGetTemperatureMetric: %v", StatusStringNoError(ret))
 	}
 
 	voltCurMem, ret := DeviceGetVoltageMetric(devHandle, VOLT_TYPE_VDDGFX, VOLT_FIRST)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceGetVoltageMetric: %v", ret)
+		t.Logf("DeviceGetVoltageMetric: %v", StatusStringNoError(ret))
 		t.Logf("  voltage (vddgfx, current): %v [millivolts]", voltCurMem)
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetVoltageMetric: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetVoltageMetric: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Errorf("DeviceGetVoltageMetric: %v", ret)
+		t.Errorf("DeviceGetVoltageMetric: %v", StatusStringNoError(ret))
 	}
 	voltMinMem, ret := DeviceGetVoltageMetric(devHandle, VOLT_TYPE_VDDGFX, VOLT_MIN)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceGetVoltageMetric: %v", ret)
+		t.Logf("DeviceGetVoltageMetric: %v", StatusStringNoError(ret))
 		t.Logf("  voltage (vddgfx, min): %v [millivolts]", voltMinMem)
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetVoltageMetric: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetVoltageMetric: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Errorf("DeviceGetVoltageMetric: %v", ret)
+		t.Errorf("DeviceGetVoltageMetric: %v", StatusStringNoError(ret))
 	}
 	voltMaxMem, ret := DeviceGetVoltageMetric(devHandle, VOLT_TYPE_VDDGFX, VOLT_MAX)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceGetVoltageMetric: %v", ret)
+		t.Logf("DeviceGetVoltageMetric: %v", StatusStringNoError(ret))
 		t.Logf("  voltage (vddgfx, max): %v [millivolts]", voltMaxMem)
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetVoltageMetric: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetVoltageMetric: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Errorf("DeviceGetVoltageMetric: %v", ret)
+		t.Errorf("DeviceGetVoltageMetric: %v", StatusStringNoError(ret))
 	}
 
 	busy, ret := DeviceGetBusyPercent(devHandle)
 	if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetBusyPercent: %v", ret)
+		t.Errorf("DeviceGetBusyPercent: %v", StatusStringNoError(ret))
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetBusyPercent: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetBusyPercent: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetBusyPercent: %v", ret)
+		t.Logf("DeviceGetBusyPercent: %v", StatusStringNoError(ret))
 		t.Logf("  utilization: %v [%%]", busy)
 	}
 
 	perfLevel, ret := DeviceGetPerfLevel(devHandle)
 	if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetPerfLevel: %v", ret)
+		t.Errorf("DeviceGetPerfLevel: %v", StatusStringNoError(ret))
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetPerfLevel: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetPerfLevel: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetPerfLevel: %v", ret)
+		t.Logf("DeviceGetPerfLevel: %v", StatusStringNoError(ret))
 		t.Logf("  perf level: %v ", int(perfLevel))
 	}
 
 	overdriveLevel, ret := DeviceGetOverdriveLevel(devHandle)
 	if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetOverdriveLevel: %v", ret)
+		t.Errorf("DeviceGetOverdriveLevel: %v", StatusStringNoError(ret))
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetOverdriveLevel: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetOverdriveLevel: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetOverdriveLevel: %v", ret)
+		t.Logf("DeviceGetOverdriveLevel: %v", StatusStringNoError(ret))
 		t.Logf("  overdrive level: %v ", overdriveLevel)
 	}
 
 	vbiosVer, ret := DeviceGetVbiosVersionString(devHandle)
 	if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetVbiosVersionString: %v", ret)
+		t.Errorf("DeviceGetVbiosVersionString: %v", StatusStringNoError(ret))
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetVbiosVersionString: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetVbiosVersionString: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetVbiosVersionString: %v", ret)
+		t.Logf("DeviceGetVbiosVersionString: %v", StatusStringNoError(ret))
 		t.Logf("  VBIOS version: %v", vbiosVer)
 	}
 
 	asdVer, ret := DeviceGetFirmwareVersion(devHandle, FW_BLOCK_ASD)
 	if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetFirmwareVersion: %v", ret)
+		t.Errorf("DeviceGetFirmwareVersion: %v", StatusStringNoError(ret))
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetFirmwareVersion: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetFirmwareVersion: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetFirmwareVersion: %v", ret)
+		t.Logf("DeviceGetFirmwareVersion: %v", StatusStringNoError(ret))
 		t.Logf("  FW_BLOCK_ASD firmware version: %v", asdVer)
 	}
 
 	eccCounts, ret := DeviceGetEccCount(devHandle, GPU_BLOCK_FIRST)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetEccCount: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetEccCount: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetEccCount: %v", ret)
+		t.Errorf("DeviceGetEccCount: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetEccCount: %v", ret)
+		t.Logf("DeviceGetEccCount: %v", StatusStringNoError(ret))
 		t.Logf("  ECC errors correctable: %v", eccCounts.Correctable_err)
 		t.Logf("  ECC errors uncorrectable: %v", eccCounts.Uncorrectable_err)
 	}
 
 	eccMask, ret := DeviceGetEccMask(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetEccMask: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetEccMask: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetEccMask: %v", ret)
+		t.Errorf("DeviceGetEccMask: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetEccMask: %v", ret)
+		t.Logf("DeviceGetEccMask: %v", StatusStringNoError(ret))
 		t.Logf("  ECC mask: %v", eccMask)
 	}
 
 	eccStatus, ret := DeviceGetEccStatus(devHandle, GPU_BLOCK_FIRST)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetEccStatus: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetEccStatus: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetEccStatus: %v", ret)
+		t.Errorf("DeviceGetEccStatus: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetEccStatus: %v", ret)
+		t.Logf("DeviceGetEccStatus: %v", StatusStringNoError(ret))
 		t.Logf("  ECC status: %v", eccStatus)
 	}
 
 	reservedPages, ret := DeviceGetMemoryReservedPages(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetMemoryReservedPages: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetMemoryReservedPages: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetMemoryReservedPages: %v", ret)
+		t.Errorf("DeviceGetMemoryReservedPages: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetMemoryReservedPages: %v", ret)
+		t.Logf("DeviceGetMemoryReservedPages: %v", StatusStringNoError(ret))
 		t.Logf("  Num Reserved Pages: %v", len(reservedPages))
 		for _, r := range reservedPages {
 			t.Logf("  Page Addr: %v Page Size: %v Page Status: %v", r.Address, r.Size, r.Status)
@@ -615,11 +615,11 @@ func TestDevice(t *testing.T) {
 
 	clock, ret := DeviceGetClockFrequency(devHandle, CLK_TYPE_FIRST)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetClockFrequency: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetClockFrequency: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetClockFrequency: %v", ret)
+		t.Errorf("DeviceGetClockFrequency: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetClockFrequency: %v", ret)
+		t.Logf("DeviceGetClockFrequency: %v", StatusStringNoError(ret))
 		t.Logf("  Clock supported: %v", clock.Num_supported)
 		for i := 0; i < int(clock.Num_supported); i++ {
 			if i != int(clock.Current) {
@@ -632,11 +632,11 @@ func TestDevice(t *testing.T) {
 
 	utilCounts, utilStamp, ret := DeviceGetUtilizationCounters(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetUtilizationCounters: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetUtilizationCounters: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetUtilizationCounters: %v", ret)
+		t.Errorf("DeviceGetUtilizationCounters: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetUtilizationCounters: %v", ret)
+		t.Logf("DeviceGetUtilizationCounters: %v", StatusStringNoError(ret))
 		t.Logf("  Timestamp: %v", utilStamp)
 		for _, counter := range utilCounts {
 			t.Logf("  Utilization (Type %v): %v", counter.Type, counter.Value)
@@ -645,11 +645,11 @@ func TestDevice(t *testing.T) {
 
 	freqVoltCurve, ret := DeviceGetVoltageFrequencyCurve(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetVoltageFrequencyCurve: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetVoltageFrequencyCurve: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetVoltageFrequencyCurve: %v", ret)
+		t.Errorf("DeviceGetVoltageFrequencyCurve: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetVoltageFrequencyCurve: %v", ret)
+		t.Logf("DeviceGetVoltageFrequencyCurve: %v", StatusStringNoError(ret))
 		t.Logf("  NumRegions: %v", freqVoltCurve.Num_regions)
 		t.Logf("  Current SCLK: %v - %v (Limits: %v - %v)", freqVoltCurve.Curr_sclk_range.Lower_bound, freqVoltCurve.Curr_sclk_range.Upper_bound, freqVoltCurve.Sclk_freq_limits.Lower_bound, freqVoltCurve.Sclk_freq_limits.Upper_bound)
 		t.Logf("  Current MCLK: %v - %v (Limits: %v - %v)", freqVoltCurve.Curr_mclk_range.Lower_bound, freqVoltCurve.Curr_mclk_range.Upper_bound, freqVoltCurve.Mclk_freq_limits.Lower_bound, freqVoltCurve.Mclk_freq_limits.Upper_bound)
@@ -657,11 +657,11 @@ func TestDevice(t *testing.T) {
 
 	freqVoltCurveRegions, ret := DeviceGetVoltageFrequencyCurveRegions(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetVoltageFrequencyCurveRegions: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetVoltageFrequencyCurveRegions: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetVoltageFrequencyCurveRegions: %v", ret)
+		t.Errorf("DeviceGetVoltageFrequencyCurveRegions: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetVoltageFrequencyCurveRegions: %v", ret)
+		t.Logf("DeviceGetVoltageFrequencyCurveRegions: %v", StatusStringNoError(ret))
 		t.Logf("  NumRegions: %v", len(freqVoltCurveRegions))
 		for i, region := range freqVoltCurveRegions {
 			t.Logf("  Region %v Freq (%v - %v) Voltage (%v - %v)", i, region.Freq_range.Lower_bound, region.Freq_range.Upper_bound, region.Volt_range.Lower_bound, region.Volt_range.Upper_bound)
@@ -670,11 +670,11 @@ func TestDevice(t *testing.T) {
 
 	metrics, ret := DeviceGetMetrics(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetMetrics: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetMetrics: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetMetrics: %v", ret)
+		t.Errorf("DeviceGetMetrics: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetMetrics: %v", ret)
+		t.Logf("DeviceGetMetrics: %v", StatusStringNoError(ret))
 		t.Logf("  Average GFX Activity: %v", metrics.Average_gfx_activity)
 		t.Logf("  Average UMC Activity: %v", metrics.Average_umc_activity)
 		t.Logf("  Average MM Activity: %v", metrics.Average_mm_activity)
@@ -683,41 +683,41 @@ func TestDevice(t *testing.T) {
 
 	node, ret := DeviceGetNumaNode(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetNumaNode: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetNumaNode: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetNumaNode: %v", ret)
+		t.Errorf("DeviceGetNumaNode: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetNumaNode: %v", ret)
+		t.Logf("DeviceGetNumaNode: %v", StatusStringNoError(ret))
 		t.Logf("  NUMA node: %v", node)
 	}
 
 	xgmiStatus, ret := DeviceXgmiErrorStatus(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceXgmiErrorStatus: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceXgmiErrorStatus: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceXgmiErrorStatus: %v", ret)
+		t.Errorf("DeviceXgmiErrorStatus: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceXgmiErrorStatus: %v", ret)
+		t.Logf("DeviceXgmiErrorStatus: %v", StatusStringNoError(ret))
 		t.Logf("  XGMI error status: %v", xgmiStatus)
 	}
 
 	xgmiHive, ret := DeviceXgmiHiveId(devHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceXgmiHiveId: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceXgmiHiveId: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceXgmiHiveId: %v", ret)
+		t.Errorf("DeviceXgmiHiveId: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceXgmiHiveId: %v", ret)
+		t.Logf("DeviceXgmiHiveId: %v", StatusStringNoError(ret))
 		t.Logf("  XGMI hive id: %v", xgmiHive)
 	}
 
 	powerProf, ret := DeviceGetPowerProfile(devHandle, 0)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetPowerProfile: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetPowerProfile: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetPowerProfile: %v", ret)
+		t.Errorf("DeviceGetPowerProfile: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetPowerProfile: %v", ret)
+		t.Logf("DeviceGetPowerProfile: %v", StatusStringNoError(ret))
 		t.Logf("  current power profile: %v", powerProf.Current)
 		t.Logf("  available power profiles: %v", powerProf.Available_profiles)
 		t.Logf("  number of power profiles: %v", powerProf.Num_profiles)
@@ -730,7 +730,7 @@ func TestPerfLevel(t *testing.T) {
 
 	deviceCount, ret := NumMonitorDevices()
 	if ret != STATUS_SUCCESS {
-		t.Errorf("NumMonitorDevices: %v", ret)
+		t.Errorf("NumMonitorDevices: %v", StatusStringNoError(ret))
 	} else {
 		t.Logf("NumMonitorDevices: %v", ret)
 		t.Logf("  count: %v", deviceCount)
@@ -740,19 +740,19 @@ func TestPerfLevel(t *testing.T) {
 	}
 	devHandle, ret := DeviceGetHandleByIndex(0)
 	if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetHandleByIndex(0): %v", ret)
+		t.Errorf("DeviceGetHandleByIndex(0): %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetHandleByIndex(0): %v", ret)
+		t.Logf("DeviceGetHandleByIndex(0): %v", StatusStringNoError(ret))
 	}
 
 	perfLevelBefore, ret := DeviceGetPerfLevel(devHandle)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceGetPerfLevel: %v", ret)
+		t.Logf("DeviceGetPerfLevel: %v", StatusStringNoError(ret))
 		t.Logf("  perf level (before): %v ", int(perfLevelBefore))
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetPerfLevel: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetPerfLevel: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Errorf("DeviceGetPerfLevel: %v", ret)
+		t.Errorf("DeviceGetPerfLevel: %v", StatusStringNoError(ret))
 	}
 	perfLevelTest := DEV_PERF_LEVEL_HIGH
 	if perfLevelBefore == perfLevelTest {
@@ -761,39 +761,39 @@ func TestPerfLevel(t *testing.T) {
 
 	ret = DeviceSetPerfLevel(devHandle, perfLevelTest)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceSetPerfLevel: %v", ret)
+		t.Logf("DeviceSetPerfLevel: %v", StatusStringNoError(ret))
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceSetPerfLevel: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceSetPerfLevel: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Errorf("DeviceSetPerfLevel: %v", ret)
+		t.Errorf("DeviceSetPerfLevel: %v", StatusStringNoError(ret))
 	}
 
 	perfLevelRead, ret := DeviceGetPerfLevel(devHandle)
 	if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetPerfLevel: %v", ret)
+		t.Errorf("DeviceGetPerfLevel: %v", StatusStringNoError(ret))
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetPerfLevel: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetPerfLevel: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetPerfLevel: %v", ret)
+		t.Logf("DeviceGetPerfLevel: %v", StatusStringNoError(ret))
 		t.Logf("  new perf level: %v", int(perfLevelRead))
 	}
 
 	ret = DeviceSetPerfLevel(devHandle, perfLevelBefore)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceSetPerfLevel: %v", ret)
+		t.Logf("DeviceSetPerfLevel: %v", StatusStringNoError(ret))
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceSetPerfLevel: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceSetPerfLevel: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Errorf("DeviceSetPerfLevel: %v", ret)
+		t.Errorf("DeviceSetPerfLevel: %v", StatusStringNoError(ret))
 	}
 
 	perfLevelRead2, ret := DeviceGetPerfLevel(devHandle)
 	if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetPerfLevel: %v", ret)
+		t.Errorf("DeviceGetPerfLevel: %v", StatusStringNoError(ret))
 	} else if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetPerfLevel: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetPerfLevel: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetPerfLevel: %v", ret)
+		t.Logf("DeviceGetPerfLevel: %v", StatusStringNoError(ret))
 		t.Logf("  reset perf level: %v", int(perfLevelRead2))
 	}
 
@@ -808,9 +808,9 @@ func TestPerfLevel(t *testing.T) {
 
 //	deviceCount, ret := NumMonitorDevices()
 //	if ret != STATUS_SUCCESS {
-//		t.Errorf("NumMonitorDevices: %v", ret)
+//		t.Errorf("NumMonitorDevices: %v", StatusStringNoError(ret))
 //	} else {
-//		t.Logf("NumMonitorDevices: %v", ret)
+//		t.Logf("NumMonitorDevices: %v", StatusStringNoError(ret))
 //		t.Logf("  count: %v", deviceCount)
 //	}
 //	if deviceCount == 0 {
@@ -818,19 +818,19 @@ func TestPerfLevel(t *testing.T) {
 //	}
 //	devHandle, ret := DeviceGetHandleByIndex(0)
 //	if ret != STATUS_SUCCESS {
-//		t.Errorf("DeviceGetHandleByIndex(0): %v", ret)
+//		t.Errorf("DeviceGetHandleByIndex(0): %v", StatusStringNoError(ret))
 //	} else {
-//		t.Logf("DeviceGetHandleByIndex(0): %v", ret)
+//		t.Logf("DeviceGetHandleByIndex(0): %v", StatusStringNoError(ret))
 //	}
 
 //	overdriveBefore, ret := DeviceGetOverdriveLevel(devHandle)
 //	if ret == STATUS_SUCCESS {
-//		t.Logf("DeviceGetOverdriveLevel: %v", ret)
+//		t.Logf("DeviceGetOverdriveLevel: %v", StatusStringNoError(ret))
 //		t.Logf("  perf overdrive (before): %v ", int(overdriveBefore))
 //	} else if ret == STATUS_NOT_SUPPORTED {
-//		t.Logf("DeviceGetOverdriveLevel: %v (NOT SUPPORTED)", ret)
+//		t.Logf("DeviceGetOverdriveLevel: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 //	} else {
-//		t.Errorf("DeviceGetOverdriveLevel: %v", ret)
+//		t.Errorf("DeviceGetOverdriveLevel: %v", StatusStringNoError(ret))
 //	}
 //	overdriveTest := overdriveBefore/2
 //	if (overdriveBefore == overdriveTest) {
@@ -839,39 +839,39 @@ func TestPerfLevel(t *testing.T) {
 
 //	ret = DeviceSetOverdriveLevel(devHandle, overdriveTest)
 //	if ret == STATUS_SUCCESS {
-//		t.Logf("DeviceSetOverdriveLevel: %v", ret)
+//		t.Logf("DeviceSetOverdriveLevel: %v", StatusStringNoError(ret))
 //	} else if ret == STATUS_NOT_SUPPORTED {
-//		t.Logf("DeviceSetOverdriveLevel: %v (NOT SUPPORTED)", ret)
+//		t.Logf("DeviceSetOverdriveLevel: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 //	} else {
-//		t.Errorf("DeviceSetOverdriveLevel: %v", ret)
+//		t.Errorf("DeviceSetOverdriveLevel: %v", StatusStringNoError(ret))
 //	}
 
 //	overdriveRead, ret := DeviceGetOverdriveLevel(devHandle)
 //	if ret != STATUS_SUCCESS {
-//		t.Errorf("DeviceGetOverdriveLevel: %v", ret)
+//		t.Errorf("DeviceGetOverdriveLevel: %v", StatusStringNoError(ret))
 //	} else if ret == STATUS_NOT_SUPPORTED {
-//		t.Logf("DeviceGetOverdriveLevel: %v (NOT SUPPORTED)", ret)
+//		t.Logf("DeviceGetOverdriveLevel: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 //	} else {
-//		t.Logf("DeviceGetOverdriveLevel: %v", ret)
+//		t.Logf("DeviceGetOverdriveLevel: %v", StatusStringNoError(ret))
 //		t.Logf("  new overdrive level: %v", int(overdriveRead))
 //	}
 
 //	ret = DeviceSetOverdriveLevel(devHandle, overdriveBefore)
 //	if ret == STATUS_SUCCESS {
-//		t.Logf("DeviceSetOverdriveLevel: %v", ret)
+//		t.Logf("DeviceSetOverdriveLevel: %v", StatusStringNoError(ret))
 //	} else if ret == STATUS_NOT_SUPPORTED {
-//		t.Logf("DeviceSetOverdriveLevel: %v (NOT SUPPORTED)", ret)
+//		t.Logf("DeviceSetOverdriveLevel: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 //	} else {
-//		t.Errorf("DeviceSetOverdriveLevel: %v", ret)
+//		t.Errorf("DeviceSetOverdriveLevel: %v", StatusStringNoError(ret))
 //	}
 
 //	overdriveRead2, ret := DeviceGetOverdriveLevel(devHandle)
 //	if ret != STATUS_SUCCESS {
-//		t.Errorf("DeviceGetOverdriveLevel: %v", ret)
+//		t.Errorf("DeviceGetOverdriveLevel: %v", StatusStringNoError(ret))
 //	} else if ret == STATUS_NOT_SUPPORTED {
-//		t.Logf("DeviceGetOverdriveLevel: %v (NOT SUPPORTED)", ret)
+//		t.Logf("DeviceGetOverdriveLevel: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 //	} else {
-//		t.Logf("DeviceGetOverdriveLevel: %v", ret)
+//		t.Logf("DeviceGetOverdriveLevel: %v", StatusStringNoError(ret))
 //		t.Logf("  reset overdrive level: %v", int(overdriveRead2))
 //	}
 
@@ -886,9 +886,9 @@ func TestMultiDevice(t *testing.T) {
 
 	deviceCount, ret := NumMonitorDevices()
 	if ret != STATUS_SUCCESS {
-		t.Errorf("NumMonitorDevices: %v", ret)
+		t.Errorf("NumMonitorDevices: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("NumMonitorDevices: %v", ret)
+		t.Logf("NumMonitorDevices: %v", StatusStringNoError(ret))
 		t.Logf("  count: %v", deviceCount)
 	}
 
@@ -898,56 +898,56 @@ func TestMultiDevice(t *testing.T) {
 
 	firstHandle, ret := DeviceGetHandleByIndex(0)
 	if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetHandleByIndex(0): %v", ret)
+		t.Errorf("DeviceGetHandleByIndex(0): %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetHandleByIndex(0): %v", ret)
+		t.Logf("DeviceGetHandleByIndex(0): %v", StatusStringNoError(ret))
 	}
 
 	secondHandle, ret := DeviceGetHandleByIndex(1)
 	if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetHandleByIndex(1): %v", ret)
+		t.Errorf("DeviceGetHandleByIndex(1): %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetHandleByIndex(1): %v", ret)
+		t.Logf("DeviceGetHandleByIndex(1): %v", StatusStringNoError(ret))
 	}
 
 	linkWidth, linkType, ret := DeviceGetLinkType(firstHandle, secondHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetLinkType: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetLinkType: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetLinkType: %v", ret)
+		t.Errorf("DeviceGetLinkType: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetLinkType: %v", ret)
+		t.Logf("DeviceGetLinkType: %v", StatusStringNoError(ret))
 		t.Logf("  link width: %v", linkWidth)
 		t.Logf("  link type: %v", linkType)
 	}
 
 	linkWeight, ret := DeviceGetLinkWeight(firstHandle, secondHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetLinkWeight: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetLinkWeight: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetLinkWeight: %v", ret)
+		t.Errorf("DeviceGetLinkWeight: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetLinkWeight: %v", ret)
+		t.Logf("DeviceGetLinkWeight: %v", StatusStringNoError(ret))
 		t.Logf("  link weight: %v", linkWeight)
 	}
 
 	p2p, ret := DeviceIsP2PAccessible(firstHandle, secondHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceIsP2PAccessible: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceIsP2PAccessible: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceIsP2PAccessible: %v", ret)
+		t.Errorf("DeviceIsP2PAccessible: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceIsP2PAccessible: %v", ret)
+		t.Logf("DeviceIsP2PAccessible: %v", StatusStringNoError(ret))
 		t.Logf("  P2P accessible: %v", p2p)
 	}
 
 	minBand, maxBand, ret := DeviceGetMinMaxBandwidth(firstHandle, secondHandle)
 	if ret == STATUS_NOT_SUPPORTED {
-		t.Logf("DeviceGetMinMaxBandwidth: %v (NOT SUPPORTED)", ret)
+		t.Logf("DeviceGetMinMaxBandwidth: %v (NOT SUPPORTED)", StatusStringNoError(ret))
 	} else if ret != STATUS_SUCCESS {
-		t.Errorf("DeviceGetMinMaxBandwidth: %v", ret)
+		t.Errorf("DeviceGetMinMaxBandwidth: %v", StatusStringNoError(ret))
 	} else {
-		t.Logf("DeviceGetMinMaxBandwidth: %v", ret)
+		t.Logf("DeviceGetMinMaxBandwidth: %v", StatusStringNoError(ret))
 		t.Logf("  minimal bandwidth: %v", minBand)
 		t.Logf("  maximal bandwidth: %v", maxBand)
 	}
