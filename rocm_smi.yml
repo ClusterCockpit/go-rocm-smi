@@ -52,7 +52,7 @@ GENERATOR:
     - {name: "CFLAGS", flags: [""]}
 PARSER:
   SourcesPaths: ["rocm_smi/rocm_smi.h", "rocm_smi/kfd_ioctl.h", "rocm_smi/rocm_smi_helpers.h"]
-  IncludePaths: ["/usr/include"]
+  IncludePaths: ["."]
   Defines:
     nullptr: "((void *)0)"
 TRANSLATOR:
