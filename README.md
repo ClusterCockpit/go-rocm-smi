@@ -66,7 +66,7 @@ There are three ROCm SMI Headers, all located at `rocm_smi/rocm_smi`
 - `rocm_smi64Config.h`
 - `kfd_ioctl.h`
 
-The files are copied from ROCm 5.1.0. For the generation, the `rocm_smi.h` header is changed to support [`c-for-go`](https://c.for-go.com/)'s parser.
+The files are copied from ROCm 6.4.1. For the generation, the `rocm_smi.h` header is changed to support [`c-for-go`](https://c.for-go.com/)'s parser.
 - `bool` is renamed to `_Bool`, since [`c-for-go`](https://c.for-go.com/) appars to choke on the former.
 - The `union id` is renamed to `union id_rename` to avoid problems with clang. The type is never addressed with the name `id` but a `typedef` name.
 
@@ -119,7 +119,7 @@ For most libraries which handle multiple devices ([`go-nvml`](https://github.com
 
 
 # Problems
-- The symbol `rsmi_dev_sku_get` is defined by the `rocm_smi.h` header but on the test system with ROCm 5.1.0, the symbol lookup fails.
+- The symbol `rsmi_dev_sku_get` is defined by the `rocm_smi.h` header but on the test system with ROCm 6.4.1, the symbol lookup fails.
   There is now an `updateFunctionPointers()` function that is called at `Init()`.
   This is quite similar the function `updateVersionedSymbols()` in [`go-nvml`](https://github.com/NVIDIA/go-nvml).
   The `APISupport` feature of the `rocm_smi` library shows, `rsmi_dev_sku_get` is supported by the device.
