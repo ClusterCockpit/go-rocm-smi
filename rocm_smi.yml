@@ -65,6 +65,8 @@ TRANSLATOR:
       - {target: "^rsmi_", default: "sref"}
   MemTips:
     - {target: "^rsmi_", default: "raw"}
+    - {target: "^metrics_table_header_t", default: "raw"}
+    - {target: "^amdgpu_xcp_metrics_t", default: "raw"}
   Rules:
     const:
       - {action: accept, from: "^RSMI_"}
@@ -84,7 +86,8 @@ TRANSLATOR:
       - {action: ignore, from: "rsmi_memory_partition_type_t"}
       - {action: accept, from: "^rsmi"}
       - {action: accept, from: "^RSMI_"}
-      - {action: accept, from: "rsmi_utilization_counter_t"}
+      - {action: accept, from: "metrics_table_header_t"}
+      - {action: accept, from: "amdgpu_xcp_metrics_t"}
       - {action: replace, from: "^rsmi_status_t", to: "RSMI_status_t"}
       - {action: replace, from: "^rsmi_version_t", to: "RSMI_version_t"}
       - {action: replace, from: "^rsmi_range_t", to: "RSMI_range_t"}
@@ -92,14 +95,14 @@ TRANSLATOR:
       - {action: replace, from: "_t$"}
       - {action: replace, from: "^_"}
       - {transform: export}
+    public:
+      # Because amdgpu_xcp_metrics_t doesn't have a typedef,
+      # it must be in the public AND type section.
+      - {action: accept, from: "amdgpu_xcp_metrics_t"}
+
 
     function:
       - {action: ignore, from: "rsmi_status_string"}
       - {action: accept, from: "^rsmi"}
-      # Ignore rsmi_dev_metrics_header_info_get, because it uses 'metrics_table_header_t'
-      # This type is currently missing the rsmi_ prefix. In addition it also
-      # has a double definition via the struct and a typedef, which c-for-go cannot tell apart.
-      # So just ignore that function for now until this is fixed in rocm_smi...
-      - {action: ignore, from: "rsmi_dev_metrics_header_info_get"}
       - {transform: unexport}
 
