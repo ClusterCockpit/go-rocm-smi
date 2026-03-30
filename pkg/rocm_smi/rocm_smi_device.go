@@ -1524,13 +1524,17 @@ func (Device DeviceHandle) SetVoltageInfo(Vpoint uint32, ClockFreq uint64, Volta
 // STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
 // STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetVoltageFrequencyCurveRegions(Device DeviceHandle) ([]RSMI_freq_volt_region, RSMI_status) {
-	var num_regions uint32 = 0
 	regions := make([]RSMI_freq_volt_region, 0)
-	ret := rsmi_dev_od_volt_curve_regions_get(Device.index, &num_regions, nil)
-	if ret == STATUS_SUCCESS && num_regions > 0 {
-		regions := make([]RSMI_freq_volt_region, num_regions)
-		ret = rsmi_dev_od_volt_curve_regions_get(Device.index, &num_regions, &regions[0])
+	var volt_info RSMI_od_volt_freq_data = RSMI_od_volt_freq_data{
+		Num_regions: 0,
 	}
+	ret := rsmi_dev_od_volt_info_get(Device.index, &volt_info)
+	if ret != STATUS_SUCCESS || volt_info.Num_regions == 0 {
+		return regions, ret
+	}
+	num_regions := volt_info.Num_regions
+	regions = make([]RSMI_freq_volt_region, num_regions)
+	ret = rsmi_dev_od_volt_curve_regions_get(Device.index, &num_regions, &regions[0])
 	return regions, ret
 }
 
