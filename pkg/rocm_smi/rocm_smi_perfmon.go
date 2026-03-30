@@ -20,15 +20,13 @@
 
 package rocm_smi
 
-
-
 // Performance Counter Functions
 
 // DeviceCounterGroupSupported tells if an event group is supported by a given device.
 //
 // STATUS_SUCCESS call was successful.
 // STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-func DeviceCounterGroupSupported(Device DeviceHandle, EventGroup RSMI_event_group) (RSMI_status) {
+func DeviceCounterGroupSupported(Device DeviceHandle, EventGroup RSMI_event_group) RSMI_status {
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	if _, ok := Device.supported["rsmi_dev_counter_group_supported"]; ok {
 		ret = rsmi_dev_counter_group_supported(Device.index, EventGroup)
@@ -40,7 +38,7 @@ func DeviceCounterGroupSupported(Device DeviceHandle, EventGroup RSMI_event_grou
 //
 // STATUS_SUCCESS call was successful.
 // STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
-func (Device DeviceHandle) CounterGroupSupported(EventGroup RSMI_event_group) (RSMI_status) {
+func (Device DeviceHandle) CounterGroupSupported(EventGroup RSMI_event_group) RSMI_status {
 	return DeviceCounterGroupSupported(Device, EventGroup)
 }
 
@@ -76,7 +74,7 @@ func (Device DeviceHandle) CounterCreate(Type RSMI_event_type) (RSMI_event_handl
 // STATUS_SUCCESS call was successful.
 // STATUS_INVALID_ARGS the provided arguments are not valid.
 // STATUS_PERMISSION function requires root access.
-func CounterDestroy(Handle RSMI_event_handle) (RSMI_status) {
+func CounterDestroy(Handle RSMI_event_handle) RSMI_status {
 	ret := rsmi_dev_counter_destroy(Handle)
 	return ret
 }
@@ -86,7 +84,7 @@ func CounterDestroy(Handle RSMI_event_handle) (RSMI_status) {
 // STATUS_SUCCESS call was successful.
 // STATUS_INVALID_ARGS the provided arguments are not valid.
 // STATUS_PERMISSION function requires root access.
-func (Handle RSMI_event_handle) CounterDestroy() (RSMI_status) {
+func (Handle RSMI_event_handle) CounterDestroy() RSMI_status {
 	return CounterDestroy(Handle)
 }
 
@@ -95,7 +93,7 @@ func (Handle RSMI_event_handle) CounterDestroy() (RSMI_status) {
 // STATUS_SUCCESS call was successful.
 // STATUS_INVALID_ARGS the provided arguments are not valid.
 // STATUS_PERMISSION function requires root access.
-func CounterControl(Handle RSMI_event_handle, Cmd RSMI_counter_command) (RSMI_status) {
+func CounterControl(Handle RSMI_event_handle, Cmd RSMI_counter_command) RSMI_status {
 	ret := rsmi_counter_control(Handle, Cmd, nil)
 	return ret
 }
@@ -105,7 +103,7 @@ func CounterControl(Handle RSMI_event_handle, Cmd RSMI_counter_command) (RSMI_st
 // STATUS_SUCCESS call was successful.
 // STATUS_INVALID_ARGS the provided arguments are not valid.
 // STATUS_PERMISSION function requires root access.
-func (Handle RSMI_event_handle) CounterControl(Cmd RSMI_counter_command) (RSMI_status) {
+func (Handle RSMI_event_handle) CounterControl(Cmd RSMI_counter_command) RSMI_status {
 	return CounterControl(Handle, Cmd)
 }
 
@@ -116,7 +114,7 @@ func (Handle RSMI_event_handle) CounterControl(Cmd RSMI_counter_command) (RSMI_s
 // STATUS_PERMISSION function requires root access.
 func CounterRead(Handle RSMI_event_handle) (RSMI_counter_value, RSMI_status) {
 	var count RSMI_counter_value = RSMI_counter_value{
-		Value: 0,
+		Value:   0,
 		Enabled: 0,
 		Running: 0,
 	}

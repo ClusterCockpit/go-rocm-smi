@@ -71,7 +71,7 @@ func TestPerfmon(t *testing.T) {
 				t.Logf("  counters: %v", counters)
 			}
 
-			if (counters == 0) {
+			if counters == 0 {
 				continue
 			}
 
@@ -92,7 +92,7 @@ func TestPerfmon(t *testing.T) {
 				if ret == STATUS_NOT_SUPPORTED {
 					t.Logf("CounterControl(%v, CNTR_CMD_START): %v (STATUS_NOT_SUPPORTED)", ctr, ret)
 				} else if ret == STATUS_PERMISSION {
-						t.Logf("CounterControl(%v, CNTR_CMD_START): %v (STATUS_PERMISSION)", ctr, ret)
+					t.Logf("CounterControl(%v, CNTR_CMD_START): %v (STATUS_PERMISSION)", ctr, ret)
 				} else if ret != STATUS_SUCCESS {
 					t.Errorf("CounterControl(%v, CNTR_CMD_START): %v", ctr, ret)
 				} else {
@@ -106,7 +106,7 @@ func TestPerfmon(t *testing.T) {
 					if ret == STATUS_NOT_SUPPORTED {
 						t.Logf("CounterControl(%v, CNTR_CMD_STOP): %v (STATUS_NOT_SUPPORTED)", ctr, ret)
 					} else if ret == STATUS_PERMISSION {
-							t.Logf("CounterControl(%v, CNTR_CMD_STOP): %v (STATUS_PERMISSION)", ctr, ret)
+						t.Logf("CounterControl(%v, CNTR_CMD_STOP): %v (STATUS_PERMISSION)", ctr, ret)
 					} else if ret != STATUS_SUCCESS {
 						t.Errorf("CounterControl(%v, CNTR_CMD_STOP): %v", ctr, ret)
 					} else {
@@ -118,7 +118,7 @@ func TestPerfmon(t *testing.T) {
 						if ret == STATUS_NOT_SUPPORTED {
 							t.Logf("CounterRead(%v): %v (STATUS_NOT_SUPPORTED)", ctr, ret)
 						} else if ret == STATUS_PERMISSION {
-								t.Logf("CounterRead(%v): %v (STATUS_PERMISSION)", ctr, ret)
+							t.Logf("CounterRead(%v): %v (STATUS_PERMISSION)", ctr, ret)
 						} else if ret != STATUS_SUCCESS {
 							t.Errorf("CounterRead(%v): %v", ctr, ret)
 						} else {
@@ -134,7 +134,7 @@ func TestPerfmon(t *testing.T) {
 				if ret == STATUS_NOT_SUPPORTED {
 					t.Logf("CounterDestroy(%v): %v (STATUS_NOT_SUPPORTED)", ctr, ret)
 				} else if ret == STATUS_PERMISSION {
-						t.Logf("CounterDestroy(%v): %v (STATUS_PERMISSION)", g, ret)
+					t.Logf("CounterDestroy(%v): %v (STATUS_PERMISSION)", g, ret)
 				} else if ret != STATUS_SUCCESS {
 					t.Errorf("CounterDestroy(%v): %v", ctr, ret)
 				} else {

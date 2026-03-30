@@ -20,7 +20,6 @@
 
 package rocm_smi
 
-
 import (
 	"testing"
 )
@@ -51,8 +50,7 @@ func TestFuncVariants(t *testing.T) {
 		for f := range devHandle.Supported() {
 			t.Logf("  handle function: %v", f)
 		}
-		
+
 	}
 
-	
 }

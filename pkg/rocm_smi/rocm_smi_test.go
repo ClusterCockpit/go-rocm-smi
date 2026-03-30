@@ -45,25 +45,25 @@ func TestStatus(t *testing.T) {
 	defer Shutdown()
 
 	all := map[RSMI_status]string{
-		STATUS_SUCCESS: "STATUS_SUCCESS",
-		STATUS_INVALID_ARGS: "STATUS_INVALID_ARGS",
-		STATUS_NOT_SUPPORTED: "STATUS_NOT_SUPPORTED",
-		STATUS_FILE_ERROR: "STATUS_FILE_ERROR",
-		STATUS_PERMISSION: "STATUS_PERMISSION",
-		STATUS_OUT_OF_RESOURCES: "STATUS_OUT_OF_RESOURCES",
-		STATUS_INTERNAL_EXCEPTION: "STATUS_INTERNAL_EXCEPTION",
+		STATUS_SUCCESS:             "STATUS_SUCCESS",
+		STATUS_INVALID_ARGS:        "STATUS_INVALID_ARGS",
+		STATUS_NOT_SUPPORTED:       "STATUS_NOT_SUPPORTED",
+		STATUS_FILE_ERROR:          "STATUS_FILE_ERROR",
+		STATUS_PERMISSION:          "STATUS_PERMISSION",
+		STATUS_OUT_OF_RESOURCES:    "STATUS_OUT_OF_RESOURCES",
+		STATUS_INTERNAL_EXCEPTION:  "STATUS_INTERNAL_EXCEPTION",
 		STATUS_INPUT_OUT_OF_BOUNDS: "STATUS_INPUT_OUT_OF_BOUNDS",
-		STATUS_INIT_ERROR: "STATUS_INIT_ERROR",
+		STATUS_INIT_ERROR:          "STATUS_INIT_ERROR",
 		STATUS_NOT_YET_IMPLEMENTED: "STATUS_NOT_YET_IMPLEMENTED",
-		STATUS_NOT_FOUND: "STATUS_NOT_FOUND",
-		STATUS_INSUFFICIENT_SIZE: "STATUS_INSUFFICIENT_SIZE",
-		STATUS_INTERRUPT: "STATUS_INTERRUPT",
-		STATUS_UNEXPECTED_SIZE: "STATUS_UNEXPECTED_SIZE",
-		STATUS_NO_DATA: "STATUS_NO_DATA",
-		STATUS_UNEXPECTED_DATA: "STATUS_UNEXPECTED_DATA",
-		STATUS_BUSY: "STATUS_BUSY",
-		STATUS_REFCOUNT_OVERFLOW: "STATUS_REFCOUNT_OVERFLOW",
-		STATUS_UNKNOWN_ERROR: "STATUS_UNKNOWN_ERROR",
+		STATUS_NOT_FOUND:           "STATUS_NOT_FOUND",
+		STATUS_INSUFFICIENT_SIZE:   "STATUS_INSUFFICIENT_SIZE",
+		STATUS_INTERRUPT:           "STATUS_INTERRUPT",
+		STATUS_UNEXPECTED_SIZE:     "STATUS_UNEXPECTED_SIZE",
+		STATUS_NO_DATA:             "STATUS_NO_DATA",
+		STATUS_UNEXPECTED_DATA:     "STATUS_UNEXPECTED_DATA",
+		STATUS_BUSY:                "STATUS_BUSY",
+		STATUS_REFCOUNT_OVERFLOW:   "STATUS_REFCOUNT_OVERFLOW",
+		STATUS_UNKNOWN_ERROR:       "STATUS_UNKNOWN_ERROR",
 	}
 
 	for err, str := range all {
@@ -747,7 +747,7 @@ func TestPerfLevel(t *testing.T) {
 
 	perfLevelBefore, ret := DeviceGetPerfLevel(devHandle)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceGetPerfLevel: %v", ret)		
+		t.Logf("DeviceGetPerfLevel: %v", ret)
 		t.Logf("  perf level (before): %v ", int(perfLevelBefore))
 	} else if ret == STATUS_NOT_SUPPORTED {
 		t.Logf("DeviceGetPerfLevel: %v (NOT SUPPORTED)", ret)
@@ -755,13 +755,13 @@ func TestPerfLevel(t *testing.T) {
 		t.Errorf("DeviceGetPerfLevel: %v", ret)
 	}
 	perfLevelTest := DEV_PERF_LEVEL_HIGH
-	if (perfLevelBefore == perfLevelTest) {
+	if perfLevelBefore == perfLevelTest {
 		perfLevelTest = DEV_PERF_LEVEL_LOW
 	}
 
 	ret = DeviceSetPerfLevel(devHandle, perfLevelTest)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceSetPerfLevel: %v", ret)		
+		t.Logf("DeviceSetPerfLevel: %v", ret)
 	} else if ret == STATUS_NOT_SUPPORTED {
 		t.Logf("DeviceSetPerfLevel: %v (NOT SUPPORTED)", ret)
 	} else {
@@ -780,7 +780,7 @@ func TestPerfLevel(t *testing.T) {
 
 	ret = DeviceSetPerfLevel(devHandle, perfLevelBefore)
 	if ret == STATUS_SUCCESS {
-		t.Logf("DeviceSetPerfLevel: %v", ret)		
+		t.Logf("DeviceSetPerfLevel: %v", ret)
 	} else if ret == STATUS_NOT_SUPPORTED {
 		t.Logf("DeviceSetPerfLevel: %v (NOT SUPPORTED)", ret)
 	} else {
@@ -825,7 +825,7 @@ func TestPerfLevel(t *testing.T) {
 
 //	overdriveBefore, ret := DeviceGetOverdriveLevel(devHandle)
 //	if ret == STATUS_SUCCESS {
-//		t.Logf("DeviceGetOverdriveLevel: %v", ret)		
+//		t.Logf("DeviceGetOverdriveLevel: %v", ret)
 //		t.Logf("  perf overdrive (before): %v ", int(overdriveBefore))
 //	} else if ret == STATUS_NOT_SUPPORTED {
 //		t.Logf("DeviceGetOverdriveLevel: %v (NOT SUPPORTED)", ret)
@@ -839,7 +839,7 @@ func TestPerfLevel(t *testing.T) {
 
 //	ret = DeviceSetOverdriveLevel(devHandle, overdriveTest)
 //	if ret == STATUS_SUCCESS {
-//		t.Logf("DeviceSetOverdriveLevel: %v", ret)		
+//		t.Logf("DeviceSetOverdriveLevel: %v", ret)
 //	} else if ret == STATUS_NOT_SUPPORTED {
 //		t.Logf("DeviceSetOverdriveLevel: %v (NOT SUPPORTED)", ret)
 //	} else {
@@ -858,7 +858,7 @@ func TestPerfLevel(t *testing.T) {
 
 //	ret = DeviceSetOverdriveLevel(devHandle, overdriveBefore)
 //	if ret == STATUS_SUCCESS {
-//		t.Logf("DeviceSetOverdriveLevel: %v", ret)		
+//		t.Logf("DeviceSetOverdriveLevel: %v", ret)
 //	} else if ret == STATUS_NOT_SUPPORTED {
 //		t.Logf("DeviceSetOverdriveLevel: %v (NOT SUPPORTED)", ret)
 //	} else {
@@ -952,4 +952,3 @@ func TestMultiDevice(t *testing.T) {
 		t.Logf("  maximal bandwidth: %v", maxBand)
 	}
 }
-

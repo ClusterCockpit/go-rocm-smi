@@ -40,6 +40,7 @@ func ComputeProcesses() ([]RSMI_process_info, RSMI_status) {
 
 	return procs, ret
 }
+
 // ComputeProcessByPid gets process information about a specific process.
 //
 // STATUS_SUCCESS call was successful.

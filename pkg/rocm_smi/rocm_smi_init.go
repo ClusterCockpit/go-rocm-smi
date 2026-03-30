@@ -50,8 +50,8 @@ var rocm_smi_lib *dl.DynamicLibrary
 // by first getting the handle for a device index and use this in all
 // subsequent calls.
 type DeviceHandle struct {
-	handle uint16
-	index  uint32
+	handle    uint16
+	index     uint32
 	supported map[string]map[uint64][]uint64
 }
 
@@ -73,18 +73,18 @@ func (d *DeviceHandle) ID() uint16 {
 //
 // Go or C function name (like DeviceGetName and rsmi_dev_name_get)
 //
-//     - Default variant identifier (DEFAULT_VARIANT) or a value usable for temperature, memory and other types listed in the const.go
+//   - Default variant identifier (DEFAULT_VARIANT) or a value usable for temperature, memory and other types listed in the const.go
 //
-//         - If the parent is DEFAULT_VARIANT: List with single entry containing the default usable value for temperature, memory, etc. type
+//   - If the parent is DEFAULT_VARIANT: List with single entry containing the default usable value for temperature, memory, etc. type
 //
-//         - If it is a usable value: There might be a list of sub_values which relate to the second argument like DeviceGetTemperatureMetric with its RSMI_temperature_type and RSMI_temperature_metric, first the sensors and second min, max or current.
+//   - If it is a usable value: There might be a list of sub_values which relate to the second argument like DeviceGetTemperatureMetric with its RSMI_temperature_type and RSMI_temperature_metric, first the sensors and second min, max or current.
 //
 // This information is used when calling one of the functions listed and the arguments are compared to avoid (maybe) costly calls to the RSMI library.
 func (d *DeviceHandle) Supported() map[string]map[uint64][]uint64 {
 	return d.supported
 }
 
-// Init initializes ROCm SMI on all AMD GPUs. When called, this initializes internal data structures, 
+// Init initializes ROCm SMI on all AMD GPUs. When called, this initializes internal data structures,
 // including those corresponding to sources of information that SMI provides. This version
 // of the Init function specifies no RSMI_init_flags.
 //
@@ -105,15 +105,15 @@ func Init() RSMI_status {
 	return rsmi_init(0)
 }
 
-// Init initializes ROCm SMI. When called, this initializes internal data structures, 
+// Init initializes ROCm SMI. When called, this initializes internal data structures,
 // including those corresponding to sources of information that SMI provides. This version
 // uses the Flags argument as RSMI_init_flags:
-// 
+//
 // INIT_FLAG_ALL_GPUS: Attempt to add all GPUs found (including non-AMD) to the list of devices from which SMI information can be retrieved. By default, only AMD devices are  enumerated by RSMI.
-// 
+//
 // STATUS_SUCCESS is returned upon successful call.
 //
-// The function panics if the ROCm SMI library cannot be found or opened. 
+// The function panics if the ROCm SMI library cannot be found or opened.
 func InitWithFlags(Flags uint64) RSMI_status {
 	lib := dl.New(rocmSmiLibraryName, rocmSmiLibraryLoadFlags)
 	if lib == nil {
@@ -132,7 +132,7 @@ func InitWithFlags(Flags uint64) RSMI_status {
 
 // Shutdown shuts down ROCm SMI and does any necessary clean up.
 //
-// The function panics if the ROCm SMI library cannot be closed. 
+// The function panics if the ROCm SMI library cannot be closed.
 func Shutdown() RSMI_status {
 	ret := rsmi_shut_down()
 	if ret != STATUS_SUCCESS {
@@ -155,7 +155,6 @@ func Version() (RSMI_version, RSMI_status) {
 	ret := rsmi_version_get(&v)
 	return v, ret
 }
-
 
 // ComponentVersionString gets the driver version string for the current system.
 // Given a software component, this function will return the driver version string for the current system.
@@ -207,7 +206,7 @@ func updateFunctionPointers() {
 	if err == nil {
 		DeviceGetSku = deviceGetSkuReal
 	} else {
-	    DeviceGetSku = deviceGetSkuFake
+		DeviceGetSku = deviceGetSkuFake
 	}
 
 	err = rocm_smi_lib.Lookup("rsmi_dev_perf_level_set")

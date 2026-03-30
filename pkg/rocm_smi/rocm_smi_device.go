@@ -24,86 +24,87 @@ package rocm_smi
 //import "strings"
 
 const defaultRsmiStringLength uint32 = 1000
-var ctoGoFuncMapping = map[string]string {
-    "rsmi_dev_fan_reset": "DeviceResetFan",
-    "rsmi_dev_fan_speed_set": "DeviceSetFanSpeed",
-    "rsmi_dev_volt_metric_get": "DeviceGetVoltageMetric",
-    "rsmi_dev_temp_metric_get": "DeviceGetTemperatureMetric",
-    "rsmi_dev_busy_percent_get": "DeviceGetBusyPercent",
-    "rsmi_utilization_count_get": "DeviceGetUtilizationCounters",
-    "rsmi_dev_fan_speed_max_get": "DeviceGetMaxFanSpeed",
-    "rsmi_dev_fan_speed_get": "DeviceGetFanSpeed",
-    "rsmi_dev_fan_rpms_get": "DeviceGetFanRpms",
-    "rsmi_dev_memory_reserved_pages_get": "DeviceGetMemoryReservedPages",
-    "rsmi_dev_memory_busy_percent_get": "DeviceGetMemoryUtilization",
-    "rsmi_dev_memory_usage_get": "DeviceGetUsedMemory",
-    "rsmi_dev_memory_total_get": "DeviceGetTotalMemory",
-    "rsmi_dev_power_profile_set": "DeviceSetPowerProfile",
-    "rsmi_dev_power_cap_set": "DeviceSetPowerCap",
-    "rsmi_dev_energy_count_get": "DeviceGetEnergyCount",
-    "rsmi_dev_power_cap_range_get": "DeviceGetPowerCapRange",
-    "rsmi_dev_power_cap_default_get": "DeviceGetDefaultPowerCap",
-    "rsmi_dev_power_cap_get": "DeviceGetPowerCap",
-    "rsmi_dev_power_ave_get": "DeviceGetPowerAverage",
-    "rsmi_topo_numa_affinity_get": "DeviceGetNumaAffinity",
-    "rsmi_dev_pci_replay_counter_get": "DeviceGetPciReplayCounter",
-    "rsmi_dev_pci_throughput_get": "DeviceGetPciThroughput",
-    "rsmi_dev_pci_bandwidth_set": "DeviceSetPciBandwidth",
-    "rsmi_dev_pci_bandwidth_get": "DeviceGetPciBandwidth",
-    "rsmi_dev_pci_id_get": "DeviceGetPciId",
-    "rsmi_dev_unique_id_get": "DeviceGetUniqueId",
-    "rsmi_dev_drm_render_minor_get": "DeviceGetDrmRenderMinor",
-    "rsmi_dev_subsystem_id_get": "DeviceGetSubsystemId",
-    "rsmi_dev_subsystem_name_get": "DeviceGetSubsystemName",
-    "rsmi_dev_serial_number_get": "DeviceGetSerial",
-    "rsmi_dev_vram_vendor_get": "DeviceGetVramVendor",
-    "rsmi_dev_vendor_id_get": "DeviceGetVendorId",
-    "rsmi_dev_vendor_name_get": "DeviceGetVendorName",
-    "rsmi_dev_sku_get": "DeviceGetSku",
-    "rsmi_dev_name_get": "DeviceGetName",
-    "rsmi_dev_brand_get": "DeviceGetBrand",
-    "rsmi_dev_perf_level_get": "DeviceGetPerfLevel",
-    "rsmi_perf_determinism_mode_set": "DeviceSetDeterminismMode",
-    "rsmi_dev_overdrive_level_get": "DeviceGetOverdriveLevel",
-    "rsmi_dev_gpu_clk_freq_get": "DeviceGetClockFrequency",
-    "rsmi_dev_od_volt_info_get": "DeviceGetVoltageFrequencyCurve",
-    "rsmi_dev_gpu_metrics_info_get": "DeviceGetMetrics",
-    "rsmi_dev_clk_range_set": "DeviceSetClockRange",
-    "rsmi_dev_od_clk_info_set": "DeviceSetClockInfo",
-    "rsmi_dev_od_volt_info_set": "DeviceSetVoltageInfo",
-    "rsmi_dev_od_volt_curve_regions_get": "DeviceGetVoltageFrequencyCurveRegions",
-    "rsmi_dev_power_profile_presets_get": "DeviceGetPowerProfile",
-    "rsmi_dev_perf_level_set": "DeviceSetPerfLevel_v2",
-    "rsmi_dev_perf_level_set_v1": "DeviceSetPerfLevel_v1",
-    "rsmi_dev_vbios_version_get": "DeviceGetVbiosVersionString",
-    "rsmi_dev_firmware_version_get": "DeviceGetFirmwareVersion",
-    "rsmi_dev_overdrive_level_set_v1": "DeviceSetOverdriveLevel_v1",
-    "rsmi_dev_overdrive_level_set": "DeviceSetOverdriveLevel_v2",
-    "rsmi_dev_gpu_clk_freq_set": "DeviceSetClockFrequency",
-    "rsmi_dev_ecc_count_get": "DeviceGetEccCount",
-    "rsmi_dev_ecc_status_get": "DeviceGetEccStatus",
-    "rsmi_dev_ecc_enabled_get": "DeviceGetEccMask",
-    "rsmi_dev_xgmi_error_status": "DeviceXgmiErrorStatus",
-    "rsmi_dev_xgmi_error_reset": "DeviceXgmiErrorReset",
-    "rsmi_dev_xgmi_hive_id_get": "DeviceXgmiHiveId",
-    "rsmi_topo_get_numa_node_number": "DeviceGetNumaNode",
-    "rsmi_topo_get_link_weight": "DeviceGetLinkWeight",
-    "rsmi_minmax_bandwidth_get": "DeviceGetMinMaxBandwidth",
-    "rsmi_topo_get_link_type": "DeviceGetLinkType",
-    "rsmi_is_P2P_accessible": "DeviceIsP2PAccessible",
-    "rsmi_event_notification_init": "DeviceInitEventNotification",
-    "rsmi_event_notification_mask_set": "DeviceSetEventNotificationMask",
-    "rsmi_event_notification_get": "GetEventNotification",
-    "rsmi_event_notification_stop": "DeviceStopEventNotification",
-    "rsmi_dev_counter_group_supported": "DeviceCounterGroupSupported",
-    "rsmi_counter_available_counters_get": "DeviceCounterGetAvailable",
-    "rsmi_dev_counter_create": "DeviceCounterCreate",
-    "rsmi_counter_control": "CounterControl",
-    "rsmi_counter_read": "CounterRead",
-    "rsmi_dev_counter_destroy": "CounterDestroy",
-    "rsmi_compute_process_info_get": "ComputeProcesses",
-    "rsmi_compute_process_info_by_pid_get": "ComputeProcessByPid",
-    "rsmi_compute_process_gpus_get": "ComputeProcessGpus",
+
+var ctoGoFuncMapping = map[string]string{
+	"rsmi_dev_fan_reset":                   "DeviceResetFan",
+	"rsmi_dev_fan_speed_set":               "DeviceSetFanSpeed",
+	"rsmi_dev_volt_metric_get":             "DeviceGetVoltageMetric",
+	"rsmi_dev_temp_metric_get":             "DeviceGetTemperatureMetric",
+	"rsmi_dev_busy_percent_get":            "DeviceGetBusyPercent",
+	"rsmi_utilization_count_get":           "DeviceGetUtilizationCounters",
+	"rsmi_dev_fan_speed_max_get":           "DeviceGetMaxFanSpeed",
+	"rsmi_dev_fan_speed_get":               "DeviceGetFanSpeed",
+	"rsmi_dev_fan_rpms_get":                "DeviceGetFanRpms",
+	"rsmi_dev_memory_reserved_pages_get":   "DeviceGetMemoryReservedPages",
+	"rsmi_dev_memory_busy_percent_get":     "DeviceGetMemoryUtilization",
+	"rsmi_dev_memory_usage_get":            "DeviceGetUsedMemory",
+	"rsmi_dev_memory_total_get":            "DeviceGetTotalMemory",
+	"rsmi_dev_power_profile_set":           "DeviceSetPowerProfile",
+	"rsmi_dev_power_cap_set":               "DeviceSetPowerCap",
+	"rsmi_dev_energy_count_get":            "DeviceGetEnergyCount",
+	"rsmi_dev_power_cap_range_get":         "DeviceGetPowerCapRange",
+	"rsmi_dev_power_cap_default_get":       "DeviceGetDefaultPowerCap",
+	"rsmi_dev_power_cap_get":               "DeviceGetPowerCap",
+	"rsmi_dev_power_ave_get":               "DeviceGetPowerAverage",
+	"rsmi_topo_numa_affinity_get":          "DeviceGetNumaAffinity",
+	"rsmi_dev_pci_replay_counter_get":      "DeviceGetPciReplayCounter",
+	"rsmi_dev_pci_throughput_get":          "DeviceGetPciThroughput",
+	"rsmi_dev_pci_bandwidth_set":           "DeviceSetPciBandwidth",
+	"rsmi_dev_pci_bandwidth_get":           "DeviceGetPciBandwidth",
+	"rsmi_dev_pci_id_get":                  "DeviceGetPciId",
+	"rsmi_dev_unique_id_get":               "DeviceGetUniqueId",
+	"rsmi_dev_drm_render_minor_get":        "DeviceGetDrmRenderMinor",
+	"rsmi_dev_subsystem_id_get":            "DeviceGetSubsystemId",
+	"rsmi_dev_subsystem_name_get":          "DeviceGetSubsystemName",
+	"rsmi_dev_serial_number_get":           "DeviceGetSerial",
+	"rsmi_dev_vram_vendor_get":             "DeviceGetVramVendor",
+	"rsmi_dev_vendor_id_get":               "DeviceGetVendorId",
+	"rsmi_dev_vendor_name_get":             "DeviceGetVendorName",
+	"rsmi_dev_sku_get":                     "DeviceGetSku",
+	"rsmi_dev_name_get":                    "DeviceGetName",
+	"rsmi_dev_brand_get":                   "DeviceGetBrand",
+	"rsmi_dev_perf_level_get":              "DeviceGetPerfLevel",
+	"rsmi_perf_determinism_mode_set":       "DeviceSetDeterminismMode",
+	"rsmi_dev_overdrive_level_get":         "DeviceGetOverdriveLevel",
+	"rsmi_dev_gpu_clk_freq_get":            "DeviceGetClockFrequency",
+	"rsmi_dev_od_volt_info_get":            "DeviceGetVoltageFrequencyCurve",
+	"rsmi_dev_gpu_metrics_info_get":        "DeviceGetMetrics",
+	"rsmi_dev_clk_range_set":               "DeviceSetClockRange",
+	"rsmi_dev_od_clk_info_set":             "DeviceSetClockInfo",
+	"rsmi_dev_od_volt_info_set":            "DeviceSetVoltageInfo",
+	"rsmi_dev_od_volt_curve_regions_get":   "DeviceGetVoltageFrequencyCurveRegions",
+	"rsmi_dev_power_profile_presets_get":   "DeviceGetPowerProfile",
+	"rsmi_dev_perf_level_set":              "DeviceSetPerfLevel_v2",
+	"rsmi_dev_perf_level_set_v1":           "DeviceSetPerfLevel_v1",
+	"rsmi_dev_vbios_version_get":           "DeviceGetVbiosVersionString",
+	"rsmi_dev_firmware_version_get":        "DeviceGetFirmwareVersion",
+	"rsmi_dev_overdrive_level_set_v1":      "DeviceSetOverdriveLevel_v1",
+	"rsmi_dev_overdrive_level_set":         "DeviceSetOverdriveLevel_v2",
+	"rsmi_dev_gpu_clk_freq_set":            "DeviceSetClockFrequency",
+	"rsmi_dev_ecc_count_get":               "DeviceGetEccCount",
+	"rsmi_dev_ecc_status_get":              "DeviceGetEccStatus",
+	"rsmi_dev_ecc_enabled_get":             "DeviceGetEccMask",
+	"rsmi_dev_xgmi_error_status":           "DeviceXgmiErrorStatus",
+	"rsmi_dev_xgmi_error_reset":            "DeviceXgmiErrorReset",
+	"rsmi_dev_xgmi_hive_id_get":            "DeviceXgmiHiveId",
+	"rsmi_topo_get_numa_node_number":       "DeviceGetNumaNode",
+	"rsmi_topo_get_link_weight":            "DeviceGetLinkWeight",
+	"rsmi_minmax_bandwidth_get":            "DeviceGetMinMaxBandwidth",
+	"rsmi_topo_get_link_type":              "DeviceGetLinkType",
+	"rsmi_is_P2P_accessible":               "DeviceIsP2PAccessible",
+	"rsmi_event_notification_init":         "DeviceInitEventNotification",
+	"rsmi_event_notification_mask_set":     "DeviceSetEventNotificationMask",
+	"rsmi_event_notification_get":          "GetEventNotification",
+	"rsmi_event_notification_stop":         "DeviceStopEventNotification",
+	"rsmi_dev_counter_group_supported":     "DeviceCounterGroupSupported",
+	"rsmi_counter_available_counters_get":  "DeviceCounterGetAvailable",
+	"rsmi_dev_counter_create":              "DeviceCounterCreate",
+	"rsmi_counter_control":                 "CounterControl",
+	"rsmi_counter_read":                    "CounterRead",
+	"rsmi_dev_counter_destroy":             "CounterDestroy",
+	"rsmi_compute_process_info_get":        "ComputeProcesses",
+	"rsmi_compute_process_info_by_pid_get": "ComputeProcessByPid",
+	"rsmi_compute_process_gpus_get":        "ComputeProcessGpus",
 }
 
 func bytes2String(bytes []byte) string {
@@ -117,7 +118,7 @@ func bytes2String(bytes []byte) string {
 // NumMonitorDevices gets the number of devices that have monitor information.
 // The number of devices which have monitors is returned. Monitors are
 // referenced by the index which can be between 0 and the returned num_devices - 1.
-// 
+//
 // Returns STATUS_SUCCESS upon successful call.
 func NumMonitorDevices() (int, RSMI_status) {
 	var DeviceCount uint32
@@ -134,8 +135,8 @@ func NumMonitorDevices() (int, RSMI_status) {
 func DeviceGetHandleByIndex(Index int) (DeviceHandle, RSMI_status) {
 	var index uint32 = uint32(Index)
 	handle := DeviceHandle{
-		handle: 0,
-		index:  index,
+		handle:    0,
+		index:     index,
 		supported: nil,
 	}
 	ret := rsmi_dev_id_get(handle.index, &handle.handle)
@@ -167,7 +168,7 @@ func DeviceGetHandleByIndex(Index int) (DeviceHandle, RSMI_status) {
 					handle.supported[name][sensor] = l
 				}
 				if goname, ok := ctoGoFuncMapping[name]; ok {
-				    handle.supported[goname] = handle.supported[name]
+					handle.supported[goname] = handle.supported[name]
 				}
 			}
 		}
@@ -239,12 +240,12 @@ func (Device DeviceHandle) GetName() (string, RSMI_status) {
 	return DeviceGetName(Device)
 }
 
-
 // DeviceGetSku gets the SKU for a device.
 // This function will attempt to obtain the SKU from the Product Information FRU chip, present on server ASICs
 //
 // Note: There are versions of the rocm_smi library which do not export the function rsmi_dev_sku_get. Therefore the bindings
-//       perform a symbol lookup at initialization. If it is not available, the deviceGetSkuFake function is assigned to DeviceGetSku
+//
+//	perform a symbol lookup at initialization. If it is not available, the deviceGetSkuFake function is assigned to DeviceGetSku
 //
 // Returns STATUS_SUCCESS when call was successful.
 // Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
@@ -271,7 +272,8 @@ func deviceGetSkuFake(Device DeviceHandle) (uint16, RSMI_status) {
 // This function will attempt to obtain the SKU from the Product Information FRU chip, present on server ASICs
 //
 // Note: There are versions of the rocm_smi library which do not export the function rsmi_dev_sku_get. Therefore the bindings
-//       perform a symbol lookup at initialization. If it is not available, the deviceGetSkuFake function is assigned to DeviceGetSku
+//
+//	perform a symbol lookup at initialization. If it is not available, the deviceGetSkuFake function is assigned to DeviceGetSku
 //
 // Returns STATUS_SUCCESS when call was successful.
 // Returns STATUS_NOT_SUPPORTED when installed software or hardware does not support this function with the given arguments.
@@ -325,7 +327,6 @@ func DeviceGetVendorId(Device DeviceHandle) (uint16, RSMI_status) {
 	ret := rsmi_dev_vendor_id_get(Device.index, &id)
 	return id, ret
 }
-
 
 // GetVendorId gets the device vendor id associated with the device
 //
@@ -467,7 +468,6 @@ func (Device DeviceHandle) GetDrmRenverMinor() (uint32, RSMI_status) {
 	return DeviceGetDrmRenderMinor(Device)
 }
 
-
 // DeviceGetUniqueId gets Unique ID
 //
 // STATUS_SUCCESS call was successful.
@@ -516,9 +516,9 @@ func (Device DeviceHandle) GetPciId() (uint64, RSMI_status) {
 
 type Pci_info struct {
 	Domain   uint32 // PCI domain
-	Bus      uint8 // PCI bus
-	Device   uint8 // PCI device
-	Function uint8 // PCI function
+	Bus      uint8  // PCI bus
+	Device   uint8  // PCI device
+	Function uint8  // PCI function
 }
 
 // DeviceGetPciInfo gets the unique PCI device identifier associated with the device split into its parts: PCI domain, PCI bus, PCI device and function.
@@ -562,10 +562,10 @@ func (Device DeviceHandle) GetPciInfo() (Pci_info, RSMI_status) {
 //
 // STATUS_SUCCESS call was successful.
 func DeviceGetPciBandwidth(Device DeviceHandle) (RSMI_pcie_bandwidth, RSMI_status) {
-	var info RSMI_pcie_bandwidth = RSMI_pcie_bandwidth {
-		Rate : RSMI_frequencies {
+	var info RSMI_pcie_bandwidth = RSMI_pcie_bandwidth{
+		Rate: RSMI_frequencies{
 			Num_supported: 0,
-			Current: 0,
+			Current:       0,
 		},
 	}
 	if _, ok := Device.supported["rsmi_dev_pci_bandwidth_get"]; !ok {
@@ -1238,11 +1238,11 @@ func DeviceGetUtilizationCounters(Device DeviceHandle) ([]RSMI_utilization_count
 	var util []RSMI_utilization_counter
 	var timestamp uint64
 	var count uint32 = uint32(UTILIZATION_COUNTER_LAST - UTILIZATION_COUNTER_FIRST + 1)
-	util = make([]RSMI_utilization_counter, 0 )
+	util = make([]RSMI_utilization_counter, 0)
 	if _, ok := Device.supported["rsmi_utilization_count_get"]; ok {
 		for i := int(UTILIZATION_COUNTER_FIRST); i <= int(UTILIZATION_COUNTER_LAST); i++ {
 			util = append(util, RSMI_utilization_counter{
-				Type: uint32(i),
+				Type:  uint32(i),
 				Value: 0,
 			})
 		}
@@ -1347,7 +1347,7 @@ func (Device DeviceHandle) GetOverdriveLevel() (uint32, RSMI_status) {
 func DeviceGetClockFrequency(Device DeviceHandle, Clock RSMI_clk_type) (RSMI_frequencies, RSMI_status) {
 	var freqs RSMI_frequencies = RSMI_frequencies{
 		Num_supported: 0,
-		Current: 0,
+		Current:       0,
 	}
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	if sensors, ok := Device.supported["rsmi_dev_gpu_clk_freq_get"]; ok {
@@ -1459,7 +1459,7 @@ func DeviceSetClockRange(Device DeviceHandle, MinFreq uint64, MaxFreq uint64, Cl
 			}
 		}
 	}
-	
+
 	return ret
 }
 
@@ -1501,9 +1501,9 @@ func (Device DeviceHandle) SetClockInfo(Level RSMI_freq_ind, ClockFreq uint64, C
 // STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
 // STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceSetVoltageInfo(Device DeviceHandle, Vpoint uint32, ClockFreq uint64, Voltage uint64) RSMI_status {
-    if Vpoint < 1 || Vpoint > 3 {
-        return STATUS_NOT_SUPPORTED
-    }
+	if Vpoint < 1 || Vpoint > 3 {
+		return STATUS_NOT_SUPPORTED
+	}
 	ret := rsmi_dev_od_volt_info_set(Device.index, Vpoint, ClockFreq, Voltage)
 	return ret
 }
@@ -1552,8 +1552,8 @@ func (Device DeviceHandle) GetVoltageFrequencyCurveRegions() ([]RSMI_freq_volt_r
 func DeviceGetPowerProfile(Device DeviceHandle, Sensor uint32) (RSMI_power_profile_status, RSMI_status) {
 	var status RSMI_power_profile_status = RSMI_power_profile_status{
 		Available_profiles: 0,
-		Current: 0,
-		Num_profiles: 0,
+		Current:            0,
+		Num_profiles:       0,
 	}
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
 	// Seems to be not listed by rsmi_dev_supported_func_iterator
@@ -1583,7 +1583,8 @@ func (Device DeviceHandle) GetPowerProfile(Sensor uint32) (RSMI_power_profile_st
 // DeviceSetPerfLevel set the PowerPlay performance level associated with the device.
 //
 // Note: The RSMI library provides two functions to set the performance level. Which function is called by DeviceSetPerfLevel is
-//       determined at initialization.
+//
+//	determined at initialization.
 //
 // STATUS_SUCCESS call was successful.
 // STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
@@ -1607,7 +1608,8 @@ func deviceSetPerfLevel_v1(Device DeviceHandle, Level RSMI_dev_perf_level) RSMI_
 // SetPerfLevel set the PowerPlay performance level associated with the device.
 //
 // Note: The RSMI library provides two functions to set the performance level. Which function is called by SetPerfLevel is
-//       determined at initialization.
+//
+//	determined at initialization.
 //
 // STATUS_SUCCESS call was successful.
 // STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
@@ -1619,13 +1621,13 @@ func (Device DeviceHandle) SetPerfLevel(Level RSMI_dev_perf_level) RSMI_status {
 // DeviceSetOverdriveLevel sets the overdrive percent associated with the device.
 //
 // Note: The RSMI library provides two functions to set the overdrive level. Which function is called by DeviceSetOverdriveLevel is
-//       determined at initialization.
+//
+//	determined at initialization.
 //
 // STATUS_SUCCESS call was successful.
 // STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
 // STATUS_PERMISSION function requires root access.
 var DeviceSetOverdriveLevel = deviceSetOverdriveLevel_v1
-
 
 func deviceSetOverdriveLevel_v2(Device DeviceHandle, Overdrive uint32) RSMI_status {
 	ret := rsmi_dev_overdrive_level_set(Device.index, Overdrive)
@@ -1641,7 +1643,8 @@ func deviceSetOverdriveLevel_v1(Device DeviceHandle, Overdrive uint32) RSMI_stat
 // SetOverdriveLevel sets the overdrive percent associated with the device.
 //
 // Note: The RSMI library provides two functions to set the overdrive level. Which function is called by SetOverdriveLevel is
-//       determined at initialization.
+//
+//	determined at initialization.
 //
 // STATUS_SUCCESS call was successful.
 // STATUS_NOT_SUPPORTED installed software or hardware does not support this function with the given arguments.
@@ -1729,7 +1732,7 @@ func (Device DeviceHandle) GetFirmwareVersion(Block RSMI_fw_block) (uint64, RSMI
 // STATUS_INVALID_ARGS the provided arguments are not valid.
 func DeviceGetEccCount(Device DeviceHandle, Block RSMI_gpu_block) (RSMI_error_count, RSMI_status) {
 	var counts RSMI_error_count = RSMI_error_count{
-		Correctable_err: 0,
+		Correctable_err:   0,
 		Uncorrectable_err: 0,
 	}
 	var ret RSMI_status = STATUS_NOT_SUPPORTED
@@ -1810,8 +1813,6 @@ func DeviceGetEccMask(Device DeviceHandle) (uint64, RSMI_status) {
 func (Device DeviceHandle) GetEccMask() (uint64, RSMI_status) {
 	return DeviceGetEccMask(Device)
 }
-
-
 
 // XGMI Functions
 
@@ -1976,7 +1977,6 @@ func DeviceIsP2PAccessible(SrcDevice DeviceHandle, DstDevice DeviceHandle) (bool
 func (Device DeviceHandle) IsP2PAccessible(DstDevice DeviceHandle) (bool, RSMI_status) {
 	return DeviceIsP2PAccessible(Device, DstDevice)
 }
-
 
 // Event Notification Functions
 
