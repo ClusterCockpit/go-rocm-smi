@@ -95,8 +95,14 @@ type RSMI_od_volt_freq_data struct {
 	Pad_cgo_0		[4]byte
 }
 
+type Metrics_table_header struct {
+	Structure_size		uint16
+	Format_revision		uint8
+	Content_revision	uint8
+}
+
 type RSMI_gpu_metrics struct {
-	Common_header			_Ctype_struct_metrics_table_header_t
+	Common_header			Metrics_table_header
 	Temperature_edge		uint16
 	Temperature_hotspot		uint16
 	Temperature_mem			uint16
@@ -161,7 +167,7 @@ type RSMI_gpu_metrics struct {
 	Vr_thm_residency_acc		uint64
 	Hbm_thm_residency_acc		uint64
 	Num_partition			uint16
-	Xcp_stats			[8]_Ctype_struct_amdgpu_xcp_metrics_t
+	Xcp_stats			[8]Amdgpu_xcp_metrics
 	Pcie_lc_perf_other_end_recovery	uint32
 	Vram_max_bandwidth		uint64
 	Xgmi_link_status		[8]uint16
@@ -212,4 +218,12 @@ type RSMI_helper_function_variants struct {
 type RSMI_helper_function struct {
 	Functions	int32
 	Functionlist	[300]RSMI_helper_function_variants
+}
+
+type Amdgpu_xcp_metrics struct {
+	Gfx_busy_inst			[8]uint32
+	Jpeg_busy			[32]uint16
+	Vcn_busy			[4]uint16
+	Gfx_busy_acc			[8]uint64
+	Gfx_below_host_limit_acc	[8]uint64
 }
