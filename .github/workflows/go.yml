@@ -17,12 +17,16 @@ jobs:
     - name: Install software
       run: sudo apt install golang libdrm-dev
 
+    # The reason we use that specific commit hash is the following:
+    # Today (2026-03-31) the latest stable release v1.3.0 handles
+    # 'typedef struct foo * foo;' wrongly. So use the bleeding edge
+    # version, which has a fix that we need.
     - name: Install c-for-go
       run: |
-         export PATH=$(go env GOTOOLDIR):$PATH
          go mod download github.com/NVIDIA/go-nvml
-         go get github.com/xlab/c-for-go
-         go install github.com/xlab/c-for-go
+         go get github.com/xlab/c-for-go@6dd1c017f91eea5364499f7926d94583eaddaadb
+         go install github.com/xlab/c-for-go@6dd1c017f91eea5364499f7926d94583eaddaadb
+         sudo cp $(go env GOPATH)/bin/c-for-go /usr/local/bin
    
     - name: Get depdencies
       run: go get
