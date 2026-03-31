@@ -1,5 +1,4 @@
 CFORGO = c-for-go
-CGO = $(shell go env GOTOOLDIR)/cgo
 PKG_DIR = $(shell readlink -f pkg)
 
 .PHONY: all
@@ -19,7 +18,7 @@ generate:
 		    rocm_smi/rocm_smi.h.orig > rocm_smi/rocm_smi.h
 	cd pkg/rocm_smi && $(CFORGO) -ccincl -ccdefs -out $(PKG_DIR) ../../rocm_smi.yml
 	cd pkg/rocm_smi && \
-		$(CGO) -godefs types.go > types.go.expand && \
+		go tool cgo -godefs types.go > types.go.expand && \
 		mv types.go.expand types.go && \
 		rm -f _cgo_2.o
 	cd pkg/rocm_smi && \
