@@ -10,23 +10,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        golang-ver:
-          - 1.25
     steps:
     - uses: actions/checkout@v3
 
     # libdrm is required by kfd_ioctl.h
-    # build-essential is required in order to avoid 'cannot find import "C"' in CI
-    - name: Install libdrm-dev and build-essential
-      run: sudo apt install libdrm-dev build-essential
-
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: ${{matrix.golang-ver}}
+    - name: Install software
+      run: sudo apt install golang libdrm-dev
 
     - name: Install c-for-go
       run: |
