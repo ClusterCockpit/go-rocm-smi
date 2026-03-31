@@ -1,6 +1,7 @@
 CFORGO = c-for-go
 CGO = $(shell go env GOTOOLDIR)/cgo
 
+.PHONY: all
 all: generate
 
 UINT64_TYPE = uint64_t
